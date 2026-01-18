@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script src="https://unpkg.com/html5-qrcode"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Howie GO</title>
@@ -62,6 +63,40 @@ input {
   display: flex;
   justify-content: space-between;
 }
+/* Contenedor del escáner */
+#reader {
+  width: 100% !important;
+  max-width: 350px;
+  margin: 15px auto;
+  border: 4px solid #fbc02d; /* Color amarillo Howie */
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* El video dentro del escáner */
+#reader video {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Botón de Escanear (para que resalte) */
+#btnAbrirScanner {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 30px;
+  border: none;
+  background: #fbc02d;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+#btnAbrirScanner:active {
+  transform: scale(0.95);
+}
 </style>
 </head>
 
@@ -108,9 +143,12 @@ input {
 
   <div class="card">
     <div id="estado1">
-      <p id="textoEstado1" style="font-style: italic; background: #e3f2fd; padding: 15px; border-radius: 10px;"></p>
-      <button onclick="mostrarEstado(2)" class="btn-principal">📷 YA ENCONTRÉ EL QR</button>
-    </div>
+  <p id="textoEstado1"></p> <button id="btnAbrirScanner" onclick="iniciarEscaneo()" style="background: #fbc02d; color: #333; font-weight: bold;">
+    📷 ESCANEAR QR DE HOWIE
+  </button>
+
+  <div id="reader" style="width: 100%; margin-top: 15px; border-radius: 10px; overflow: hidden; display: none;"></div>
+</div>
 
     <div id="estado2" style="display:none;">
     <p id="textoEstado2" style="background: #f1f8e9; padding: 15px; border-radius: 10px;"></p>
@@ -526,20 +564,26 @@ window.onload = () => {
     player = JSON.parse(saved);
     iniciarHome(); // Esto muestra el saludo y el progreso
 
-    // Lógica del QR: Solo se activa si el jugador ya existe
+    // Lógica del QR
     const urlParams = new URLSearchParams(window.location.search);
     const zonaDesdeQR = urlParams.get('zona');
     
     if (zonaDesdeQR) {
-        // Borramos el rastro del QR de la barrita de arriba para que no moleste
+        // 1. Limpiamos la URL para que no moleste el parámetro al refrescar
         window.history.replaceState({}, document.title, window.location.pathname);
         
-        // Verificamos si la zona del QR es la que le toca (donde está la estrella)
-        if (zonaDesdeQR === player.actualNombre) {
-            entrarZona(zonaDesdeQR); // Lo lleva directo a la misión
+        // 2. Limpiamos el nombre: cambiamos guiones por espacios 
+        // Ejemplo: "Maquina-de-Espuma" pasa a ser "Maquina de Espuma"
+        const zonaLimpia = zonaDesdeQR.replace(/-/g, " ");
+        
+        // 3. Verificamos si la zona del QR es donde está la estrella actual
+        // Usamos toLowerCase() para que no importe si hay mayúsculas distintas
+        if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
+            entrarZona(player.actualNombre); 
+            mostrarEstado(2); // Lo lleva directo al desafío (Estado 2)
         } else {
-            // Si escaneó uno que no le tocaba, le avisamos sin sacarlo del mapa
-            alert(`¡Hola! Howie dice que todavía no es momento de ir a "${zonaDesdeQR}". Tu estrella ⭐ te espera en "${player.actualNombre}".`);
+            // Si escaneó uno que no le tocaba, le avisamos
+            alert(`¡Hola! Howie dice que todavía no es momento de ir a "${zonaLimpia}". Tu estrella ⭐ te espera en "${player.actualNombre}".`);
             irA('mapa-screen');
         }
     }
@@ -559,6 +603,62 @@ function pedirAyuda() {
   
   const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
   window.open(url, '_blank');
+}
+let html5QrCode;
+
+function iniciarEscaneo() {
+    // Mostramos el visor y ocultamos el botón
+    document.getElementById('reader').style.display = 'block';
+    document.getElementById('btnAbrirScanner').style.display = 'none';
+
+    html5QrCode = new Html5Qrcode("reader");
+    
+    const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0 
+    };
+
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        config,
+        (decodedText) => {
+            // El QR trae la URL completa: https://equipodecreacion.github.io/HowieGo/?zona=Lobby
+            try {
+                const url = new URL(decodedText);
+                const zonaParam = url.searchParams.get("zona");
+                
+                if (zonaParam) {
+                    const zonaLimpia = zonaParam.replace(/-/g, " ");
+
+                    if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
+                        detenerEscaneo();
+                        // ¡Éxito! Como ya estamos en la zona, solo pasamos al desafío
+                        mostrarEstado(2); 
+                    } else {
+                        alert(`Howie dice: "Ese QR es de ${zonaLimpia}, pero tu estrella está en ${player.actualNombre}"`);
+                        detenerEscaneo();
+                    }
+                }
+            } catch (e) {
+                alert("Este no parece ser un código de Howie.");
+            }
+        },
+        (errorMessage) => { /* Ignorar errores de escaneo constante */ }
+    ).catch(err => {
+        alert("No se pudo abrir la cámara. Asegurate de dar permisos.");
+        document.getElementById('reader').style.display = 'none';
+        document.getElementById('btnAbrirScanner').style.display = 'block';
+    });
+}
+
+function detenerEscaneo() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+            document.getElementById('reader').style.display = 'none';
+            document.getElementById('btnAbrirScanner').style.display = 'block';
+        });
+    }
 }
 </script>
 
