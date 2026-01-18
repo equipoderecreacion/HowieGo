@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Howie GO</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+}
+
+.screen {
+  display: none;
+  padding: 20px;
+}
+
+.screen.active {
+  display: block;
+}
+
+.card {
+  background: white;
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-main {
+  background: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+input {
+  width: 90%;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.zona-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="screen active">
+  <div class="card">
+    <h1>Howie GO</h1>
+    <input id="inputNombre" placeholder="Tu nombre">
+    <input id="inputHabitacion" placeholder="Habitación">
+    <button class="btn-main" id="loginBtn">COMENZAR</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home-screen" class="screen">
+  <div class="card">
+    <h2 id="saludo"></h2>
+    <p id="progreso">Progreso: 0 / 15</p>
+
+    <button class="btn-main" onclick="irA('mapa-screen')">🗺️ MAPA</button>
+    <button onclick="irA('album-screen')">📘 ÁLBUM</button>
+    <button onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- MAPA -->
+<div id="mapa-screen" class="screen">
+  <div class="card">
+    <h2>Mapa</h2>
+    <div id="listaZonas"></div>
+    <button onclick="irA('home-screen')">⬅ Volver</button>
+  </div>
+</div>
+
+<!-- ZONA -->
+<div id="zona-screen" class="screen">
+  <header>
+    <button onclick="irA('mapa-screen')">⬅ Volver</button>
+    <h3 id="zonaTitulo"></h3>
+    <div style="width:50px;"></div>
+  </header>
+
+  <div class="card">
+    <div id="estado1">
+      <p id="textoEstado1" style="font-style: italic; background: #e3f2fd; padding: 15px; border-radius: 10px;"></p>
+      <button onclick="mostrarEstado(2)" class="btn-principal">📷 YA ENCONTRÉ EL QR</button>
+    </div>
+
+    <div id="estado2" style="display:none;">
+    <p id="textoEstado2" style="background: #f1f8e9; padding: 15px; border-radius: 10px;"></p>
+    
+    <div id="seccionFoto" style="display:none; margin-bottom: 15px; text-align: center;">
+      <label for="fotoInput" style="display: block; background: #673ab7; color: white; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold;">
+          📸 SACAR FOTO DEL DESAFÍO
+      </label>
+      <input type="file" id="fotoInput" accept="image/*" capture="camera" style="display:none;" onchange="previsualizarFoto(this)">
+      
+      <div id="previewContenedor" style="margin-top: 10px; display:none;">
+          <img id="fotoPreview" src="" style="width: 100%; border-radius: 10px; border: 3px solid #673ab7;">
+          <p style="font-size: 12px; color: #666;">¡Buena foto! Ahora pedile el código a Howie por chat.</p>
+      </div>
+    </div>
+
+    <input type="text" id="respuestaInput" placeholder="Escribí aquí...">
+    <button onclick="validarRespuesta()" class="btn-principal">VALIDAR</button>
+</div>
+
+    <div id="estado3" style="display:none;">
+      <h3>¡CONSEGUIDO!</h3>
+      <div style="font-size: 50px;">🖼️</div>
+      <button onclick="obtenerRecompensa()" class="btn-principal">SIGUIENTE MISIÓN</button>
+    </div>
+
+    <hr style="margin-top: 20px; border: 0; border-top: 1px solid #eee;">
+    <button id="btnAyuda" onclick="pedirAyuda()" style="background: #25D366; color: white; font-weight: bold; border-radius: 50px; margin-top: 10px;">
+      💬 PEDIR AYUDA A HOWIE
+    </button>
+  </div>
+</div>
+
+<!-- ÁLBUM -->
+<div id="album-screen" class="screen">
+  <header>
+    <button onclick="irA('home-screen')">⬅ Volver</button>
+    <h3>Mi Álbum de Howie</h3>
+    <div style="width:50px;"></div>
+  </header>
+  
+  <div class="album-container" id="contenedorFiguritas">
+    </div>
+</div>
+
+<style>
+  .album-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+    gap: 10px;
+    padding: 15px;
+  }
+  .figurita {
+    aspect-ratio: 1/1;
+    background: #f0f0f0;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .figurita.ganada {
+    border: 2px solid #fbc02d;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    animation: aparecer 0.5s ease-out;
+  }
+  .figurita img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none; /* Se muestra solo si está ganada */
+  }
+  .figurita.ganada img {
+    display: block;
+  }
+  .figurita.ganada .candado {
+    display: none;
+  }
+  @keyframes aparecer {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+</style>
+
+<script>
+/* =====================
+   DATOS DEL JUEGO
+===================== */
+const zonasVisuales = [
+  "Bicis", "Lobby", "Máquina de Espuma", "Tirolesa", "Resto", 
+  "Quinchos","Arquería", "Patio cervecero", "Escaleras", "Camastros",
+  "Kids", "Plaza", "Estatuas", "Pileta", "Plays"
+];
+
+const circuitoOculto = [
+  "Plaza", "Máquina de Espuma", "Bicis", "Tirolesa", "Quinchos", "Camastros", 
+  "Arquería", "Kids", "Pileta", "Resto", "Lobby", 
+  "Plays", "Escaleras", "Estatuas", "Patio cervecero"
+];
+
+const zonasData = {
+  "Bicis": {
+    e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas. Encontrá el QR para continuar.",
+    e2: "Howie estuvo contando rayos y pedales. Dice que para los más aventureros, el equilibrio es un arte. ¿Cuántas bicicletas con rueditas de aprendizaje ves acá?",
+    respuestasValidas: ["ninguna", "cero", "0", "no hay", "0 rueditas"],
+    tipo: "auto"
+  },
+  "Lobby": {
+    e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.",
+    e2: "A Howie le preocupa el tiempo. Se quedó mirando el reloj y se pregunta: ¿A qué hora es el último adiós a la habitación?",
+    respuestasValidas: ["diez", "10", "10:00", "10 am", "las diez"],
+    tipo: "auto"
+  },
+  "Máquina de Espuma": {
+    e1: "Howie escuchó un rumor: que acá las nubes caen al suelo y te permiten bailar entre burbujas. Encontrá el QR para continuar.",
+    e2: "Howie dice que para que la espuma sea perfecta, hay que ponerle ritmo. Sacate una foto simulando estar en una fiesta. Enviársela a Howie.",
+    respuesta: "FIESTA",
+    tipo: "foto"
+  },
+  "Tirolesa": {
+    e1: "Howie dice que el miedo se queda abajo, pero el coraje te hace volar. Encontrá el QR para continuar.",
+    e2: "Howie quiere verte volar. Ponete en posición, estirá los brazos y sacate una foto simulando que estás cruzando el cielo a toda velocidad.",
+    respuesta: "VUELO",
+    tipo: "foto"
+  },
+  "Quinchos": {
+    e1: "Howie busca la sombra de los techos de paja. Es el lugar donde los grupos se reúnen a compartir cuando el sol calienta. Encontrá el QR para continuar.",
+    e2: "Howie se quedó en la sombra, mirando hacia arriba, su numero favorito ahí aparecía ¿sabes cual es?",
+    respuestasValidas: ["ocho", "8"],
+    tipo: "auto"
+  },
+  "Resto": {
+    e1: "Howie dice que es su lugar favorito, lo que más le gusta es compartir en familia, repasar las anécdotas y que no falten las risas.",
+    e2: "Howie es un gran comensal. Para saber cuál es su plato favorito, en la carta de pizza contá hasta 3.",
+    respuestasValidas: ["especial", "la especial", "pizza especial"],
+    tipo: "auto"
+  },
+  "Arquería": {
+    e1: "Howie dice que la paciencia es como una flecha: cuanto más la tensás, más lejos llegás. Encontrá el QR para continuar.",
+    e2: "Howie estuvo mirando los círculos que nunca terminan: ¿Cuál es el de más valor?",
+    respuestasValidas: ["amarillo", "el amarillo", "centro", "el centro"],
+    tipo: "auto"
+  },
+  "Patio cervecero": {
+    e1: "Howie busca la brisa de la tarde y el tintineo de los vasos fríos. Bajo las luces, las historias se cuentan mejor. Encontrá el QR para continuar.",
+    e2: "Howie dice que el suelo está lleno de tesoros pequeños. Usá las piedritas para formar la inicial de la persona que atiende el foodtruck.",
+    respuesta: "PIEDRA",
+    tipo: "foto"
+  },
+  "Escaleras": {
+    e1: "Howie siempre se detiene un momento antes de subir. Dice que desde acá las cosas se ven distintas… Encontrá el QR para continuar.",
+    e2: "Howie se queda justo donde el esfuerzo afloja. Desde ahí, los colores cuentan historias de la ciudad. Tomale una foto y envíasela a Howie.",
+    respuesta: "VISTA",
+    tipo: "foto"
+  },
+  "Camastros": {
+    e1: "Howie encontró el lugar donde el tiempo se detiene y el sol te abraza en silencio. Encontrá el QR para continuar.",
+    e2: "No siempre es el lugar más ruidoso, pero cuando algo importante pasa, todas las miradas terminan ahí. ¿Sabés qué es?",
+    respuestasValidas: ["escenario", "el escenario", "la tarima"],
+    tipo: "auto"
+  },
+  "Kids": {
+    e1: "Howie se siente chiquito otra vez, así que acá se pone a jugar. Encontrá el QR para continuar.",
+    e2: "Tiene cuatro patas, cuida este lugar sin hablar, y cuando esta contento mueve la cola sin parar.",
+    respuestasValidas: ["perro", "perros", "perrito", "perritos", "el perro"],
+    tipo: "auto"
+  },
+  "Plaza": {
+    e1: "Howie sigue el rastro de la arena y el sonido de los saltos. Encontrá el QR para continuar.",
+    e2: "Sube a lo mas alto y desde ahí cuenta cuantos balcones tiene el edificio frente a ti.",
+    respuestasValidas: ["16", "dieceis", "dieciséis"],
+    tipo: "auto"
+  },
+  "Estatuas": {
+    e1: "Howie se detiene frente a figuras que no se mueven, pero son centro de atracción. Encontrá el QR para continuar.",
+    e2: "El guerrero protege un mensaje. La aprobación está escrita más de una vez. Decinos qué siglas ves.",
+    respuestasValidas: ["aprobado por o.s.n.", "aprobado por osn", "osn", "o.s.n."],
+    tipo: "auto"
+  },
+  "Pileta": {
+    e1: "Acá todo es diversión. Howie se acuerda de una regla importante: acá se juega… pero no se corre 😉 Encontrá el QR para continuar.",
+    e2: "No se mete a jugar, pero cuida el juego. Está siempre atento mientras otros chapotean. ¿Quién es?",
+    respuestasValidas: ["guardavidas", "el guardavidas", "bañero", "el bañero", "socorrista"],
+    tipo: "auto"
+  },
+  "Plays": {
+    e1: "Howie se dejó llevar por las luces parpadeantes y los sonidos de victoria. Encontrá el QR para continuar.",
+    e2: "Famoso soy, en lo alto estoy, si queres completar el desafío deci que personaje soy.",
+    respuestasValidas: ["cronos", "kronos"],
+    tipo: "auto"
+  }
+};
+ 
+
+let player = {
+  nombre: "",
+  habitacion: "",
+  actualNombre: "", 
+  completadas: []
+};
+
+/* =====================
+   NAVEGACIÓN
+===================== */
+function irA(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const target = document.getElementById(id);
+  if(target) target.classList.add("active");
+  if (id === "mapa-screen") renderMapa();
+}
+
+/* =====================
+   LOGIN
+===================== */
+// Usamos addEventListener para asegurar que el botón funcione
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const n = document.getElementById("inputNombre").value.trim();
+  const h = document.getElementById("inputHabitacion").value.trim();
+  
+  if (!n || !h) {
+    alert("Por favor, completá nombre y habitación");
+    return;
+  }
+
+  player.nombre = n;
+  player.habitacion = h;
+  player.completadas = [];
+  
+  // Selección inicial aleatoria del circuito oculto
+  const inicioAzar = Math.floor(Math.random() * circuitoOculto.length);
+  player.actualNombre = circuitoOculto[inicioAzar];
+
+  localStorage.setItem("howie", JSON.stringify(player));
+  iniciarHome();
+});
+
+function iniciarHome() {
+  document.getElementById("saludo").innerText = `¡Hola ${player.nombre}!`;
+  document.getElementById("progreso").innerText = `Progreso: ${player.completadas.length} / 15`;
+  irA("home-screen");
+}
+
+/* =====================
+   MAPA (Aquí se genera la Estrella)
+===================== */
+function renderMapa() {
+  const listaContenedor = document.getElementById("listaZonas");
+  listaContenedor.innerHTML = "";
+
+  zonasVisuales.forEach((z) => {
+    const div = document.createElement("div");
+    div.className = "zona-item";
+    div.style.padding = "15px";
+    div.style.margin = "10px 0";
+    div.style.borderRadius = "10px";
+    div.style.display = "flex";
+    div.style.justifyContent = "space-between";
+    div.style.alignItems = "center";
+    div.style.border = "1px solid #ddd";
+
+    // LÓGICA DE LA ESTRELLA
+    if (z === player.actualNombre) {
+      div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
+      div.style.border = "2px solid #fbc02d";
+      div.style.background = "#fff9c4";
+      div.style.cursor = "pointer";
+      div.onclick = () => entrarZona(z);
+    } else if (player.completadas.includes(z)) {
+      div.innerHTML = `<span>✔ ${z}</span> <span style="color:green; font-size:12px;">Completado</span>`;
+      div.style.background = "#e8f5e9";
+    } else {
+      div.innerHTML = `<span>🔒 ${z}</span>`;
+      div.style.opacity = "0.5";
+      div.style.background = "#f5f5f5";
+    }
+    listaContenedor.appendChild(div);
+  });
+}
+
+function renderAlbum() {
+  const contenedor = document.getElementById("contenedorFiguritas");
+  contenedor.innerHTML = "";
+
+  zonasVisuales.forEach(zona => {
+    const div = document.createElement("div");
+    const estaCompletada = player.completadas.includes(zona);
+    div.className = `figurita ${estaCompletada ? 'ganada' : ''}`;
+    
+    // Aquí pondrías la imagen real. Si no tenés una por zona, 
+    // podés usar un emoji o una imagen genérica por ahora.
+    if(estaCompletada) {
+      div.innerHTML = `<img src="img/figus/${zona}.jpg" alt="${zona}">
+                       <div style="position:absolute; bottom:0; background:rgba(255,255,255,0.8); width:100%;">${zona}</div>`;
+    } else {
+      div.innerHTML = `<div class="candado">🔒</div><div style="color:#aaa">${zona}</div>`;
+    }
+    contenedor.appendChild(div);
+  });
+}
+
+// Asegúrate de que al ir al álbum se ejecute el render
+// Modifica tu función irA:
+function irA(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if (id === "mapa-screen") renderMapa();
+  if (id === "album-screen") renderAlbum(); // <--- Agregado
+}
+/* =====================
+   ZONA Y VALIDACIÓN
+===================== */
+function entrarZona(zona) {
+  const data = zonasData[zona];
+  document.getElementById("zonaTitulo").innerText = zona;
+  document.getElementById("textoEstado1").innerText = data?.e1 || "Buscá el QR.";
+  document.getElementById("textoEstado2").innerText = data?.e2 || "Resolvé el desafío.";
+  
+  // Mostramos u ocultamos la sección de foto según el tipo
+  document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
+  
+  // Limpiamos todo lo anterior
+  document.getElementById("previewContenedor").style.display = "none";
+  document.getElementById("respuestaInput").value = "";
+  document.getElementById("fotoInput").value = "";
+
+  mostrarEstado(1);
+  irA("zona-screen");
+}
+
+function mostrarEstado(n) {
+  document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
+  document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
+  document.getElementById("estado3").style.display = n === 3 ? "block" : "none";
+  
+  // Ocultamos el botón de ayuda solo si ya ganó (Estado 3)
+  document.getElementById("btnAyuda").style.display = n === 3 ? "none" : "block";
+}
+
+function validarRespuesta() {
+  const r = document.getElementById("respuestaInput").value.trim().toUpperCase();
+  const data = zonasData[player.actualNombre];
+  
+  if(!data) return;
+
+  let esCorrecto = false;
+
+  if (data.tipo === "foto") {
+    // Busca la palabra clave específica de cada zona (FIESTA, VUELO, VISTA, etc.)
+    esCorrecto = (r === data.respuesta.toUpperCase());
+  } else {
+    // Lógica automática para las preguntas
+    esCorrecto = data.respuestasValidas.some(res => r.toLowerCase().includes(res.toLowerCase()));
+  }
+
+  if (esCorrecto) {
+    mostrarEstado(3);
+  } else {
+    alert("¡Howie dice que ese no es el código o respuesta correcta! Intentá de nuevo o pedí ayuda.");
+  }
+}
+
+// Función para la previsualización de la imagen
+function previsualizarFoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById("fotoPreview").src = e.target.result;
+      document.getElementById("previewContenedor").style.display = "block";
+      
+      // CAMBIO DE TEXTO EN EL BOTÓN
+      const btn = document.getElementById("btnAyuda");
+      btn.innerHTML = "✅ ENVIAR ESTA FOTO POR WHATSAPP";
+      btn.style.background = "#25D366"; 
+      btn.style.animation = "pulse 1s infinite"; // Opcional: un brillito para que lo toque
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function obtenerRecompensa() {
+  if (!player.completadas.includes(player.actualNombre)) {
+    player.completadas.push(player.actualNombre);
+  }
+
+  // SALTO CIRCULAR
+  const posOculta = circuitoOculto.indexOf(player.actualNombre);
+  const siguientePos = (posOculta + 1) % circuitoOculto.length;
+  player.actualNombre = circuitoOculto[siguientePos];
+
+  localStorage.setItem("howie", JSON.stringify(player));
+  document.getElementById("respuestaInput").value = ""; // Limpiar input
+  iniciarHome();
+}
+
+function cerrarSesion() {
+  if(confirm("¿Cerrar sesión? Se perderá el progreso.")) {
+    localStorage.removeItem("howie");
+    location.reload();
+  }
+}
+
+// AUTOLOAD
+window.onload = () => {
+  const saved = localStorage.getItem("howie");
+  
+  if (saved) {
+    player = JSON.parse(saved);
+    iniciarHome(); // Esto muestra el saludo y el progreso
+
+    // Lógica del QR: Solo se activa si el jugador ya existe
+    const urlParams = new URLSearchParams(window.location.search);
+    const zonaDesdeQR = urlParams.get('zona');
+    
+    if (zonaDesdeQR) {
+        // Borramos el rastro del QR de la barrita de arriba para que no moleste
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Verificamos si la zona del QR es la que le toca (donde está la estrella)
+        if (zonaDesdeQR === player.actualNombre) {
+            entrarZona(zonaDesdeQR); // Lo lleva directo a la misión
+        } else {
+            // Si escaneó uno que no le tocaba, le avisamos sin sacarlo del mapa
+            alert(`¡Hola! Howie dice que todavía no es momento de ir a "${zonaDesdeQR}". Tu estrella ⭐ te espera en "${player.actualNombre}".`);
+            irA('mapa-screen');
+        }
+    }
+  }
+};
+
+function pedirAyuda() {
+  const numero = "5493544582547";
+  const tieneFoto = document.getElementById("fotoInput").files.length > 0;
+  
+  let mensaje = "";
+  if (tieneFoto) {
+    mensaje = `¡Hola Howie! Soy ${player.nombre}. Acá te mando la foto del desafío de ${player.actualNombre}. ¿Me das el código?`;
+  } else {
+    mensaje = `Hola Howie! Soy ${player.nombre}. Estoy en ${player.actualNombre} y necesito una pista.`;
+  }
+  
+  const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, '_blank');
+}
+</script>
+
+</body>
+</html>
