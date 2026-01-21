@@ -97,6 +97,55 @@ input {
 #btnAbrirScanner:active {
   transform: scale(0.95);
 }
+#contenedorStickers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 por fila */
+  gap: 12px;
+  padding: 15px;
+  background: #f0f0f0; /* Fondo gris claro como álbum de papel */
+}
+
+.sticker-slot {
+  aspect-ratio: 2 / 3; /* Proporción vertical (tipo figurita) */
+  background: #ddd;
+  border-radius: 8px;
+  border: 2px dashed #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sticker-slot.ganada {
+  border: none;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombrita de papel pegado */
+}
+
+.sticker-img {
+  width: 92%; /* Pequeño margen blanco alrededor como figurita real */
+  height: 92%;
+  object-fit: cover; /* Para que llene el espacio sin deformarse */
+  border-radius: 4px;
+}
+
+.numero-guia {
+  font-weight: bold;
+  color: #aaa;
+  font-size: 20px;
+}
+
+/* Efecto de brillo al aparecer */
+.bounceIn {
+  animation: appearance 0.6s ease-out;
+}
+
+@keyframes appearance {
+  0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  70% { transform: scale(1.1) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
 </style>
 </head>
 
@@ -435,24 +484,41 @@ function renderMapa() {
 }
 
 function renderAlbum() {
-  const contenedor = document.getElementById("contenedorFiguritas");
-  contenedor.innerHTML = "";
+  const contenedor = document.getElementById("contenedorStickers");
+  if (!contenedor) return;
+  contenedor.innerHTML = ""; 
 
-  zonasVisuales.forEach(zona => {
+  zonasVisuales.forEach((zona) => {
     const div = document.createElement("div");
-    const estaCompletada = player.completadas.includes(zona);
-    div.className = `figurita ${estaCompletada ? 'ganada' : ''}`;
+    div.className = "sticker-slot";
     
-    // Aquí pondrías la imagen real. Si no tenés una por zona, 
-    // podés usar un emoji o una imagen genérica por ahora.
-    if(estaCompletada) {
-      div.innerHTML = `<img src="img/figus/${zona}.jpg" alt="${zona}">
-                       <div style="position:absolute; bottom:0; background:rgba(255,255,255,0.8); width:100%;">${zona}</div>`;
+    if (player.completadas.includes(zona)) {
+      // Limpiamos el nombre para que coincida con el archivo en /img
+      const nombreArchivo = zona.toLowerCase()
+        .replace(/ /g, "-")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, ""); 
+        
+      // BUSCAMOS .jpg (Asegurate que en GitHub tus archivos terminen en .jpg minúscula)
+      div.innerHTML = `<img src="img/${nombreArchivo}.jpg" class="sticker-img bounceIn">`;
+      div.classList.add("ganada");
     } else {
-      div.innerHTML = `<div class="candado">🔒</div><div style="color:#aaa">${zona}</div>`;
+      div.innerHTML = `<span class="numero-guia">${zonasVisuales.indexOf(zona) + 1}</span>`;
     }
     contenedor.appendChild(div);
   });
+  //Si ya completó las 15 figuritas
+  if (player.completadas.length === zonasVisuales.length) {
+      const mensajeFinal = document.createElement("div");
+      mensajeFinal.innerHTML = `
+        <div style="background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center;">
+          <h3>¡ÁLBUM COMPLETO! 🏆</h3>
+          <p>¡Felicitaciones! Lograste completar todos los desafíos de Howie.</p>
+          <p><b>Mostrá esta pantalla a los profes para retirar tu premio.</b></p>
+        </div>
+      `;
+      contenedor.appendChild(mensajeFinal);
+  }
 }
 
 // Asegúrate de que al ir al álbum se ejecute el render
