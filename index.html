@@ -232,60 +232,74 @@ input {
 </div>
 
 <!-- ÁLBUM -->
-<div id="album-screen" class="screen">
+<div id="album-screen" class="screen" style="display:none;">
   <header>
     <button onclick="irA('home-screen')">⬅ Volver</button>
     <h3>Mi Álbum de Howie</h3>
     <div style="width:50px;"></div>
   </header>
   
-  <div class="album-container" id="contenedorFiguritas">
-    </div>
+  <div class="album-container" id="contenedorFiguritas"></div>
 </div>
 
 <style>
+  /* Contenedor del Álbum */
   .album-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas */
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas para que entren bien en el celu */
+    gap: 12px;
     padding: 15px;
+    background: #f8f8f8;
   }
-  .figurita {
-    aspect-ratio: 1/1;
-    background: #f0f0f0;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
+
+  /* Espacio de cada figurita (Vertical 2:3) */
+  .sticker-slot {
+    aspect-ratio: 2 / 3; 
+    background: #e0e0e0;
+    border: 2px dashed #bbb;
+    border-radius: 10px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
-    text-align: center;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
   }
-  .figurita.ganada {
-    border: 2px solid #fbc02d;
+
+  /* Cuando ya ganaron el sticker */
+  .sticker-slot.ganada {
+    border: 2px solid #fbc02d; /* El amarillo de Howie */
     background: #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    animation: aparecer 0.5s ease-out;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    animation: aparecer 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  .figurita img {
+
+  /* La imagen de la figurita .jpg */
+  .sticker-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    display: none; /* Se muestra solo si está ganada */
-  }
-  .figurita.ganada img {
+    object-fit: cover; /* Llena el espacio sin deformarse */
     display: block;
   }
-  .figurita.ganada .candado {
-    display: none;
+
+  /* El número que se ve cuando no tienen la figurita */
+  .numero-guia {
+    font-weight: bold;
+    color: #999;
+    font-size: 1.2rem;
   }
+
   @keyframes aparecer {
-    0% { transform: scale(0.5); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
+.screen {
+    display: none; /* Por defecto todas ocultas */
+}
+
+.screen.active {
+    display: block !important; /* ¡Esta línea hace que se vea! */
+}
 </style>
 
 <script>
@@ -409,12 +423,18 @@ let player = {
    NAVEGACIÓN
 ===================== */
 function irA(id) {
+  // 1. Manejo de clases para mostrar/ocultar pantallas
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const target = document.getElementById(id);
   if(target) target.classList.add("active");
-  if (id === "mapa-screen") renderMapa();
-}
 
+  // 2. Lógica de renderizado según la pantalla
+  if (id === "mapa-screen") {
+      renderMapa();
+  } else if (id === "album-screen") {
+      renderAlbum(); // ¡Esta es la línea que te faltaba!
+  }
+}
 /* =====================
    LOGIN
 ===================== */
@@ -484,45 +504,44 @@ function renderMapa() {
 }
 
 function renderAlbum() {
-  const contenedor = document.getElementById("contenedorStickers");
-  if (!contenedor) return;
-  contenedor.innerHTML = ""; 
-
-  zonasVisuales.forEach((zona) => {
-    const div = document.createElement("div");
-    div.className = "sticker-slot";
+    const contenedor = document.getElementById("contenedorFiguritas");
+    if (!contenedor) return;
     
-    if (player.completadas.includes(zona)) {
-      // Limpiamos el nombre para que coincida con el archivo en /img
-      const nombreArchivo = zona.toLowerCase()
-        .replace(/ /g, "-")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, ""); 
-        
-      // BUSCAMOS .jpg (Asegurate que en GitHub tus archivos terminen en .jpg minúscula)
-      div.innerHTML = `<img src="img/${nombreArchivo}.jpg" class="sticker-img bounceIn">`;
-      div.classList.add("ganada");
-    } else {
-      div.innerHTML = `<span class="numero-guia">${zonasVisuales.indexOf(zona) + 1}</span>`;
-    }
-    contenedor.appendChild(div);
-  });
-  //Si ya completó las 15 figuritas
-  if (player.completadas.length === zonasVisuales.length) {
-      const mensajeFinal = document.createElement("div");
-      mensajeFinal.innerHTML = `
-        <div style="background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center;">
-          <h3>¡ÁLBUM COMPLETO! 🏆</h3>
-          <p>¡Felicitaciones! Lograste completar todos los desafíos de Howie.</p>
-          <p><b>Mostrá esta pantalla a los profes para retirar tu premio.</b></p>
-        </div>
-      `;
-      contenedor.appendChild(mensajeFinal);
-  }
-}
+    contenedor.innerHTML = ""; 
 
-// Asegúrate de que al ir al álbum se ejecute el render
-// Modifica tu función irA:
+    // Dibujamos las 15 figuritas del Howard Johnson Villa Carlos Paz
+    zonasVisuales.forEach((zona, index) => {
+        const div = document.createElement("div");
+        div.className = "sticker-slot"; 
+        
+        if (player.completadas && player.completadas.includes(zona)) {
+            const nombreArchivo = zona.toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, ""); 
+                
+            div.innerHTML = `<img src="img/${nombreArchivo}.jpg" class="sticker-img">`;
+            div.classList.add("ganada");
+        } else {
+            div.innerHTML = `<span class="candado">🔒</span>`;
+        }
+        contenedor.appendChild(div);
+    });
+
+    // MENSAJE DE ÉXITO FINAL (Si completó las 15 zonas)
+    if (player.completadas.length === zonasVisuales.length) {
+        const mensajeFinal = document.createElement("div");
+        mensajeFinal.style.cssText = "grid-column: 1 / -1; margin-top: 20px; padding: 20px; background: #fbc02d; border-radius: 15px; text-align: center; border: 3px solid #333;";
+        mensajeFinal.innerHTML = `
+            <h3>¡ÁLBUM COMPLETO! 🏆</h3>
+            <p>Mostrá esta pantalla a los profes para tu premio.</p>
+        `;
+        contenedor.appendChild(mensajeFinal);
+    }
+} 
+
+
 function irA(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
