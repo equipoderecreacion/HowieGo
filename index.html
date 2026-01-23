@@ -301,7 +301,7 @@ input {
     display: block !important; /* ¡Esta línea hace que se vea! */
 }
 </style>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 <script>
 /* =====================
    DATOS DEL JUEGO
@@ -531,14 +531,16 @@ function renderAlbum() {
 
     // MENSAJE DE ÉXITO FINAL (Si completó las 15 zonas)
     if (player.completadas.length === zonasVisuales.length) {
-        const mensajeFinal = document.createElement("div");
-        mensajeFinal.style.cssText = "grid-column: 1 / -1; margin-top: 20px; padding: 20px; background: #fbc02d; border-radius: 15px; text-align: center; border: 3px solid #333;";
-        mensajeFinal.innerHTML = `
-            <h3>¡ÁLBUM COMPLETO! 🏆</h3>
-            <p>Mostrá esta pantalla a los profes para tu premio.</p>
-        `;
-        contenedor.appendChild(mensajeFinal);
-    }
+    const mensajeFinal = document.createElement("div");
+    mensajeFinal.style.cssText = "grid-column: 1 / -1; background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 15px; text-align: center; font-weight: bold; border: 2px solid #333;";
+    mensajeFinal.innerHTML = `
+        <h3 style="margin:0;">¡LO LOGRASTE, EXPLORADOR! 🏆</h3>
+        <p style="margin:10px 0;">Completaste todas las misiones de Howie en el hotel.</p>
+        <p><b>¡Buscá a los profes de recreación para recibir tu premio!</b></p>
+        <div style="font-size: 30px;">🦉🎖️</div>
+    `;
+    contenedor.appendChild(mensajeFinal);
+}
 } 
 
 
@@ -744,6 +746,29 @@ function detenerEscaneo() {
             document.getElementById('btnAbrirScanner').style.display = 'block';
         });
     }
+}
+function mostrarPremio(zona) {
+    // Limpiamos el nombre para buscar el .jpg (ej: "Lobby" -> "lobby.jpg")
+    const nombreArchivo = zona.toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    Swal.fire({
+        title: '¡NUEVA FIGURITA!',
+        html: `¡Ganaste la figurita de <b>${zona}</b>!<br>Ya podés verla en tu álbum.`,
+        imageUrl: `img/${nombreArchivo}.jpg`,
+        imageWidth: 200,
+        imageHeight: 300,
+        imageAlt: 'Foto del hotel',
+        confirmButtonText: 'IR AL ÁLBUM',
+        confirmButtonColor: '#fbc02d', // El amarillo Howie
+        background: '#fff',
+        backdrop: `rgba(0,0,123,0.4)` // Un fondo oscurecido para que resalte
+    }).then(() => {
+        irA('album-screen'); // Lo mandamos al álbum para que vea su premio
+    });
 }
 </script>
 
