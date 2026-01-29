@@ -146,6 +146,12 @@ input {
   70% { transform: scale(1.1) rotate(5deg); }
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
 </style>
 </head>
 
@@ -603,49 +609,54 @@ function validarRespuesta() {
   }
 }
 
-// 1. Esta función se encarga de mostrar la foto cuando la sacan
+// 1. FUNCIÓN PARA MOSTRAR LA FOTO CUANDO LA SACAN
 function previsualizarFoto(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const fotoData = e.target.result;
-      document.getElementById("fotoPreview").src = fotoData;
-      document.getElementById("previewContenedor").style.display = "block";
-      
-      const btn = document.getElementById("btnAyuda");
-      btn.innerHTML = "✅ ENVIAR ESTA FOTO POR WHATSAPP";
-      btn.style.background = "#25D366"; 
-      btn.style.animation = "pulse 1s infinite";
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fotoData = e.target.result;
+            const previewImg = document.getElementById("fotoPreview");
+            const contenedor = document.getElementById("previewContenedor");
+            const btn = document.getElementById("btnAyuda");
 
-      // Programamos el botón para que al hacer clic guarde y envíe
-      btn.onclick = function() {
-          descargarYEnviar(fotoData);
-      };
+            if(previewImg) previewImg.src = fotoData;
+            if(contenedor) contenedor.style.display = "block";
+            
+            if(btn) {
+                btn.innerHTML = "✅ ENVIAR ESTA FOTO A LOS PROFES";
+                btn.style.background = "#25D366";
+                btn.style.animation = "pulse 1s infinite";
+                // Enganchamos la función de guardado directamente al botón
+                btn.onclick = function() {
+                    guardarYEnviarAProfes(fotoData);
+                };
+            }
+        }
+        reader.readAsDataURL(input.files[0]);
     }
-    reader.readAsDataURL(input.files[0]);
-  }
 }
 
-// 2. Esta es la función "mágica" que guarda la foto en el celu
-function descargarYEnviar(imageData) {
-    // DESCARGA AUTOMÁTICA
+// 2. FUNCIÓN PARA GUARDAR EN CELULAR Y ABRIR WHATSAPP
+function guardarYEnviarAProfes(imageData) {
+    // DESCARGA AUTOMÁTICA AL CELULAR
     const enlace = document.createElement("a");
     enlace.href = imageData;
-    enlace.download = `mision-howie-${zonaActual || 'foto'}.png`;
+    enlace.download = `mision-howie-${typeof zonaActual !== 'undefined' ? zonaActual : 'foto'}.png`;
     document.body.appendChild(enlace);
     enlace.click();
     document.body.removeChild(enlace);
 
-    // AVISO CON SWEETALERT (Para que no se pierdan)
+    // CARTEL DE SWEETALERT (Asegúrate de tener la librería cargada arriba)
     Swal.fire({
         title: '¡Foto guardada!',
-        text: 'La foto se guardó en tu galería. Ahora adjuntala en el chat de WhatsApp que se va a abrir.',
+        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat que se va a abrir.',
         icon: 'success',
         confirmButtonText: 'ABRIR WHATSAPP',
         confirmButtonColor: '#25D366'
     }).then(() => {
-        const mensaje = encodeURIComponent(`¡Hola Howie! Acá te mando mi foto de la misión: ${zonaActual}`);
-        window.open(`https://wa.me/TUNUMERODEWHATSAPP?text=${mensaje}`, '_blank');
+        const mensaje = encodeURIComponent(`¡Hola Profes! Acá les mando la foto de mi misión en: ${typeof zonaActual !== 'undefined' ? zonaActual : 'el Hotel'}`);
+        // REEMPLAZÁ LAS X POR TU NÚMERO DE WHATSAPP (sin el + ni espacios)
+        window.open(`https://wa.me/5493544582547?text=${mensaje}`, '_blank');
     });
 }
 
