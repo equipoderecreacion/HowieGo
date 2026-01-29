@@ -603,22 +603,50 @@ function validarRespuesta() {
   }
 }
 
-// Función para la previsualización de la imagen
+// 1. Esta función se encarga de mostrar la foto cuando la sacan
 function previsualizarFoto(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      document.getElementById("fotoPreview").src = e.target.result;
+      const fotoData = e.target.result;
+      document.getElementById("fotoPreview").src = fotoData;
       document.getElementById("previewContenedor").style.display = "block";
       
-      // CAMBIO DE TEXTO EN EL BOTÓN
       const btn = document.getElementById("btnAyuda");
       btn.innerHTML = "✅ ENVIAR ESTA FOTO POR WHATSAPP";
       btn.style.background = "#25D366"; 
-      btn.style.animation = "pulse 1s infinite"; // Opcional: un brillito para que lo toque
+      btn.style.animation = "pulse 1s infinite";
+
+      // Programamos el botón para que al hacer clic guarde y envíe
+      btn.onclick = function() {
+          descargarYEnviar(fotoData);
+      };
     }
     reader.readAsDataURL(input.files[0]);
   }
+}
+
+// 2. Esta es la función "mágica" que guarda la foto en el celu
+function descargarYEnviar(imageData) {
+    // DESCARGA AUTOMÁTICA
+    const enlace = document.createElement("a");
+    enlace.href = imageData;
+    enlace.download = `mision-howie-${zonaActual || 'foto'}.png`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+
+    // AVISO CON SWEETALERT (Para que no se pierdan)
+    Swal.fire({
+        title: '¡Foto guardada!',
+        text: 'La foto se guardó en tu galería. Ahora adjuntala en el chat de WhatsApp que se va a abrir.',
+        icon: 'success',
+        confirmButtonText: 'ABRIR WHATSAPP',
+        confirmButtonColor: '#25D366'
+    }).then(() => {
+        const mensaje = encodeURIComponent(`¡Hola Howie! Acá te mando mi foto de la misión: ${zonaActual}`);
+        window.open(`https://wa.me/TUNUMERODEWHATSAPP?text=${mensaje}`, '_blank');
+    });
 }
 
 function obtenerRecompensa() {
