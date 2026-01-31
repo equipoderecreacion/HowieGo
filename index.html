@@ -579,45 +579,26 @@ function entrarZona(zona) {
 
 
 function mostrarEstado(n) {
-  // 1. Referencias a los contenedores
-  var e1 = document.getElementById("estado1");
-  var e2 = document.getElementById("estado2");
-  var e3 = document.getElementById("estado3");
+    // 1. Buscamos los elementos
+    var s1 = document.getElementById("estado1");
+    var s2 = document.getElementById("estado2");
+    var s3 = document.getElementById("estado3");
 
-  // 2. Limpieza de pantalla (Estilo original que te funcionaba)
-  if(e1) e1.style.display = (n === 1) ? "block" : "none";
-  if(e2) e2.style.display = (n === 2) ? "block" : "none";
-  if(e3) e3.style.display = (n === 3) ? "block" : "none";
+    // 2. Ocultamos todos (Reset)
+    if (s1) s1.style.display = "none";
+    if (s2) s2.style.display = "none";
+    if (s3) s3.style.display = "none";
 
-  // 3. Ocultar botón de ayuda si ganó
-  var btnAyuda = document.getElementById("btnAyuda");
-  if (btnAyuda) {
-    btnAyuda.style.display = (n === 3) ? "none" : "block";
-  }
+    // 3. Mostramos el estado que corresponde
+    if (n === 1 && s1) s1.style.display = "block";
+    if (n === 2 && s2) s2.style.display = "block";
+    if (n === 3 && s3) s3.style.display = "block";
 
-  // 4. Cartel de Felicidades (SweetAlert2)
-  if (n === 3) {
-    // Primero guardamos el progreso para que la estrella avance
-    if (typeof obtenerRecompensa === 'function') {
-      obtenerRecompensa();
+    // 4. Botón de ayuda
+    var btnAyuda = document.getElementById("btnAyuda");
+    if (btnAyuda) {
+        btnAyuda.style.display = (n === 3) ? "none" : "block";
     }
-
-    // Mostramos el cartel de éxito
-    if (typeof Swal !== 'undefined') {
-      Swal.fire({
-        title: '¡LO LOGRASTE!',
-        text: '¡Conseguiste una nueva figurita!',
-        icon: 'success',
-        confirmButtonText: 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d'
-      }).then(function() {
-        if (typeof irA === 'function') irA('album-screen');
-      });
-    } else {
-      // Si falla la librería, mandamos directo al álbum para que no se trabe
-      if (typeof irA === 'function') irA('album-screen');
-    }
-  }
 }
 
 // --- LLAVE PARA CERRAR ESTA FUNCIÓN ---
