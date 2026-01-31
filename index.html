@@ -578,21 +578,33 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
+  // 1. Control de visibilidad de los estados
   document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
   document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
-  document.getElementById("estado3").style.display = "none";
+  document.getElementById("estado3").style.display = "none"; // Ocultamos el emoji viejo
 
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = n === 3 ? "none" : "block";
   }
 
+  // 2. LÓGICA DE ÉXITO (Estado 3)
   if (n === 3) {
-    // 1. Limpiamos el nombre para la foto (.jpg)
-    const nombre = zonaActual.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const rutaImagen = `./img/${nombre}.jpg`;
+    // A. GUARDAR PROGRESO PRIMERO: Para que la estrella avance en el álbum
+    if (typeof obtenerRecompensa === 'function') {
+        obtenerRecompensa(); 
+    }
 
-    // 2. Mostramos el cartel de SweetAlert2 PRIMERO
+    // B. PREPARAR LA FOTO: Limpiamos el nombre y usamos .jpg
+    const nombreLimpio = zonaActual.toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    
+    const rutaImagen = `./img/${nombreLimpio}.jpg`; // <--- CORREGIDO A .JPG
+
+    // C. MOSTRAR EL CARTEL DE PREMIO
     Swal.fire({
         title: '¡CONSEGUIDO!',
         html: `¡Ganaste la figurita de <b>${zonaActual}</b>!`,
@@ -601,14 +613,10 @@ function mostrarEstado(n) {
         imageHeight: 300,
         confirmButtonText: 'VER MI ÁLBUM',
         confirmButtonColor: '#fbc02d',
-        allowOutsideClick: false // Obliga a que vean el cartel
+        allowOutsideClick: false
     }).then(() => {
-        // 3. RECIÉN CUANDO CIERRAN EL CARTEL, ejecutamos la lógica de avanzar
-        if (typeof obtenerRecompensa === 'function') {
-            obtenerRecompensa(); 
-        }
-        // Si obtenerRecompensa no los saca de la pantalla, los mandamos nosotros:
-        irA('album-screen'); 
+        // Al cerrar, mandamos al álbum para ver la nueva figurita
+        irA('album-screen');
     });
   }
 }
