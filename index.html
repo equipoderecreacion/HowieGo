@@ -556,19 +556,20 @@ function irA(id) {
   if (id === "mapa-screen") renderMapa();
   if (id === "album-screen") renderAlbum(); // <--- Agregado
 }
+
 /* =====================
    ZONA Y VALIDACIÓN
 ===================== */
 function entrarZona(zona) {
   const data = zonasData[zona];
+  if (!data) return;
+
   document.getElementById("zonaTitulo").innerText = zona;
-  document.getElementById("textoEstado1").innerText = data?.e1 || "Buscá el QR.";
-  document.getElementById("textoEstado2").innerText = data?.e2 || "Resolvé el desafío.";
+  document.getElementById("textoEstado1").innerText = data.e1 || "Buscá el QR.";
+  document.getElementById("textoEstado2").innerText = data.e2 || "Resolvé el desafío.";
   
-  // Mostramos u ocultamos la sección de foto según el tipo
   document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
   
-  // Limpiamos todo lo anterior
   document.getElementById("previewContenedor").style.display = "none";
   document.getElementById("respuestaInput").value = "";
   document.getElementById("fotoInput").value = "";
@@ -577,121 +578,72 @@ function entrarZona(zona) {
   irA("zona-screen");
 }
 
-
-/* =====================
-   VALIDACIÓN FINAL (RECONECTADA)
-===================== */
 function validarRespuesta() {
-    const zona = player.actualNombre; // Usamos el nombre de la zona donde está la estrella
+    const zona = player.actualNombre;
     const data = zonasData[zona];
     const input = document.getElementById("respuestaInput").value.trim().toLowerCase();
 
     if (!data) return;
 
-    // 1. Si el desafío es un Acertijo (auto)
     if (data.tipo === "auto") {
-        if (data.respuestasValidas.includes(input)) {
-            mostrarEstado(3); // ¡ÉXITO!
+        if (data.respuestasValidas.map(r => r.toLowerCase()).includes(input)) {
+            mostrarEstado(3);
         } else {
             Swal.fire('¡Casi!', 'Howie dice que esa no es la respuesta correcta.', 'error');
         }
-    } 
-    // 2. Si el desafío es una Foto (código de los profes)
-    else {
+    } else {
         if (input === data.respuesta.toLowerCase()) {
-            mostrarEstado(3); // ¡ÉXITO!
+            mostrarEstado(3);
         } else {
-            Swal.fire('Código incorrecto', 'Pedile el código a los profes después de mostrarles tu foto.', 'warning');
+            Swal.fire('Código incorrecto', 'Pedile el código a los profes.', 'warning');
         }
     }
 }
 
-/* =====================
-   ESTADO 3 CON CARTEL Y FOTO
-===================== */
 function mostrarEstado(n) {
-    // Referencias a tus IDs de Howard Johnson
-    const e1 = document.getElementById("estado1");
-    const e2 = document.getElementById("estado2");
-    const e3 = document.getElementById("estado3");
+  const e1 = document.getElementById("estado1");
+  const e2 = document.getElementById("estado2");
+  const e3 = document.getElementById("estado3");
 
-    if(e1) e1.style.display = (n === 1) ? "block" : "none";
-    if(e2) e2.style.display = (n === 2) ? "block" : "none";
-    if(e3) e3.style.display = (n === 3) ? "block" : "none";
+  if(e1) e1.style.display = (n === 1) ? "block" : "none";
+  if(e2) e2.style.display = (n === 2) ? "block" : "none";
+  if(e3) e3.style.display = (n === 3) ? "block" : "none";
 
-    const btnAyuda = document.getElementById("btnAyuda");
-    if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
+  const btnAyuda = document.getElementById("btnAyuda");
+  if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
 
-    // Si ganó, disparamos el proceso de figurita
-    if (n === 3) {
-        const zonaGanada = player.actualNombre;
-        
-        // 1. Guardamos progreso (se suma a completadas y mueve la estrella)
-        obtenerRecompensa();
+  if (n === 3) {
+    const zonaGanada = player.actualNombre;
+    obtenerRecompensa();
 
-        // 2. Armamos el nombre del archivo para la imagen
-        const nombreLimpio = zonaGanada.toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
-            
-        const rutaImagen = `./img/${nombreLimpio}.jpg`;
+    const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const rutaImagen = `./img/${nombreLimpio}.jpg`;
 
-        // 3. Mostramos el cartel final
-        Swal.fire({
-            title: '¡CONSEGUIDO!',
-            text: `¡Ganaste la figurita de ${zonaGanada}!`,
-            imageUrl: rutaImagen,
-            imageWidth: 200,
-            imageHeight: 300,
-            imageAlt: '⭐',
-            confirmButtonText: 'VER MI ÁLBUM',
-            confirmButtonColor: '#fbc02d',
-            allowOutsideClick: false
-        }).then(() => {
-            irA('album-screen');
-        });
-    }
-}
-
-// 2. FUNCIÓN PARA GUARDAR EN CELULAR Y ABRIR WHATSAPP
-function guardarYEnviarAProfes(imageData) {
-    // DESCARGA AUTOMÁTICA AL CELULAR
-    const enlace = document.createElement("a");
-    enlace.href = imageData;
-    enlace.download = `mision-howie-${typeof zonaActual !== 'undefined' ? zonaActual : 'foto'}.png`;
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
-
-    // CARTEL DE SWEETALERT (Asegúrate de tener la librería cargada arriba)
     Swal.fire({
-        title: '¡Foto guardada!',
-        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat que se va a abrir.',
-        icon: 'success',
-        confirmButtonText: 'ABRIR WHATSAPP',
-        confirmButtonColor: '#25D366'
+        title: '¡CONSEGUIDO!',
+        text: `¡Ganaste la figurita de ${zonaGanada}!`,
+        imageUrl: rutaImagen,
+        imageWidth: 200,
+        imageHeight: 300,
+        imageAlt: '⭐',
+        confirmButtonText: 'VER MI ÁLBUM',
+        confirmButtonColor: '#fbc02d',
+        allowOutsideClick: false
     }).then(() => {
-        const mensaje = encodeURIComponent(`¡Hola Profes! Acá les mando la foto de mi misión en: ${typeof zonaActual !== 'undefined' ? zonaActual : 'el Hotel'}`);
-        // REEMPLAZÁ LAS X POR TU NÚMERO DE WHATSAPP (sin el + ni espacios)
-        window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
+        irA('album-screen');
     });
+  }
 }
 
 function obtenerRecompensa() {
   if (!player.completadas.includes(player.actualNombre)) {
     player.completadas.push(player.actualNombre);
   }
-
-  // SALTO CIRCULAR
   const posOculta = circuitoOculto.indexOf(player.actualNombre);
   const siguientePos = (posOculta + 1) % circuitoOculto.length;
   player.actualNombre = circuitoOculto[siguientePos];
 
   localStorage.setItem("howie", JSON.stringify(player));
-  document.getElementById("respuestaInput").value = ""; // Limpiar input
-  iniciarHome();
 }
 
 function cerrarSesion() {
@@ -701,34 +653,21 @@ function cerrarSesion() {
   }
 }
 
-// AUTOLOAD
 window.onload = () => {
   const saved = localStorage.getItem("howie");
-  
   if (saved) {
     player = JSON.parse(saved);
-    iniciarHome(); // Esto muestra el saludo y el progreso
-
-    // Lógica del QR
+    iniciarHome();
     const urlParams = new URLSearchParams(window.location.search);
     const zonaDesdeQR = urlParams.get('zona');
-    
     if (zonaDesdeQR) {
-        // 1. Limpiamos la URL para que no moleste el parámetro al refrescar
         window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // 2. Limpiamos el nombre: cambiamos guiones por espacios 
-        // Ejemplo: "Maquina-de-Espuma" pasa a ser "Maquina de Espuma"
         const zonaLimpia = zonaDesdeQR.replace(/-/g, " ");
-        
-        // 3. Verificamos si la zona del QR es donde está la estrella actual
-        // Usamos toLowerCase() para que no importe si hay mayúsculas distintas
         if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
             entrarZona(player.actualNombre); 
-            mostrarEstado(2); // Lo lleva directo al desafío (Estado 2)
+            mostrarEstado(2);
         } else {
-            // Si escaneó uno que no le tocaba, le avisamos
-            alert(`¡Hola! Howie dice que todavía no es momento de ir a "${zonaLimpia}". Tu estrella ⭐ te espera en "${player.actualNombre}".`);
+            alert(`Howie dice que tu estrella está en "${player.actualNombre}".`);
             irA('mapa-screen');
         }
     }
@@ -736,64 +675,30 @@ window.onload = () => {
 };
 
 function pedirAyuda() {
-  const numero = "5493517669480";
-  const tieneFoto = document.getElementById("fotoInput").files.length > 0;
-  
-  let mensaje = "";
-  if (tieneFoto) {
-    mensaje = `¡Hola Howie! Soy ${player.nombre}. Acá te mando la foto del desafío de ${player.actualNombre}. ¿Me das el código?`;
-  } else {
-    mensaje = `Hola Howie! Soy ${player.nombre}. Estoy en ${player.actualNombre} y necesito una pista.`;
-  }
-  
-  const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-  window.open(url, '_blank');
+  const mensaje = `Hola Howie! Soy ${player.nombre}. Estoy en ${player.actualNombre} y necesito una pista.`;
+  window.open(`https://wa.me/5493517669480?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
-let html5QrCode;
 
+let html5QrCode;
 function iniciarEscaneo() {
-    // Mostramos el visor y ocultamos el botón
     document.getElementById('reader').style.display = 'block';
     document.getElementById('btnAbrirScanner').style.display = 'none';
-
     html5QrCode = new Html5Qrcode("reader");
-    
-    const config = { 
-        fps: 10, 
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0 
-    };
-
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        config,
-        (decodedText) => {
-            // El QR trae la URL completa: https://equipodecreacion.github.io/HowieGo/?zona=Lobby
-            try {
-                const url = new URL(decodedText);
-                const zonaParam = url.searchParams.get("zona");
-                
-                if (zonaParam) {
-                    const zonaLimpia = zonaParam.replace(/-/g, " ");
-
-                    if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
-                        detenerEscaneo();
-                        // ¡Éxito! Como ya estamos en la zona, solo pasamos al desafío
-                        mostrarEstado(2); 
-                    } else {
-                        alert(`Howie dice: "Ese QR es de ${zonaLimpia}, pero tu estrella está en ${player.actualNombre}"`);
-                        detenerEscaneo();
-                    }
-                }
-            } catch (e) {
-                alert("Este no parece ser un código de Howie.");
+    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+        const url = new URL(decodedText);
+        const zonaParam = url.searchParams.get("zona");
+        if (zonaParam) {
+            const zonaLimpia = zonaParam.replace(/-/g, " ");
+            if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
+                detenerEscaneo();
+                mostrarEstado(2); 
+            } else {
+                alert(`Ese QR es de ${zonaLimpia}. Tu estrella está en ${player.actualNombre}`);
+                detenerEscaneo();
             }
-        },
-        (errorMessage) => { /* Ignorar errores de escaneo constante */ }
-    ).catch(err => {
-        alert("No se pudo abrir la cámara. Asegurate de dar permisos.");
-        document.getElementById('reader').style.display = 'none';
-        document.getElementById('btnAbrirScanner').style.display = 'block';
+        }
+    }).catch(() => {
+        alert("Permití el acceso a la cámara.");
     });
 }
 
@@ -804,38 +709,6 @@ function detenerEscaneo() {
             document.getElementById('btnAbrirScanner').style.display = 'block';
         });
     }
-}
-function mostrarPremio(zona) {
-    // 1. Limpieza total del nombre para evitar errores
-    const nombreArchivo = zona.toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-') // Cambia espacios por guiones
-        .normalize("NFD")    // Quita acentos
-        .replace(/[\u0300-\u036f]/g, "");
-
-    // 2. Ruta de la imagen. 
-    
-    const rutaImagen = `./img/${nombreArchivo}.jpg`;
-
-    Swal.fire({
-        title: '¡CONSEGUIDO!',
-        html: `¡Ganaste la figurita de <b>${zona}</b>!`,
-        imageUrl: rutaImagen,
-        imageWidth: 200,
-        imageHeight: 300,
-        imageAlt: 'Cargando figurita...',
-        confirmButtonText: 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d',
-        // Si la imagen no carga, este código nos dirá por qué en la consola
-        didOpen: () => {
-            const img = Swal.getImage();
-            img.onerror = () => {
-                console.error("No se encontró la imagen en: " + rutaImagen);
-            };
-        }
-    }).then(() => {
-        irA('album-screen');
-    });
 }
 </script>
 
