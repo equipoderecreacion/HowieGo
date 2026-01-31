@@ -578,44 +578,12 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // 1. Ocultar los 3 divs de estado
-  const ids = ["estado1", "estado2", "estado3"];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
-
-  // 2. Mostrar el que corresponde (si no es el 3)
-  if (n === 1) document.getElementById("estado1").style.display = "block";
-  if (n === 2) document.getElementById("estado2").style.display = "block";
-
-  // 3. Manejo del botón de ayuda
-  const btnAyuda = document.getElementById("btnAyuda");
-  if (btnAyuda) {
-    btnAyuda.style.display = n === 3 ? "none" : "block";
-  }
-
-  // 4. EL DISPARADOR DEL CARTEL
-  if (n === 3) {
-    // Primero guardamos progreso para que la estrella avance
-    if (typeof obtenerRecompensa === 'function') {
-      obtenerRecompensa();
-    }
-
-    // Usamos el cartel más simple posible para probar
-    Swal.fire({
-      title: '¡Misión Cumplida!',
-      text: 'Conseguiste la figurita de ' + (zonaActual || 'la zona'),
-      icon: 'success',
-      confirmButtonText: 'VER ÁLBUM',
-      confirmButtonColor: '#fbc02d',
-      allowOutsideClick: false
-    }).then(() => {
-      if (typeof irA === 'function') {
-        irA('album-screen');
-      }
-    });
-  }
+  document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
+  document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
+  document.getElementById("estado3").style.display = n === 3 ? "block" : "none";
+  
+  // Ocultamos el botón de ayuda solo si ya ganó (Estado 3)
+  document.getElementById("btnAyuda").style.display = n === 3 ? "none" : "block";
 }
 
 // 1. FUNCIÓN PARA MOSTRAR LA FOTO CUANDO LA SACAN
