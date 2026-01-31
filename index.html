@@ -577,41 +577,26 @@ function entrarZona(zona) {
   irA("zona-screen");
 }
 
-} // Esta llave extra intenta cerrar cualquier función que haya quedado abierta arriba
-
-// Cerramos cualquier función que haya quedado abierta por error arriba
-} } 
 
 function mostrarEstado(n) {
-  console.log("Cambiando a estado: " + n);
+  // 1. Referencias seguras a los elementos
+  var e1 = document.getElementById("estado1");
+  var e2 = document.getElementById("estado2");
+  var e3 = document.getElementById("estado3");
 
-  // Referencias a tus IDs de la zona
-  var s1 = document.getElementById("estado1");
-  var s2 = document.getElementById("estado2");
-  var s3 = document.getElementById("estado3");
+  // 2. Reset de visibilidad (Estilo original)
+  if(e1) e1.style.display = (n === 1) ? "block" : "none";
+  if(e2) e2.style.display = (n === 2) ? "block" : "none";
+  if(e3) e3.style.display = (n === 3) ? "block" : "none";
 
-  // Ocultamos todos primero
-  if(s1) s1.style.display = "none";
-  if(s2) s2.style.display = "none";
-  if(s3) s3.style.display = "none";
-
-  // Mostramos el que pediste
-  if (n === 1 && s1) s1.style.display = "block";
-  if (n === 2 && s2) s2.style.display = "block";
-  if (n === 3 && s3) s3.style.display = "block";
-
-  // Manejo del botón de ayuda
+  // 3. Botón de ayuda
   var btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = (n === 3) ? "none" : "block";
   }
 }
 
-// Función para asegurar que el botón de validar siempre responda
-function validarMision() {
-    console.log("Validación activada");
-    mostrarEstado(3); 
-}
+// --- LLAVE PARA CERRAR ESTA FUNCIÓN ---
 // 1. FUNCIÓN PARA MOSTRAR LA FOTO CUANDO LA SACAN
 function previsualizarFoto(input) {
     if (input.files && input.files[0]) {
