@@ -578,12 +578,29 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
+  // 1. Manejo de visibilidad de los estados
   document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
   document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
-  document.getElementById("estado3").style.display = n === 3 ? "block" : "none";
   
-  // Ocultamos el botón de ayuda solo si ya ganó (Estado 3)
-  document.getElementById("btnAyuda").style.display = n === 3 ? "none" : "block";
+  // 2. IMPORTANTE: El estado 3 visual (el del emoji 🖼️) lo mantenemos oculto 
+  // porque ahora usamos el cartel animado con la foto real.
+  document.getElementById("estado3").style.display = "none";
+
+  // 3. Tu línea extra: Ocultamos el botón de ayuda solo si ya ganó
+  const btnAyuda = document.getElementById("btnAyuda");
+  if (btnAyuda) {
+    btnAyuda.style.display = n === 3 ? "none" : "block";
+  }
+
+  // 4. DISPARADOR DEL PREMIO: Si llegamos al estado 3, lanzamos el cartel con la foto
+  if (n === 3) {
+    if (typeof zonaActual !== 'undefined') {
+        mostrarPremio(zonaActual); 
+    } else {
+        // Por si la variable zonaActual se pierde, que no se trabe el juego
+        Swal.fire("¡Misión Cumplida!", "¡Conseguiste una nueva figurita!", "success");
+    }
+  }
 }
 
 function validarRespuesta() {
@@ -656,7 +673,7 @@ function guardarYEnviarAProfes(imageData) {
     }).then(() => {
         const mensaje = encodeURIComponent(`¡Hola Profes! Acá les mando la foto de mi misión en: ${typeof zonaActual !== 'undefined' ? zonaActual : 'el Hotel'}`);
         // REEMPLAZÁ LAS X POR TU NÚMERO DE WHATSAPP (sin el + ni espacios)
-        window.open(`https://wa.me/5493544582547?text=${mensaje}`, '_blank');
+        window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
     });
 }
 
@@ -787,26 +804,35 @@ function detenerEscaneo() {
     }
 }
 function mostrarPremio(zona) {
-    // Limpiamos el nombre para buscar el .jpg (ej: "Lobby" -> "lobby.jpg")
+    // 1. Limpieza total del nombre para evitar errores
     const nombreArchivo = zona.toLowerCase()
         .trim()
-        .replace(/\s+/g, '-')
-        .normalize("NFD")
+        .replace(/\s+/g, '-') // Cambia espacios por guiones
+        .normalize("NFD")    // Quita acentos
         .replace(/[\u0300-\u036f]/g, "");
 
+    // 2. Ruta de la imagen. 
+    
+    const rutaImagen = `./img/${nombreArchivo}.jpg`;
+
     Swal.fire({
-        title: '¡NUEVA FIGURITA!',
-        html: `¡Ganaste la figurita de <b>${zona}</b>!<br>Ya podés verla en tu álbum.`,
-        imageUrl: `img/${nombreArchivo}.jpg`,
+        title: '¡CONSEGUIDO!',
+        html: `¡Ganaste la figurita de <b>${zona}</b>!`,
+        imageUrl: rutaImagen,
         imageWidth: 200,
         imageHeight: 300,
-        imageAlt: 'Foto del hotel',
-        confirmButtonText: 'IR AL ÁLBUM',
-        confirmButtonColor: '#fbc02d', // El amarillo Howie
-        background: '#fff',
-        backdrop: `rgba(0,0,123,0.4)` // Un fondo oscurecido para que resalte
+        imageAlt: 'Cargando figurita...',
+        confirmButtonText: 'VER MI ÁLBUM',
+        confirmButtonColor: '#fbc02d',
+        // Si la imagen no carga, este código nos dirá por qué en la consola
+        didOpen: () => {
+            const img = Swal.getImage();
+            img.onerror = () => {
+                console.error("No se encontró la imagen en: " + rutaImagen);
+            };
+        }
     }).then(() => {
-        irA('album-screen'); // Lo mandamos al álbum para que vea su premio
+        irA('album-screen');
     });
 }
 </script>
