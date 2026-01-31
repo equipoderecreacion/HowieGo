@@ -578,21 +578,18 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // 1. Ocultar todos los estados para resetear la vista
+  console.log("Cambiando a estado: " + n);
+
+  // Forzamos que los elementos existan antes de tocarlos
   const e1 = document.getElementById("estado1");
   const e2 = document.getElementById("estado2");
   const e3 = document.getElementById("estado3");
 
-  if(e1) e1.style.display = "none";
-  if(e2) e2.style.display = "none";
-  if(e3) e3.style.display = "none";
+  if(e1) e1.style.display = (n === 1) ? "block" : "none";
+  if(e2) e2.style.display = (n === 2) ? "block" : "none";
+  if(e3) e3.style.display = (n === 3) ? "block" : "none";
 
-  // 2. Mostrar SOLAMENTE el que pedimos
-  if (n === 1 && e1) e1.style.display = "block";
-  if (n === 2 && e2) e2.style.display = "block";
-  if (n === 3 && e3) e3.style.display = "block";
-
-  // 3. Manejo del botón de ayuda (se oculta en el estado 3)
+  // El botón de ayuda solo se oculta si ganaste
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = (n === 3) ? "none" : "block";
