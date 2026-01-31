@@ -308,6 +308,7 @@ input {
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
 /* =====================
    DATOS DEL JUEGO
@@ -615,7 +616,13 @@ function mostrarEstado(n) {
   if (n === 3) {
     const zonaGanada = player.actualNombre;
     obtenerRecompensa();
-
+    // Esto lanza el confeti
+    confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#fbc02d', '#ffffff', '#4CAF50'] // Colores Howie y éxito
+    });
     const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const rutaImagen = `./img/${nombreLimpio}.jpg`;
 
