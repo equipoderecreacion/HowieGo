@@ -579,23 +579,26 @@ function entrarZona(zona) {
 
 } // Esta llave extra intenta cerrar cualquier función que haya quedado abierta arriba
 
+// Cerramos cualquier función que haya quedado abierta por error arriba
+} } 
+
 function mostrarEstado(n) {
   console.log("Cambiando a estado: " + n);
 
-  // Seleccionamos los elementos
-  var e1 = document.getElementById("estado1");
-  var e2 = document.getElementById("estado2");
-  var e3 = document.getElementById("estado3");
+  // Referencias a tus IDs de la zona
+  var s1 = document.getElementById("estado1");
+  var s2 = document.getElementById("estado2");
+  var s3 = document.getElementById("estado3");
 
-  // Reset de visualización
-  if(e1) e1.style.display = "none";
-  if(e2) e2.style.display = "none";
-  if(e3) e3.style.display = "none";
+  // Ocultamos todos primero
+  if(s1) s1.style.display = "none";
+  if(s2) s2.style.display = "none";
+  if(s3) s3.style.display = "none";
 
-  // Mostrar el estado solicitado
-  if (n === 1 && e1) e1.style.display = "block";
-  if (n === 2 && e2) e2.style.display = "block";
-  if (n === 3 && e3) e3.style.display = "block";
+  // Mostramos el que pediste
+  if (n === 1 && s1) s1.style.display = "block";
+  if (n === 2 && s2) s2.style.display = "block";
+  if (n === 3 && s3) s3.style.display = "block";
 
   // Manejo del botón de ayuda
   var btnAyuda = document.getElementById("btnAyuda");
@@ -604,6 +607,11 @@ function mostrarEstado(n) {
   }
 }
 
+// Función para asegurar que el botón de validar siempre responda
+function validarMision() {
+    console.log("Validación activada");
+    mostrarEstado(3); 
+}
 // 1. FUNCIÓN PARA MOSTRAR LA FOTO CUANDO LA SACAN
 function previsualizarFoto(input) {
     if (input.files && input.files[0]) {
