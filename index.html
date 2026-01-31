@@ -578,54 +578,80 @@ function entrarZona(zona) {
 }
 
 
-function mostrarEstado(n) {
-    // 1. Buscamos los elementos
-    var s1 = document.getElementById("estado1");
-    var s2 = document.getElementById("estado2");
-    var s3 = document.getElementById("estado3");
+/* =====================
+   VALIDACIÓN FINAL (RECONECTADA)
+===================== */
+function validarRespuesta() {
+    const zona = player.actualNombre; // Usamos el nombre de la zona donde está la estrella
+    const data = zonasData[zona];
+    const input = document.getElementById("respuestaInput").value.trim().toLowerCase();
 
-    // 2. Ocultamos todos (Reset)
-    if (s1) s1.style.display = "none";
-    if (s2) s2.style.display = "none";
-    if (s3) s3.style.display = "none";
+    if (!data) return;
 
-    // 3. Mostramos el estado que corresponde
-    if (n === 1 && s1) s1.style.display = "block";
-    if (n === 2 && s2) s2.style.display = "block";
-    if (n === 3 && s3) s3.style.display = "block";
-
-    // 4. Botón de ayuda
-    var btnAyuda = document.getElementById("btnAyuda");
-    if (btnAyuda) {
-        btnAyuda.style.display = (n === 3) ? "none" : "block";
+    // 1. Si el desafío es un Acertijo (auto)
+    if (data.tipo === "auto") {
+        if (data.respuestasValidas.includes(input)) {
+            mostrarEstado(3); // ¡ÉXITO!
+        } else {
+            Swal.fire('¡Casi!', 'Howie dice que esa no es la respuesta correcta.', 'error');
+        }
+    } 
+    // 2. Si el desafío es una Foto (código de los profes)
+    else {
+        if (input === data.respuesta.toLowerCase()) {
+            mostrarEstado(3); // ¡ÉXITO!
+        } else {
+            Swal.fire('Código incorrecto', 'Pedile el código a los profes después de mostrarles tu foto.', 'warning');
+        }
     }
 }
 
-// --- LLAVE PARA CERRAR ESTA FUNCIÓN ---
-// 1. FUNCIÓN PARA MOSTRAR LA FOTO CUANDO LA SACAN
-function previsualizarFoto(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const fotoData = e.target.result;
-            const previewImg = document.getElementById("fotoPreview");
-            const contenedor = document.getElementById("previewContenedor");
-            const btn = document.getElementById("btnAyuda");
+/* =====================
+   ESTADO 3 CON CARTEL Y FOTO
+===================== */
+function mostrarEstado(n) {
+    // Referencias a tus IDs de Howard Johnson
+    const e1 = document.getElementById("estado1");
+    const e2 = document.getElementById("estado2");
+    const e3 = document.getElementById("estado3");
 
-            if(previewImg) previewImg.src = fotoData;
-            if(contenedor) contenedor.style.display = "block";
+    if(e1) e1.style.display = (n === 1) ? "block" : "none";
+    if(e2) e2.style.display = (n === 2) ? "block" : "none";
+    if(e3) e3.style.display = (n === 3) ? "block" : "none";
+
+    const btnAyuda = document.getElementById("btnAyuda");
+    if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
+
+    // Si ganó, disparamos el proceso de figurita
+    if (n === 3) {
+        const zonaGanada = player.actualNombre;
+        
+        // 1. Guardamos progreso (se suma a completadas y mueve la estrella)
+        obtenerRecompensa();
+
+        // 2. Armamos el nombre del archivo para la imagen
+        const nombreLimpio = zonaGanada.toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
             
-            if(btn) {
-                btn.innerHTML = "✅ ENVIAR ESTA FOTO A LOS PROFES";
-                btn.style.background = "#25D366";
-                btn.style.animation = "pulse 1s infinite";
-                // Enganchamos la función de guardado directamente al botón
-                btn.onclick = function() {
-                    guardarYEnviarAProfes(fotoData);
-                };
-            }
-        }
-        reader.readAsDataURL(input.files[0]);
+        const rutaImagen = `./img/${nombreLimpio}.jpg`;
+
+        // 3. Mostramos el cartel final
+        Swal.fire({
+            title: '¡CONSEGUIDO!',
+            text: `¡Ganaste la figurita de ${zonaGanada}!`,
+            imageUrl: rutaImagen,
+            imageWidth: 200,
+            imageHeight: 300,
+            imageAlt: '⭐',
+            confirmButtonText: 'VER MI ÁLBUM',
+            confirmButtonColor: '#fbc02d',
+            allowOutsideClick: false
+        }).then(() => {
+            irA('album-screen');
+        });
     }
 }
 
