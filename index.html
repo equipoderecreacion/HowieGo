@@ -221,7 +221,7 @@ input {
     </div>
 
     <input type="text" id="respuestaInput" placeholder="Escribí aquí...">
-    <button type="button" onclick="validarRespuesta(event)" class="btn-principal">VALIDAR</button>
+    <button onclick="validarRespuesta()" class="btn-principal">VALIDAR</button>
 </div>
 
     <div id="estado3" style="display:none;">
@@ -579,9 +579,7 @@ function entrarZona(zona) {
   irA("zona-screen");
 }
 
-function validarRespuesta(event) {
-    if (event) event.preventDefault(); // DETIENE EL RESETEO
-    
+function validarRespuesta() {
     const zona = player.actualNombre;
     const data = zonasData[zona];
     const input = document.getElementById("respuestaInput").value.trim().toLowerCase();
@@ -596,24 +594,47 @@ function validarRespuesta(event) {
         }
     } 
     else {
-        // Validación de código (ej: VISTA)
         if (input === data.respuesta.toLowerCase()) {
             const inputFoto = document.getElementById("fotoInput");
             
+            // Si hay foto, la procesamos como antes
             if (inputFoto.files && inputFoto.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    // LLAMAMOS A LA FUNCIÓN DE DESCARGA Y WHATSAPP
                     guardarYEnviarAProfes(e.target.result);
-                    mostrarEstado(3); // LANZA EL CONFETI Y PREMIO
+                    mostrarEstado(3); 
                 };
                 reader.readAsDataURL(inputFoto.files[0]);
             } else {
                 mostrarEstado(3);
             }
         } else {
-            Swal.fire('Código incorrecto', 'Pedile el código a los profes después de mostrarles tu foto.', 'warning');
+            Swal.fire('Código incorrecto', 'Pedile el código a los profes.', 'warning');
         }
     }
+}
+
+function guardarYEnviarAProfes(imageData) {
+    // 1. VOLVEMOS A LA DESCARGA QUE TENÍAS
+    const enlace = document.createElement("a");
+    enlace.href = imageData;
+    enlace.download = `mision-howie-${player.actualNombre}.png`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+
+    // 2. EL CARTEL DE AVISO
+    Swal.fire({
+        title: '¡Foto guardada!',
+        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat que se va a abrir.',
+        icon: 'success',
+        confirmButtonText: 'ABRIR WHATSAPP',
+        confirmButtonColor: '#25D366'
+    }).then(() => {
+        const mensaje = encodeURIComponent(`¡Hola Profes! Acá les mando la foto de mi misión en: ${player.actualNombre}.`);
+        window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
+    });
 }
 
 function previsualizarFoto(input) {
@@ -629,27 +650,6 @@ function previsualizarFoto(input) {
     }
 }
 
-function guardarYEnviarAProfes(imageData) {
-    // 1. DESCARGA AL CELULAR
-    const enlace = document.createElement("a");
-    enlace.href = imageData;
-    enlace.download = `mision-howie-${player.actualNombre}.png`;
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
-
-    // 2. CARTEL Y WHATSAPP
-    Swal.fire({
-        title: '¡Foto guardada!',
-        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat que se va a abrir.',
-        icon: 'success',
-        confirmButtonText: 'ABRIR WHATSAPP',
-        confirmButtonColor: '#25D366'
-    }).then(() => {
-        const mensaje = encodeURIComponent(`¡Hola Howie! Acá te mando la foto de mi misión en: ${player.actualNombre}. Mi código es: ${zonasData[player.actualNombre].respuesta}`);
-        window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
-    });
-}
 
 function mostrarEstado(n) {
   const e1 = document.getElementById("estado1");
