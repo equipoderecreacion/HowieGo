@@ -578,53 +578,36 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // Ocultamos todo lo anterior
-  document.getElementById("estado1").style.display = "none";
-  document.getElementById("estado2").style.display = "none";
+  document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
+  document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
   document.getElementById("estado3").style.display = "none";
 
-  // Manejo del botón de ayuda
-  const btnAyuda = document.getElementById("btnAyuda");
-  if (btnAyuda) {
-    btnAyuda.style.display = n === 3 ? "none" : "block";
-  }
-
-  // Si el estado es 1 o 2, los mostramos normalmente
-  if (n === 1) document.getElementById("estado1").style.display = "block";
-  if (n === 2) document.getElementById("estado2").style.display = "block";
-
-  // LÓGICA DE GANADOR (Estado 3)
   if (n === 3) {
-    // 1. Guardamos el progreso de una (para que avance la estrella)
     if (typeof obtenerRecompensa === 'function') {
         obtenerRecompensa();
     }
 
-    // 2. Intentamos armar la ruta de la imagen con cuidado
-    let rutaImagen = "";
-    try {
-        const nombreSuelto = (typeof zonaActual !== 'undefined') ? zonaActual : "Premio";
-        const nombreLimpio = nombreSuelto.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        rutaImagen = `./img/${nombreLimpio}.jpg`;
-    } catch (e) {
-        rutaImagen = ""; // Si falla el nombre, queda vacío
-    }
+    // LISTA DE TRADUCCIÓN (Asegurate que coincidan con tus archivos en /img)
+    // Si tu archivo se llama maquina-de-espuma.jpg, aquí debe decir lo mismo
+    let nombreFoto = "mision"; 
+    if (zonaActual.includes("Espuma")) nombreFoto = "maquina-de-espuma";
+    if (zonaActual.includes("Quinchos")) nombreFoto = "quinchos";
+    // ... podés agregar más si ves que otras no cargan
 
-    // 3. Lanzamos el cartel. Si la imagen falla, SweetAlert muestra un placeholder
+    const rutaImagen = `./img/${nombreFoto}.jpg`;
+
     Swal.fire({
         title: '¡CONSEGUIDO!',
-        text: `¡Ganaste la figurita de ${typeof zonaActual !== 'undefined' ? zonaActual : 'esta zona'}!`,
+        html: `¡Ganaste la figurita de <b>${zonaActual}</b>!`,
         imageUrl: rutaImagen,
-        imageWidth: 200,
+        imageWidth: 220,
         imageHeight: 300,
-        imageAlt: '⭐', // Si no carga la foto, se ve esta estrella
+        imageAlt: '⭐',
         confirmButtonText: 'VER MI ÁLBUM',
         confirmButtonColor: '#fbc02d',
         allowOutsideClick: false
     }).then(() => {
-        if (typeof irA === 'function') {
-            irA('album-screen');
-        }
+        irA('album-screen');
     });
   }
 }
