@@ -579,54 +579,44 @@ function entrarZona(zona) {
 
 
 function mostrarEstado(n) {
-  // Ocultamos todo lo anterior
-  document.getElementById("estado1").style.display = "none";
-  document.getElementById("estado2").style.display = "none";
-  document.getElementById("estado3").style.display = "none";
+  // 1. Referencias a los contenedores
+  var e1 = document.getElementById("estado1");
+  var e2 = document.getElementById("estado2");
+  var e3 = document.getElementById("estado3");
 
-  // Manejo del botón de ayuda
-  const btnAyuda = document.getElementById("btnAyuda");
+  // 2. Limpieza de pantalla (Estilo original que te funcionaba)
+  if(e1) e1.style.display = (n === 1) ? "block" : "none";
+  if(e2) e2.style.display = (n === 2) ? "block" : "none";
+  if(e3) e3.style.display = (n === 3) ? "block" : "none";
+
+  // 3. Ocultar botón de ayuda si ganó
+  var btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
-    btnAyuda.style.display = n === 3 ? "none" : "block";
+    btnAyuda.style.display = (n === 3) ? "none" : "block";
   }
 
-  // Si el estado es 1 o 2, los mostramos normalmente
-  if (n === 1) document.getElementById("estado1").style.display = "block";
-  if (n === 2) document.getElementById("estado2").style.display = "block";
-
-  // LÓGICA DE GANADOR (Estado 3)
+  // 4. Cartel de Felicidades (SweetAlert2)
   if (n === 3) {
-    // 1. Guardamos el progreso de una (para que avance la estrella)
+    // Primero guardamos el progreso para que la estrella avance
     if (typeof obtenerRecompensa === 'function') {
-        obtenerRecompensa();
+      obtenerRecompensa();
     }
 
-    // 2. Intentamos armar la ruta de la imagen con cuidado
-    let rutaImagen = "";
-    try {
-        const nombreSuelto = (typeof zonaActual !== 'undefined') ? zonaActual : "Premio";
-        const nombreLimpio = nombreSuelto.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        rutaImagen = `./img/${nombreLimpio}.jpg`;
-    } catch (e) {
-        rutaImagen = ""; // Si falla el nombre, queda vacío
-    }
-
-    // 3. Lanzamos el cartel. Si la imagen falla, SweetAlert muestra un placeholder
-    Swal.fire({
-        title: '¡CONSEGUIDO!',
-        text: `¡Ganaste la figurita de ${typeof zonaActual !== 'undefined' ? zonaActual : 'esta zona'}!`,
-        imageUrl: rutaImagen,
-        imageWidth: 200,
-        imageHeight: 300,
-        imageAlt: '⭐', // Si no carga la foto, se ve esta estrella
+    // Mostramos el cartel de éxito
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        title: '¡LO LOGRASTE!',
+        text: '¡Conseguiste una nueva figurita!',
+        icon: 'success',
         confirmButtonText: 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d',
-        allowOutsideClick: false
-    }).then(() => {
-        if (typeof irA === 'function') {
-            irA('album-screen');
-        }
-    });
+        confirmButtonColor: '#fbc02d'
+      }).then(function() {
+        if (typeof irA === 'function') irA('album-screen');
+      });
+    } else {
+      // Si falla la librería, mandamos directo al álbum para que no se trabe
+      if (typeof irA === 'function') irA('album-screen');
+    }
   }
 }
 
