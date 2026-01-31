@@ -616,23 +616,23 @@ function validarRespuesta() {
 }
 
 function guardarYEnviarAProfes(imageData) {
-    // 1. VOLVEMOS A LA DESCARGA QUE TENÍAS
-    const enlace = document.createElement("a");
-    enlace.href = imageData;
-    enlace.download = `mision-howie-${player.actualNombre}.png`;
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
+    // 1. FORZAR DESCARGA
+    const link = document.createElement("a");
+    link.href = imageData;
+    link.download = `HowieGo_${player.actualNombre}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-    // 2. EL CARTEL DE AVISO
+    // 2. AVISO Y WHATSAPP
     Swal.fire({
-        title: '¡Foto guardada!',
-        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat que se va a abrir.',
+        title: '¡Foto Guardada!',
+        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat de WhatsApp.',
         icon: 'success',
         confirmButtonText: 'ABRIR WHATSAPP',
         confirmButtonColor: '#25D366'
     }).then(() => {
-        const mensaje = encodeURIComponent(`¡Hola Profes! Acá les mando la foto de mi misión en: ${player.actualNombre}.`);
+        const mensaje = encodeURIComponent(`¡Hola Howie! Acá te mando la foto de mi misión en: ${player.actualNombre}.`);
         window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
     });
 }
@@ -641,10 +641,18 @@ function previsualizarFoto(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const preview = document.getElementById("fotoPreview");
-            const contenedor = document.getElementById("previewContenedor");
-            if (preview) preview.src = e.target.result;
-            if (contenedor) contenedor.style.display = "block";
+            const img = document.getElementById("fotoPreview");
+            const cont = document.getElementById("previewContenedor");
+            const btnAyuda = document.getElementById("btnAyuda");
+
+            if (img) img.src = e.target.result;
+            if (cont) cont.style.display = "block";
+            
+            // Esto cambia el botón verde cuando hay una foto lista
+            if (btnAyuda) {
+                btnAyuda.innerText = "💬 ENVIAR FOTO A HOWIE";
+                btnAyuda.style.background = "#25D366";
+            }
         };
         reader.readAsDataURL(input.files[0]);
     }
