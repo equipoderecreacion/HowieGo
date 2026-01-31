@@ -578,27 +578,29 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // 1. Manejo de visibilidad de los estados
   document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
   document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
   
-  // 2. IMPORTANTE: El estado 3 visual (el del emoji 🖼️) lo mantenemos oculto 
-  // porque ahora usamos el cartel animado con la foto real.
+  // Mantenemos el div del emoji oculto para que no quede la pantalla blanca
   document.getElementById("estado3").style.display = "none";
 
-  // 3. Tu línea extra: Ocultamos el botón de ayuda solo si ya ganó
+  // Ocultamos el botón de ayuda/enviar
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = n === 3 ? "none" : "block";
   }
 
-  // 4. DISPARADOR DEL PREMIO: Si llegamos al estado 3, lanzamos el cartel con la foto
+  // SI ES ESTADO 3 (GANÓ)
   if (n === 3) {
+    // A. PRIMERO: Ejecutamos la lógica que ya tenías para avanzar
+    // Esto es lo que desbloquea la estrella y guarda el progreso
+    if (typeof obtenerRecompensa === 'function') {
+        obtenerRecompensa(); 
+    }
+
+    // B. SEGUNDO: Mostramos el cartel con la foto de la zona
     if (typeof zonaActual !== 'undefined') {
-        mostrarPremio(zonaActual); 
-    } else {
-        // Por si la variable zonaActual se pierde, que no se trabe el juego
-        Swal.fire("¡Misión Cumplida!", "¡Conseguiste una nueva figurita!", "success");
+        mostrarPremio(zonaActual);
     }
   }
 }
