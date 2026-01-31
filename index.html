@@ -578,42 +578,24 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // 1. Ocultar los contenedores de la zona
-  const ids = ["estado1", "estado2", "estado3"];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
+  // 1. Ocultar todos los estados para resetear la vista
+  const e1 = document.getElementById("estado1");
+  const e2 = document.getElementById("estado2");
+  const e3 = document.getElementById("estado3");
 
-  // 2. Mostrar el que corresponde
-  if (n === 1) document.getElementById("estado1").style.display = "block";
-  if (n === 2) document.getElementById("estado2").style.display = "block";
+  if(e1) e1.style.display = "none";
+  if(e2) e2.style.display = "none";
+  if(e3) e3.style.display = "none";
 
-  // 3. Manejo del botón Ayuda/Enviar
+  // 2. Mostrar SOLAMENTE el que pedimos
+  if (n === 1 && e1) e1.style.display = "block";
+  if (n === 2 && e2) e2.style.display = "block";
+  if (n === 3 && e3) e3.style.display = "block";
+
+  // 3. Manejo del botón de ayuda (se oculta en el estado 3)
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = (n === 3) ? "none" : "block";
-  }
-
-  // 4. Si ganó (Estado 3)
-  if (n === 3) {
-    // Primero: Guardar progreso (estrella y álbum)
-    if (typeof obtenerRecompensa === 'function') {
-      obtenerRecompensa();
-    }
-
-    // Segundo: Cartel de éxito garantizado
-    Swal.fire({
-      title: '¡MUY BIEN!',
-      text: '¡Misión cumplida! Ganaste una figurita.',
-      icon: 'success',
-      confirmButtonText: 'VER MI ÁLBUM',
-      confirmButtonColor: '#fbc02d'
-    }).then(() => {
-      if (typeof irA === 'function') {
-        irA('album-screen');
-      }
-    });
   }
 }
 
