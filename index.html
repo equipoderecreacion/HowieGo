@@ -616,13 +616,18 @@ function mostrarEstado(n) {
   if (n === 3) {
     const zonaGanada = player.actualNombre;
     obtenerRecompensa();
-    // Esto lanza el confeti
-    confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#fbc02d', '#ffffff', '#4CAF50'] // Colores Howie y éxito
-    });
+
+    // Lanzar confeti FORZANDO que se vea arriba de todo
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#fbc02d', '#ffffff', '#4CAF50'],
+            zIndex: 9999  // <--- ESTA LÍNEA ES LA CLAVE
+        });
+    }
+
     const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const rutaImagen = `./img/${nombreLimpio}.jpg`;
 
