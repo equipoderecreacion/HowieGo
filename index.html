@@ -580,28 +580,36 @@ function entrarZona(zona) {
 function mostrarEstado(n) {
   document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
   document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
-  
-  // Mantenemos el div del emoji oculto para que no quede la pantalla blanca
   document.getElementById("estado3").style.display = "none";
 
-  // Ocultamos el botón de ayuda/enviar
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = n === 3 ? "none" : "block";
   }
 
-  // SI ES ESTADO 3 (GANÓ)
   if (n === 3) {
-    // A. PRIMERO: Ejecutamos la lógica que ya tenías para avanzar
-    // Esto es lo que desbloquea la estrella y guarda el progreso
-    if (typeof obtenerRecompensa === 'function') {
-        obtenerRecompensa(); 
-    }
+    // 1. Limpiamos el nombre para la foto (.jpeg)
+    const nombre = zonaActual.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const rutaImagen = `./img/${nombre}.jpeg`;
 
-    // B. SEGUNDO: Mostramos el cartel con la foto de la zona
-    if (typeof zonaActual !== 'undefined') {
-        mostrarPremio(zonaActual);
-    }
+    // 2. Mostramos el cartel de SweetAlert2 PRIMERO
+    Swal.fire({
+        title: '¡CONSEGUIDO!',
+        html: `¡Ganaste la figurita de <b>${zonaActual}</b>!`,
+        imageUrl: rutaImagen,
+        imageWidth: 200,
+        imageHeight: 300,
+        confirmButtonText: 'VER MI ÁLBUM',
+        confirmButtonColor: '#fbc02d',
+        allowOutsideClick: false // Obliga a que vean el cartel
+    }).then(() => {
+        // 3. RECIÉN CUANDO CIERRAN EL CARTEL, ejecutamos la lógica de avanzar
+        if (typeof obtenerRecompensa === 'function') {
+            obtenerRecompensa(); 
+        }
+        // Si obtenerRecompensa no los saca de la pantalla, los mandamos nosotros:
+        irA('album-screen'); 
+    });
   }
 }
 
