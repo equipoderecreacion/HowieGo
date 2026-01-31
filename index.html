@@ -578,47 +578,42 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  console.log("Cambiando a estado: " + n); // Esto nos dirá en la consola si funciona
+  // 1. Ocultar los 3 divs de estado
+  const ids = ["estado1", "estado2", "estado3"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
 
-  // 1. Ocultamos los tres estados por seguridad
-  const e1 = document.getElementById("estado1");
-  const e2 = document.getElementById("estado2");
-  const e3 = document.getElementById("estado3");
+  // 2. Mostrar el que corresponde (si no es el 3)
+  if (n === 1) document.getElementById("estado1").style.display = "block";
+  if (n === 2) document.getElementById("estado2").style.display = "block";
 
-  if(e1) e1.style.display = "none";
-  if(e2) e2.style.display = "none";
-  if(e3) e3.style.display = "none";
-
-  // 2. Mostramos el que corresponde
-  if (n === 1 && e1) e1.style.display = "block";
-  if (n === 2 && e2) e2.style.display = "block";
-
-  // 3. Manejo del botón de ayuda/enviar
+  // 3. Manejo del botón de ayuda
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = n === 3 ? "none" : "block";
   }
 
-  // 4. Si ganó (Estado 3), lanzamos el cartel de una
+  // 4. EL DISPARADOR DEL CARTEL
   if (n === 3) {
-    console.log("¡Misión cumplida detectada!");
-    
-    // Ejecutamos la recompensa para que la estrella avance
+    // Primero guardamos progreso para que la estrella avance
     if (typeof obtenerRecompensa === 'function') {
-        obtenerRecompensa();
+      obtenerRecompensa();
     }
 
-    // Cartel de éxito garantizado
+    // Usamos el cartel más simple posible para probar
     Swal.fire({
-        title: '¡LO LOGRASTE!',
-        text: '¡Conseguiste una nueva figurita!',
-        icon: 'success',
-        confirmButtonText: 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d'
+      title: '¡Misión Cumplida!',
+      text: 'Conseguiste la figurita de ' + (zonaActual || 'la zona'),
+      icon: 'success',
+      confirmButtonText: 'VER ÁLBUM',
+      confirmButtonColor: '#fbc02d',
+      allowOutsideClick: false
     }).then(() => {
-        if (typeof irA === 'function') {
-            irA('album-screen');
-        }
+      if (typeof irA === 'function') {
+        irA('album-screen');
+      }
     });
   }
 }
