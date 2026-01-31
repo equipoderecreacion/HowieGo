@@ -586,19 +586,56 @@ function validarRespuesta() {
 
     if (!data) return;
 
+    // 1. Si es ACERTIJO (auto)
     if (data.tipo === "auto") {
         if (data.respuestasValidas.map(r => r.toLowerCase()).includes(input)) {
             mostrarEstado(3);
         } else {
             Swal.fire('¡Casi!', 'Howie dice que esa no es la respuesta correcta.', 'error');
         }
-    } else {
+    } 
+    // 2. Si es FOTO (descarga + whatsapp + cartel)
+    else {
         if (input === data.respuesta.toLowerCase()) {
-            mostrarEstado(3);
+            // Primero el proceso de la foto
+            const inputFoto = document.getElementById("fotoInput");
+            if (inputFoto.files && inputFoto.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    guardarYEnviarAProfes(e.target.result);
+                    mostrarEstado(3); // Les damos la figurita después de enviar
+                };
+                reader.readAsDataURL(inputFoto.files[0]);
+            } else {
+                // Si no subió foto, pero puso el código igual (por si los profes lo autorizan)
+                mostrarEstado(3);
+            }
         } else {
-            Swal.fire('Código incorrecto', 'Pedile el código a los profes.', 'warning');
+            Swal.fire('Código incorrecto', 'Pedile el código a los profes después de mostrarles tu foto.', 'warning');
         }
     }
+}
+
+function guardarYEnviarAProfes(imageData) {
+    // 1. DESCARGA AL CELULAR
+    const enlace = document.createElement("a");
+    enlace.href = imageData;
+    enlace.download = `mision-howie-${player.actualNombre}.png`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+
+    // 2. CARTEL Y WHATSAPP
+    Swal.fire({
+        title: '¡Foto guardada!',
+        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat que se va a abrir.',
+        icon: 'success',
+        confirmButtonText: 'ABRIR WHATSAPP',
+        confirmButtonColor: '#25D366'
+    }).then(() => {
+        const mensaje = encodeURIComponent(`¡Hola Howie! Acá te mando la foto de mi misión en: ${player.actualNombre}. Mi código es: ${zonasData[player.actualNombre].respuesta}`);
+        window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
+    });
 }
 
 function mostrarEstado(n) {
