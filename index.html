@@ -578,60 +578,51 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
-  document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
+  // Ocultamos estados viejos
+  document.getElementById("estado1").style.display = "none";
+  document.getElementById("estado2").style.display = "none";
   document.getElementById("estado3").style.display = "none";
 
+  const btnAyuda = document.getElementById("btnAyuda");
+  if (btnAyuda) {
+    btnAyuda.style.display = n === 3 ? "none" : "block";
+  }
+
+  if (n === 1) document.getElementById("estado1").style.display = "block";
+  if (n === 2) document.getElementById("estado2").style.display = "block";
+
   if (n === 3) {
+    // 1. Ejecutamos la recompensa para que avance la estrella
     if (typeof obtenerRecompensa === 'function') {
         obtenerRecompensa();
     }
 
-    // LISTA DE TRADUCCIÓN (Asegurate que coincidan con tus archivos en /img)
-    // Si tu archivo se llama maquina-de-espuma.jpg, aquí debe decir lo mismo
-    let nombreFoto = "mision"; 
-    if (zonaActual.includes("Espuma")) nombreFoto = "maquina-de-espuma";
-    if (zonaActual.includes("Quinchos")) nombreFoto = "quinchos";
-    // ... podés agregar más si ves que otras no cargan
+    // 2. Intentamos armar la ruta. Si falla, el cartel sale igual.
+    let rutaFoto = "./img/mision.jpg"; 
+    try {
+        if (typeof zonaActual !== 'undefined') {
+            // Convertimos "Maquina de Espuma" a "maquina-de-espuma"
+            let limpio = zonaActual.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            rutaFoto = `./img/${limpio}.jpg`;
+        }
+    } catch (e) { console.log("Error con el nombre de la foto"); }
 
-    const rutaImagen = `./img/${nombreFoto}.jpg`;
-
+    // 3. El Cartel que NO FALLA
     Swal.fire({
         title: '¡CONSEGUIDO!',
-        html: `¡Ganaste la figurita de <b>${zonaActual}</b>!`,
-        imageUrl: rutaImagen,
-        imageWidth: 220,
+        html: `¡Ganaste la figurita de <b>${typeof zonaActual !== 'undefined' ? zonaActual : 'la zona'}</b>!`,
+        imageUrl: rutaFoto,
+        imageWidth: 200,
         imageHeight: 300,
-        imageAlt: '⭐',
+        imageAlt: '⭐', // Si la foto no existe en GitHub, se ve esta estrella
         confirmButtonText: 'VER MI ÁLBUM',
         confirmButtonColor: '#fbc02d',
         allowOutsideClick: false
     }).then(() => {
-        irA('album-screen');
+        if (typeof irA === 'function') {
+            irA('album-screen');
+        }
     });
-  }
-}
-
-function validarRespuesta() {
-  const r = document.getElementById("respuestaInput").value.trim().toUpperCase();
-  const data = zonasData[player.actualNombre];
-  
-  if(!data) return;
-
-  let esCorrecto = false;
-
-  if (data.tipo === "foto") {
-    // Busca la palabra clave específica de cada zona (FIESTA, VUELO, VISTA, etc.)
-    esCorrecto = (r === data.respuesta.toUpperCase());
-  } else {
-    // Lógica automática para las preguntas
-    esCorrecto = data.respuestasValidas.some(res => r.toLowerCase().includes(res.toLowerCase()));
-  }
-
-  if (esCorrecto) {
-    mostrarEstado(3);
-  } else {
-    alert("¡Howie dice que ese no es el código o respuesta correcta! Intentá de nuevo o pedí ayuda.");
   }
 }
 
