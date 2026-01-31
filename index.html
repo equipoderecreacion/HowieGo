@@ -578,45 +578,53 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // 1. Control de visibilidad de los estados
-  document.getElementById("estado1").style.display = n === 1 ? "block" : "none";
-  document.getElementById("estado2").style.display = n === 2 ? "block" : "none";
-  document.getElementById("estado3").style.display = "none"; // Ocultamos el emoji viejo
+  // Ocultamos todo lo anterior
+  document.getElementById("estado1").style.display = "none";
+  document.getElementById("estado2").style.display = "none";
+  document.getElementById("estado3").style.display = "none";
 
+  // Manejo del botón de ayuda
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = n === 3 ? "none" : "block";
   }
 
-  // 2. LÓGICA DE ÉXITO (Estado 3)
+  // Si el estado es 1 o 2, los mostramos normalmente
+  if (n === 1) document.getElementById("estado1").style.display = "block";
+  if (n === 2) document.getElementById("estado2").style.display = "block";
+
+  // LÓGICA DE GANADOR (Estado 3)
   if (n === 3) {
-    // A. GUARDAR PROGRESO PRIMERO: Para que la estrella avance en el álbum
+    // 1. Guardamos el progreso de una (para que avance la estrella)
     if (typeof obtenerRecompensa === 'function') {
-        obtenerRecompensa(); 
+        obtenerRecompensa();
     }
 
-    // B. PREPARAR LA FOTO: Limpiamos el nombre y usamos .jpg
-    const nombreLimpio = zonaActual.toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-    
-    const rutaImagen = `./img/${nombreLimpio}.jpg`; // <--- CORREGIDO A .JPG
+    // 2. Intentamos armar la ruta de la imagen con cuidado
+    let rutaImagen = "";
+    try {
+        const nombreSuelto = (typeof zonaActual !== 'undefined') ? zonaActual : "Premio";
+        const nombreLimpio = nombreSuelto.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        rutaImagen = `./img/${nombreLimpio}.jpg`;
+    } catch (e) {
+        rutaImagen = ""; // Si falla el nombre, queda vacío
+    }
 
-    // C. MOSTRAR EL CARTEL DE PREMIO
+    // 3. Lanzamos el cartel. Si la imagen falla, SweetAlert muestra un placeholder
     Swal.fire({
         title: '¡CONSEGUIDO!',
-        html: `¡Ganaste la figurita de <b>${zonaActual}</b>!`,
+        text: `¡Ganaste la figurita de ${typeof zonaActual !== 'undefined' ? zonaActual : 'esta zona'}!`,
         imageUrl: rutaImagen,
         imageWidth: 200,
         imageHeight: 300,
+        imageAlt: '⭐', // Si no carga la foto, se ve esta estrella
         confirmButtonText: 'VER MI ÁLBUM',
         confirmButtonColor: '#fbc02d',
         allowOutsideClick: false
     }).then(() => {
-        // Al cerrar, mandamos al álbum para ver la nueva figurita
-        irA('album-screen');
+        if (typeof irA === 'function') {
+            irA('album-screen');
+        }
     });
   }
 }
