@@ -578,43 +578,35 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // Ocultamos estados viejos
-  document.getElementById("estado1").style.display = "none";
-  document.getElementById("estado2").style.display = "none";
-  document.getElementById("estado3").style.display = "none";
+  // 1. Ocultar todos los estados de una vez
+  const estados = ["estado1", "estado2", "estado3"];
+  estados.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = "none";
+  });
 
+  // 2. Manejo del botón de ayuda
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = n === 3 ? "none" : "block";
   }
 
+  // 3. Mostrar el estado que corresponde si no es el final
   if (n === 1) document.getElementById("estado1").style.display = "block";
   if (n === 2) document.getElementById("estado2").style.display = "block";
 
+  // 4. LÓGICA DE GANADOR (Estado 3)
   if (n === 3) {
-    // 1. Ejecutamos la recompensa para que avance la estrella
+    // Ejecutamos la recompensa para que la estrella avance
     if (typeof obtenerRecompensa === 'function') {
         obtenerRecompensa();
     }
 
-    // 2. Intentamos armar la ruta. Si falla, el cartel sale igual.
-    let rutaFoto = "./img/mision.jpg"; 
-    try {
-        if (typeof zonaActual !== 'undefined') {
-            // Convertimos "Maquina de Espuma" a "maquina-de-espuma"
-            let limpio = zonaActual.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            rutaFoto = `./img/${limpio}.jpg`;
-        }
-    } catch (e) { console.log("Error con el nombre de la foto"); }
-
-    // 3. El Cartel que NO FALLA
+    // El cartel ahora es independiente de la foto
     Swal.fire({
-        title: '¡CONSEGUIDO!',
-        html: `¡Ganaste la figurita de <b>${typeof zonaActual !== 'undefined' ? zonaActual : 'la zona'}</b>!`,
-        imageUrl: rutaFoto,
-        imageWidth: 200,
-        imageHeight: 300,
-        imageAlt: '⭐', // Si la foto no existe en GitHub, se ve esta estrella
+        title: '¡MISIÓN CUMPLIDA!',
+        text: `¡Conseguiste la figurita de ${zonaActual || "esta zona"}!`,
+        icon: 'success', // Usamos un icono de éxito por defecto
         confirmButtonText: 'VER MI ÁLBUM',
         confirmButtonColor: '#fbc02d',
         allowOutsideClick: false
