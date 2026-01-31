@@ -578,43 +578,40 @@ function entrarZona(zona) {
 }
 
 function mostrarEstado(n) {
-  // 1. Ocultar todos los estados para que no se pisen
-  const e1 = document.getElementById("estado1");
-  const e2 = document.getElementById("estado2");
-  const e3 = document.getElementById("estado3");
-  
-  if (e1) e1.style.display = "none";
-  if (e2) e2.style.display = "none";
-  if (e3) e3.style.display = "none";
+  // 1. Ocultar los contenedores de la zona
+  const ids = ["estado1", "estado2", "estado3"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
 
   // 2. Mostrar el que corresponde
-  if (n === 1 && e1) e1.style.display = "block";
-  if (n === 2 && e2) e2.style.display = "block";
+  if (n === 1) document.getElementById("estado1").style.display = "block";
+  if (n === 2) document.getElementById("estado2").style.display = "block";
 
-  // 3. Manejo del botón de ayuda/enviar
+  // 3. Manejo del botón Ayuda/Enviar
   const btnAyuda = document.getElementById("btnAyuda");
   if (btnAyuda) {
     btnAyuda.style.display = (n === 3) ? "none" : "block";
   }
 
-  // 4. LÓGICA DE ÉXITO (Solo el mensaje de felicidades)
+  // 4. Si ganó (Estado 3)
   if (n === 3) {
-    // Primero guardamos el progreso para que la estrella avance
+    // Primero: Guardar progreso (estrella y álbum)
     if (typeof obtenerRecompensa === 'function') {
       obtenerRecompensa();
     }
 
-    // Mensaje de éxito directo con SweetAlert2
+    // Segundo: Cartel de éxito garantizado
     Swal.fire({
-      title: '¡FELICITACIONES!',
-      text: '¡Conseguiste una nueva figurita para tu álbum!',
+      title: '¡MUY BIEN!',
+      text: '¡Misión cumplida! Ganaste una figurita.',
       icon: 'success',
-      confirmButtonText: 'IR AL ÁLBUM',
-      confirmButtonColor: '#fbc02d',
-      allowOutsideClick: false
+      confirmButtonText: 'VER MI ÁLBUM',
+      confirmButtonColor: '#fbc02d'
     }).then(() => {
       if (typeof irA === 'function') {
-        irA('album-screen'); // Vuelve al álbum automáticamente
+        irA('album-screen');
       }
     });
   }
