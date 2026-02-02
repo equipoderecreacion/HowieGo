@@ -619,20 +619,21 @@ function previsualizarFoto(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            // 1. Mostramos la miniatura
+            // 1. Mostrar miniatura
             const img = document.getElementById("fotoPreview");
             const cont = document.getElementById("previewContenedor");
             if (img) img.src = e.target.result;
             if (cont) cont.style.display = "block";
             
-            // 2. TRANSFORMACIÓN REAL DEL BOTÓN VERDE
+            // 2. Transformar el botón verde COMPLETAMENTE
             const btnAyuda = document.getElementById("btnAyuda");
             if (btnAyuda) {
                 btnAyuda.innerText = "💬 ENVIAR FOTO A HOWIE";
                 btnAyuda.style.background = "#25D366";
-                // IMPORTANTE: Le asignamos la función de envío directamente aquí
+                
+                // Forzamos a que el botón use la nueva lógica de envío
                 btnAyuda.onclick = function() {
-                    guardarYEnviarAProfes(e.target.result);
+                    ejecutarEnvioFinal(e.target.result);
                 };
             }
         };
@@ -640,23 +641,24 @@ function previsualizarFoto(input) {
     }
 }
 
-function guardarYEnviarAProfes(imageData) {
-    // Descarga la imagen en el celular del huésped
+function ejecutarEnvioFinal(base64Image) {
+    // 1. DESCARGA REAL
     const link = document.createElement("a");
-    link.href = imageData;
-    link.download = `HowieGo_${player.actualNombre}.png`;
+    link.href = base64Image;
+    link.download = `Mision_Howie_${player.actualNombre}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    // Abre el WhatsApp de los profes en Carlos Paz
+    // 2. CARTEL DE AVISO (Para que el usuario sepa que se descargó)
     Swal.fire({
         title: '¡Foto Guardada!',
-        text: 'La imagen ya está en tu galería. Ahora adjuntala en el chat.',
+        text: 'La imagen ya está en tu galería. Ahora adjuntala en WhatsApp.',
         icon: 'success',
         confirmButtonText: 'ABRIR WHATSAPP',
         confirmButtonColor: '#25D366'
     }).then(() => {
+        // 3. WHATSAPP CON TEXTO ACTUALIZADO
         const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Acá te mando la foto de mi misión en: ${player.actualNombre}.`);
         window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
     });
