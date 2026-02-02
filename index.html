@@ -712,29 +712,19 @@ function mostrarEstado(n) {
 }
 
 function obtenerRecompensa() {
-    console.log("Sumando progreso para:", player.actualNombre);
+    // ... tu lógica de sumar a la lista completadas ...
 
-    // 1. Verificamos que la lista exista
-    if (!player.completadas) {
-        player.completadas = [];
-    }
-
-    // 2. Solo sumamos si no estaba ya completada
-    if (!player.completadas.includes(player.actualNombre)) {
-        player.completadas.push(player.actualNombre);
-        console.log("Misiones completadas ahora:", player.completadas.length);
-    }
-
-    // 3. Movemos la estrella al siguiente lugar del circuito oculto
-    const posActual = circuitoOculto.indexOf(player.actualNombre);
-    const siguientePos = (posActual + 1) % circuitoOculto.length;
-    player.actualNombre = circuitoOculto[siguientePos];
-
-    // 4. GUARDADO CRÍTICO: Esto es lo que actualiza el 0/15
+    // 1. Guardamos en la memoria del celu
     localStorage.setItem("howie", JSON.stringify(player));
+
+    // 2. ACTUALIZACIÓN FORZADA DE LA PANTALLA
+    const txtProgreso = document.getElementById("progreso");
+    if (txtProgreso) {
+        txtProgreso.innerText = `Progreso: ${player.completadas.length} / 15`;
+    }
     
-    // 5. Actualizamos la pantalla principal
-    actualizarInterfazHome();
+    // 3. Opcional: Redibujar el mapa o home para que se vea el cambio
+    if (typeof renderMapa === 'function') renderMapa();
 }
 
 function actualizarInterfazHome() {
@@ -820,6 +810,26 @@ function arrancarCamara() {
         console.error("Error al iniciar cámara:", err);
         alert("Por favor, refrescá la página y aceptá los permisos de cámara.");
     });
+}
+
+function detenerEscaneo() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+            // Limpiamos el objeto por completo para que la próxima vez sea nuevo
+            html5QrCode = null; 
+            
+            const readerElement = document.getElementById('reader');
+            const btnScanner = document.getElementById('btnAbrirScanner');
+            if (readerElement) readerElement.style.display = 'none';
+            if (btnScanner) btnScanner.style.display = 'block';
+            
+            console.log("Cámara liberada con éxito");
+        }).catch(err => {
+            console.error("Error al liberar cámara:", err);
+            // Si falla el stop, forzamos el ocultado igual
+            document.getElementById('reader').style.display = 'none';
+        });
+    }
 }
 </script>
 
