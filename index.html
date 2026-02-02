@@ -763,22 +763,35 @@ function pedirAyuda() {
 let html5QrCode;
 
 function iniciarEscaneo() {
-    const readerElement = document.getElementById('reader');
-    const btnScanner = document.getElementById('btnAbrirScanner');
-    
-    if (readerElement) readerElement.style.display = 'block';
-    if (btnScanner) btnScanner.style.display = 'none';
-
-    // 1. Limpieza preventiva
-    if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => {
-            html5QrCode = new Html5Qrcode("reader");
-            arrancarCamara();
-        });
-    } else {
-        html5QrCode = new Html5Qrcode("reader");
-        arrancarCamara();
+    // 1. Nos aseguramos de que el div 'reader' esté limpio
+    const readerDiv = document.getElementById('reader');
+    if (!readerDiv) {
+        console.error("No se encontró el elemento 'reader' en el HTML");
+        return;
     }
+    
+    readerDiv.style.display = 'block';
+    document.getElementById('btnAbrirScanner').style.display = 'none';
+
+    // 2. Si ya había una instancia, la matamos antes de crear una nueva
+    if (html5QrCode) {
+        html5QrCode.clear();
+    }
+
+    html5QrCode = new Html5Qrcode("reader");
+
+    // 3. Arrancamos la cámara
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+            // Éxito al escanear
+            procesarLecturaQR(decodedText);
+        }
+    ).catch((err) => {
+        console.error("Error al iniciar cámara:", err);
+        Swal.fire('Error', 'No se pudo acceder a la cámara. Verificá los permisos.', 'error');
+    });
 }
 
 function arrancarCamara() {
@@ -816,6 +829,30 @@ function arrancarCamara() {
     ).catch((err) => {
         console.error("Error de cámara:", err);
     });
+}
+
+function procesarLecturaQR(decodedText) {
+    detenerEscaneo(); // Apagamos la cámara rápido
+
+    try {
+        // Buscamos el parámetro 'zona' en la URL del QR
+        const url = new URL(decodedText);
+        const zonaParam = url.searchParams.get("zona");
+        
+        if (zonaParam) {
+            const zonaLimpia = zonaParam.replace(/-/g, " ").toLowerCase();
+            if (zonaLimpia === player.actualNombre.toLowerCase()) {
+                setTimeout(() => { mostrarEstado(2); }, 300);
+            } else {
+                Swal.fire('Zona Equivocada', `Este QR es de ${zonaLimpia}. Buscá: ${player.actualNombre}`, 'warning');
+            }
+        }
+    } catch (e) {
+        // Si el QR no es una URL, comparamos el texto directo
+        if (decodedText.toLowerCase() === player.actualNombre.toLowerCase()) {
+            setTimeout(() => { mostrarEstado(2); }, 300);
+        }
+    }
 }
 
 function detenerEscaneo() {
