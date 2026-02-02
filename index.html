@@ -771,35 +771,55 @@ function pedirAyuda() {
 }
 
 let html5QrCode;
-function iniciarEscaneo() {
-    document.getElementById('reader').style.display = 'block';
-    document.getElementById('btnAbrirScanner').style.display = 'none';
-    html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
-        const url = new URL(decodedText);
-        const zonaParam = url.searchParams.get("zona");
-        if (zonaParam) {
-            const zonaLimpia = zonaParam.replace(/-/g, " ");
-            if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
-                detenerEscaneo();
-                mostrarEstado(2); 
-            } else {
-                alert(`Ese QR es de ${zonaLimpia}. Tu estrella está en ${player.actualNombre}`);
-                detenerEscaneo();
-            }
-        }
-    }).catch(() => {
-        alert("Permití el acceso a la cámara.");
-    });
-}
 
-function detenerEscaneo() {
+function iniciarEscaneo() {
+    const readerElement = document.getElementById('reader');
+    const btnScanner = document.getElementById('btnAbrirScanner');
+    
+    if (readerElement) readerElement.style.display = 'block';
+    if (btnScanner) btnScanner.style.display = 'none';
+
+    // 1. Limpieza preventiva
     if (html5QrCode && html5QrCode.isScanning) {
         html5QrCode.stop().then(() => {
-            document.getElementById('reader').style.display = 'none';
-            document.getElementById('btnAbrirScanner').style.display = 'block';
+            html5QrCode = new Html5Qrcode("reader");
+            arrancarCamara();
         });
+    } else {
+        html5QrCode = new Html5Qrcode("reader");
+        arrancarCamara();
     }
+}
+
+function arrancarCamara() {
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: { width: 250, height: 250 } }, 
+        (decodedText) => {
+            try {
+                const url = new URL(decodedText);
+                const zonaParam = url.searchParams.get("zona");
+
+                if (zonaParam) {
+                    const zonaLimpia = zonaParam.replace(/-/g, " ");
+                    
+                    if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
+                        detenerEscaneo();
+                        // Pequeño retraso para que la cámara suelte el proceso antes de cambiar de pantalla
+                        setTimeout(() => { mostrarEstado(2); }, 300); 
+                    } else {
+                        Swal.fire('Zona Equivocada', `Ese QR es de ${zonaLimpia}. Tenés que buscar: ${player.actualNombre}`, 'warning');
+                        detenerEscaneo();
+                    }
+                }
+            } catch (e) {
+                console.error("QR no válido");
+            }
+        }
+    ).catch((err) => {
+        console.error("Error al iniciar cámara:", err);
+        alert("Por favor, refrescá la página y aceptá los permisos de cámara.");
+    });
 }
 </script>
 
