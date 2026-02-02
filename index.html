@@ -712,21 +712,36 @@ function mostrarEstado(n) {
 }
 
 function obtenerRecompensa() {
-  if (!player.completadas.includes(player.actualNombre)) {
-    player.completadas.push(player.actualNombre);
-  }
-  const posOculta = circuitoOculto.indexOf(player.actualNombre);
-  const siguientePos = (posOculta + 1) % circuitoOculto.length;
-  player.actualNombre = circuitoOculto[siguientePos];
+    console.log("Sumando progreso para:", player.actualNombre);
 
-  localStorage.setItem("howie", JSON.stringify(player));
+    // 1. Verificamos que la lista exista
+    if (!player.completadas) {
+        player.completadas = [];
+    }
+
+    // 2. Solo sumamos si no estaba ya completada
+    if (!player.completadas.includes(player.actualNombre)) {
+        player.completadas.push(player.actualNombre);
+        console.log("Misiones completadas ahora:", player.completadas.length);
+    }
+
+    // 3. Movemos la estrella al siguiente lugar del circuito oculto
+    const posActual = circuitoOculto.indexOf(player.actualNombre);
+    const siguientePos = (posActual + 1) % circuitoOculto.length;
+    player.actualNombre = circuitoOculto[siguientePos];
+
+    // 4. GUARDADO CRÍTICO: Esto es lo que actualiza el 0/15
+    localStorage.setItem("howie", JSON.stringify(player));
+    
+    // 5. Actualizamos la pantalla principal
+    actualizarInterfazHome();
 }
 
-function cerrarSesion() {
-  if(confirm("¿Cerrar sesión? Se perderá el progreso.")) {
-    localStorage.removeItem("howie");
-    location.reload();
-  }
+function actualizarInterfazHome() {
+    const p = document.getElementById("progreso");
+    if (p) {
+        p.innerText = `Progreso: ${player.completadas.length} / 15`;
+    }
 }
 
 window.onload = () => {
