@@ -711,148 +711,113 @@ function mostrarEstado(n) {
   }
 }
 
+// --- 1. GESTIÓN DE PROGRESO Y RECOMPENSA ---
 function obtenerRecompensa() {
-    console.log("Iniciando guardado de progreso...");
-
-    // 1. Evitar errores si la lista no existe
     if (!player.completadas) player.completadas = [];
 
-    // 2. Sumar la zona solo si no estaba (para no sumar puntos de más)
     if (!player.completadas.includes(player.actualNombre)) {
         player.completadas.push(player.actualNombre);
     }
 
-    // 3. MOVER LA ESTRELLA A LA SIGUIENTE ZONA
+    // Mover estrella al siguiente punto del circuito
     const posActual = circuitoOculto.indexOf(player.actualNombre);
     const siguientePos = (posActual + 1) % circuitoOculto.length;
     player.actualNombre = circuitoOculto[siguientePos];
 
-    // 4. EL PASO MÁS IMPORTANTE: GUARDAR EN EL DISCO DEL CELULAR
+    // GUARDADO CRÍTICO
     localStorage.setItem("howie", JSON.stringify(player));
-
-    // 5. Refrescar el contador 0/15 y el Álbum sin hacer refresh
+    
+    // Actualizar interfaz al instante
     actualizarInterfazHome();
     if (typeof renderAlbum === 'function') renderAlbum();
 }
 
 function actualizarInterfazHome() {
     const p = document.getElementById("progreso");
-    if (p) {
+    if (p && player.completadas) {
         p.innerText = `Progreso: ${player.completadas.length} / 15`;
     }
 }
 
-window.onload = () => {
-  const saved = localStorage.getItem("howie");
-  if (saved) {
-    player = JSON.parse(saved);
-    iniciarHome();
-    const urlParams = new URLSearchParams(window.location.search);
-    const zonaDesdeQR = urlParams.get('zona');
-    if (zonaDesdeQR) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-        const zonaLimpia = zonaDesdeQR.replace(/-/g, " ");
-        if (zonaLimpia.toLowerCase() === player.actualNombre.toLowerCase()) {
-            entrarZona(player.actualNombre); 
-            mostrarEstado(2);
-        } else {
-            alert(`Howie dice que tu estrella está en "${player.actualNombre}".`);
-            irA('mapa-screen');
-        }
-    }
-  }
-};
-
-function pedirAyuda() {
-  const mensaje = `Hola Howie! Soy ${player.nombre}. Estoy en ${player.actualNombre} y necesito una pista.`;
-  window.open(`https://wa.me/5493517669480?text=${encodeURIComponent(mensaje)}`, '_blank');
-}
-
+// --- 2. ESCÁNER QR (SIN LOOPS Y CON CIERRE SEGURO) ---
 let html5QrCode = null;
+let escaneando = false; 
 
 async function iniciarEscaneo() {
     const readerDiv = document.getElementById('reader');
     if (!readerDiv) return;
 
     readerDiv.style.display = 'block';
-    document.getElementById('btnAbrirScanner').style.display = 'none';
+    const btnScan = document.getElementById('btnAbrirScanner');
+    if (btnScan) btnScan.style.display = 'none';
 
-    // 1. Si ya había algo, lo matamos y esperamos un milisegundo
     if (html5QrCode) {
-        try {
-            await html5QrCode.stop();
-        } catch (e) {
-            console.log("Nada que detener");
-        }
+        try { await html5QrCode.stop(); } catch (e) {}
         html5QrCode = null;
     }
 
-    // 2. Pequeña pausa de seguridad antes de arrancar
     setTimeout(() => {
+        escaneando = true;
         html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start(
             { facingMode: "environment" }, 
             { fps: 10, qrbox: { width: 250, height: 250 } },
             (decodedText) => {
-                // Solo detenemos si realmente leyó algo
+                if (!escaneando) return;
+                escaneando = false; 
                 detenerEscaneo(); 
-                logicaDeValidacionQR(decodedText);
+                procesarLecturaQR(decodedText);
             }
-        ).catch((err) => {
-            console.error("Error al iniciar:", err);
-            // Si se cierra solo, es probable que falte este ID en el HTML
-            alert("Error de cámara. Revisa que el div 'reader' exista.");
-        });
-    }, 500); // Medio segundo de respiro para el hardware
+        ).catch(err => console.error("Error cámara:", err));
+    }, 300);
 }
 
-
-function procesarLecturaQR(decodedText) {
-    detenerEscaneo(); // Apagamos la cámara rápido
-
-    try {
-        // Buscamos el parámetro 'zona' en la URL del QR
-        const url = new URL(decodedText);
-        const zonaParam = url.searchParams.get("zona");
-        
-        if (zonaParam) {
-            const zonaLimpia = zonaParam.replace(/-/g, " ").toLowerCase();
-            if (zonaLimpia === player.actualNombre.toLowerCase()) {
-                setTimeout(() => { mostrarEstado(2); }, 300);
-            } else {
-                Swal.fire('Zona Equivocada', `Este QR es de ${zonaLimpia}. Buscá: ${player.actualNombre}`, 'warning');
-            }
-        }
-    } catch (e) {
-        // Si el QR no es una URL, comparamos el texto directo
-        if (decodedText.toLowerCase() === player.actualNombre.toLowerCase()) {
-            setTimeout(() => { mostrarEstado(2); }, 300);
-        }
+function detenerEscaneo() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+            html5QrCode = null;
+            document.getElementById('reader').style.display = 'none';
+            const btnScan = document.getElementById('btnAbrirScanner');
+            if (btnScan) btnScan.style.display = 'block';
+        }).catch(() => {
+            document.getElementById('reader').style.display = 'none';
+        });
     }
 }
 
-let escaneando = false; // Interruptor de seguridad
-
-function arrancarCamara() {
-    escaneando = true; 
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: { width: 250, height: 250 } }, 
-        (decodedText) => {
-            if (!escaneando) return; // Si ya leyó uno, ignora los demás
-            
-            console.log("QR Detectado");
-            escaneando = false; // Bloqueamos nuevas lecturas inmediatamente
-
-            // 1. DETENER ESCÁNER DE RAÍZ
-            detenerEscaneo(); 
-
-            // 2. PROCESAR LÓGICA (Con un pequeño delay para que la cámara cierre)
-            setTimeout(() => {
-                procesarResultadoQR(decodedText);
-            }, 500);
+function procesarLecturaQR(decodedText) {
+    try {
+        let zonaLeida = "";
+        if (decodedText.includes("zona=")) {
+            const url = new URL(decodedText);
+            zonaLeida = url.searchParams.get("zona").replace(/-/g, " ");
+        } else {
+            zonaLeida = decodedText;
         }
-    ).catch(err => console.error("Error al arrancar", err));
+
+        if (zonaLeida.toLowerCase() === player.actualNombre.toLowerCase()) {
+            setTimeout(() => { mostrarEstado(2); }, 300);
+        } else {
+            Swal.fire('Zona Equivocada', `Buscá: ${player.actualNombre}`, 'warning');
+        }
+    } catch (e) {
+        console.error("Error QR:", e);
+    }
+}
+
+// --- 3. INICIO Y AYUDA ---
+window.onload = () => {
+    const saved = localStorage.getItem("howie");
+    if (saved) {
+        player = JSON.parse(saved);
+        actualizarInterfazHome();
+        if (typeof iniciarHome === 'function') iniciarHome();
+    }
+};
+
+function pedirAyuda() {
+    const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Estoy en ${player.actualNombre} y necesito una pista.`);
+    window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
 }
 </script>
 
