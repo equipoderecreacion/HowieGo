@@ -591,7 +591,8 @@ function entrarZona(zona) {
 
 function validarRespuesta() {
     const zona = player.actualNombre;
-    const data = zonasData[zona];
+    // Buscamos la data de la zona ignorando mayúsculas/minúsculas
+    const data = zonasData[zona]; 
     const inputElement = document.getElementById("respuestaInput");
     
     if (!inputElement) return;
@@ -599,28 +600,42 @@ function validarRespuesta() {
 
     if (!data) {
         console.error("No hay datos para la zona:", zona);
+        // TRUCO DE EMERGENCIA: Si no hay data, intentamos validar igual con obtenerRecompensa
+        Swal.fire('Error de Configuración', 'No se encontró la data de ' + zona, 'error');
         return;
     }
 
-    // LÓGICA DE VALIDACIÓN
     let esCorrecto = false;
 
+    // Validación según el tipo de desafío
     if (data.tipo === "auto") {
-        // Para desafíos como el del Lobby (ej: "10")
-        esCorrecto = data.respuestasValidas.map(r => r.toLowerCase()).includes(valorEscrito);
+        // Validación para respuestas múltiples (ej: números)
+        if (data.respuestasValidas) {
+            esCorrecto = data.respuestasValidas.some(r => r.toString().toLowerCase() === valorEscrito);
+        }
     } else {
-        // Para los códigos que pasan los profes por WhatsApp (ej: "VISTA")
-        esCorrecto = (valorEscrito === data.respuesta.toLowerCase());
+        // Validación para códigos de WhatsApp (ej: VISTA, NATATORIO)
+        if (data.respuesta) {
+            esCorrecto = (valorEscrito === data.respuesta.toLowerCase());
+        }
     }
 
     if (esCorrecto) {
-        // 1. SUMAR PROGRESO Y MOVER ESTRELLA
-        obtenerRecompensa();
+        // 1. SUMAMOS EL PUNTO (Esto mueve la estrella y guarda en el celu)
+        obtenerRecompensa(); 
         
-        // 2. MOSTRAR ÉXITO Y CONFETTI
+        // 2. FESTEJO
         mostrarEstado(3); 
+        
+        // Limpiamos el input para la próxima zona
+        inputElement.value = "";
     } else {
-        Swal.fire('Código Incorrecto', 'Howie dice que ese no es el código. ¡Pedilo por chat!', 'warning');
+        Swal.fire({
+            title: 'Código Incorrecto',
+            text: 'Howie dice que revises bien el código que te pasaron.',
+            icon: 'warning',
+            confirmButtonColor: '#004A97' // Color Howard Johnson
+        });
     }
 }
 
