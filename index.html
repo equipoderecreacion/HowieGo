@@ -806,42 +806,6 @@ async function iniciarEscaneo() {
     }, 500); // Medio segundo de respiro para el hardware
 }
 
-function arrancarCamara() {
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 15, qrbox: { width: 250, height: 250 } }, 
-        (decodedText) => {
-            console.log("¡QR Detectado con éxito!");
-            
-            // 1. Detenemos la cámara apenas detecta para que no se tilde
-            detenerEscaneo();
-
-            try {
-                // Si el QR es una URL (ej: https://.../?zona=escaleras)
-                if (decodedText.includes("zona=")) {
-                    const url = new URL(decodedText);
-                    const zonaParam = url.searchParams.get("zona");
-                    const zonaLimpia = zonaParam.replace(/-/g, " ").toLowerCase();
-
-                    if (zonaLimpia === player.actualNombre.toLowerCase()) {
-                        // ¡ÉXITO! Pasamos a la misión
-                        setTimeout(() => { mostrarEstado(2); }, 300);
-                    } else {
-                        Swal.fire('Zona Equivocada', `Ese QR es de ${zonaLimpia}. Buscá: ${player.actualNombre}`, 'warning');
-                    }
-                } 
-                // Si el QR es solo el texto de la zona (ej: "escaleras")
-                else if (decodedText.toLowerCase() === player.actualNombre.toLowerCase()) {
-                    setTimeout(() => { mostrarEstado(2); }, 300);
-                }
-            } catch (e) {
-                console.error("Error al procesar el texto del QR", e);
-            }
-        }
-    ).catch((err) => {
-        console.error("Error de cámara:", err);
-    });
-}
 
 function procesarLecturaQR(decodedText) {
     detenerEscaneo(); // Apagamos la cámara rápido
@@ -867,24 +831,28 @@ function procesarLecturaQR(decodedText) {
     }
 }
 
-function detenerEscaneo() {
-    if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-            // Limpiamos el objeto por completo para que la próxima vez sea nuevo
-            html5QrCode = null; 
+let escaneando = false; // Interruptor de seguridad
+
+function arrancarCamara() {
+    escaneando = true; 
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: { width: 250, height: 250 } }, 
+        (decodedText) => {
+            if (!escaneando) return; // Si ya leyó uno, ignora los demás
             
-            const readerElement = document.getElementById('reader');
-            const btnScanner = document.getElementById('btnAbrirScanner');
-            if (readerElement) readerElement.style.display = 'none';
-            if (btnScanner) btnScanner.style.display = 'block';
-            
-            console.log("Cámara liberada con éxito");
-        }).catch(err => {
-            console.error("Error al liberar cámara:", err);
-            // Si falla el stop, forzamos el ocultado igual
-            document.getElementById('reader').style.display = 'none';
-        });
-    }
+            console.log("QR Detectado");
+            escaneando = false; // Bloqueamos nuevas lecturas inmediatamente
+
+            // 1. DETENER ESCÁNER DE RAÍZ
+            detenerEscaneo(); 
+
+            // 2. PROCESAR LÓGICA (Con un pequeño delay para que la cámara cierre)
+            setTimeout(() => {
+                procesarResultadoQR(decodedText);
+            }, 500);
+        }
+    ).catch(err => console.error("Error al arrancar", err));
 }
 </script>
 
