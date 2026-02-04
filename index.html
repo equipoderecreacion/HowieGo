@@ -712,20 +712,27 @@ function mostrarEstado(n) {
 }
 
 function obtenerRecompensa() {
-    // ... tu lógica de sumar a completadas ...
+    console.log("Iniciando guardado de progreso...");
+
+    // 1. Evitar errores si la lista no existe
+    if (!player.completadas) player.completadas = [];
+
+    // 2. Sumar la zona solo si no estaba (para no sumar puntos de más)
     if (!player.completadas.includes(player.actualNombre)) {
         player.completadas.push(player.actualNombre);
     }
 
-    // Mover estrella
+    // 3. MOVER LA ESTRELLA A LA SIGUIENTE ZONA
     const posActual = circuitoOculto.indexOf(player.actualNombre);
-    player.actualNombre = circuitoOculto[(posActual + 1) % circuitoOculto.length];
+    const siguientePos = (posActual + 1) % circuitoOculto.length;
+    player.actualNombre = circuitoOculto[siguientePos];
 
-    // ¡ESTO ES LO QUE TE FALTA!
+    // 4. EL PASO MÁS IMPORTANTE: GUARDAR EN EL DISCO DEL CELULAR
     localStorage.setItem("howie", JSON.stringify(player));
-    
-    // Y esto actualiza el 0/15 en el momento
-    actualizarInterfazHome(); 
+
+    // 5. Refrescar el contador 0/15 y el Álbum sin hacer refresh
+    actualizarInterfazHome();
+    if (typeof renderAlbum === 'function') renderAlbum();
 }
 
 function actualizarInterfazHome() {
