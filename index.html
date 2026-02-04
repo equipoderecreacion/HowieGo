@@ -592,36 +592,35 @@ function entrarZona(zona) {
 function validarRespuesta() {
     const zona = player.actualNombre;
     const data = zonasData[zona];
-    const input = document.getElementById("respuestaInput").value.trim().toLowerCase();
+    const inputElement = document.getElementById("respuestaInput");
+    
+    if (!inputElement) return;
+    const valorEscrito = inputElement.value.trim().toLowerCase();
 
-    if (!data) return;
+    if (!data) {
+        console.error("No hay datos para la zona:", zona);
+        return;
+    }
+
+    // LÓGICA DE VALIDACIÓN
+    let esCorrecto = false;
 
     if (data.tipo === "auto") {
-        if (data.respuestasValidas.map(r => r.toLowerCase()).includes(input)) {
-            mostrarEstado(3);
-        } else {
-            Swal.fire('¡Casi!', 'Howie dice que esa no es la respuesta correcta.', 'error');
-        }
-    } 
-    else {
-        if (input === data.respuesta.toLowerCase()) {
-            const inputFoto = document.getElementById("fotoInput");
-            
-            // Si hay foto, la procesamos como antes
-            if (inputFoto.files && inputFoto.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // LLAMAMOS A LA FUNCIÓN DE DESCARGA Y WHATSAPP
-                    guardarYEnviarAProfes(e.target.result);
-                    mostrarEstado(3); 
-                };
-                reader.readAsDataURL(inputFoto.files[0]);
-            } else {
-                mostrarEstado(3);
-            }
-        } else {
-            Swal.fire('Código incorrecto', 'Pedile el código a los profes.', 'warning');
-        }
+        // Para desafíos como el del Lobby (ej: "10")
+        esCorrecto = data.respuestasValidas.map(r => r.toLowerCase()).includes(valorEscrito);
+    } else {
+        // Para los códigos que pasan los profes por WhatsApp (ej: "VISTA")
+        esCorrecto = (valorEscrito === data.respuesta.toLowerCase());
+    }
+
+    if (esCorrecto) {
+        // 1. SUMAR PROGRESO Y MOVER ESTRELLA
+        obtenerRecompensa();
+        
+        // 2. MOSTRAR ÉXITO Y CONFETTI
+        mostrarEstado(3); 
+    } else {
+        Swal.fire('Código Incorrecto', 'Howie dice que ese no es el código. ¡Pedilo por chat!', 'warning');
     }
 }
 
