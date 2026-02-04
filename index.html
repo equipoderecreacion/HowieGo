@@ -712,19 +712,20 @@ function mostrarEstado(n) {
 }
 
 function obtenerRecompensa() {
-    // ... tu lógica de sumar a la lista completadas ...
-
-    // 1. Guardamos en la memoria del celu
-    localStorage.setItem("howie", JSON.stringify(player));
-
-    // 2. ACTUALIZACIÓN FORZADA DE LA PANTALLA
-    const txtProgreso = document.getElementById("progreso");
-    if (txtProgreso) {
-        txtProgreso.innerText = `Progreso: ${player.completadas.length} / 15`;
+    // ... tu lógica de sumar a completadas ...
+    if (!player.completadas.includes(player.actualNombre)) {
+        player.completadas.push(player.actualNombre);
     }
+
+    // Mover estrella
+    const posActual = circuitoOculto.indexOf(player.actualNombre);
+    player.actualNombre = circuitoOculto[(posActual + 1) % circuitoOculto.length];
+
+    // ¡ESTO ES LO QUE TE FALTA!
+    localStorage.setItem("howie", JSON.stringify(player));
     
-    // 3. Opcional: Redibujar el mapa o home para que se vea el cambio
-    if (typeof renderMapa === 'function') renderMapa();
+    // Y esto actualiza el 0/15 en el momento
+    actualizarInterfazHome(); 
 }
 
 function actualizarInterfazHome() {
@@ -760,38 +761,42 @@ function pedirAyuda() {
   window.open(`https://wa.me/5493517669480?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
-let html5QrCode;
+let html5QrCode = null;
 
-function iniciarEscaneo() {
-    // 1. Nos aseguramos de que el div 'reader' esté limpio
+async function iniciarEscaneo() {
     const readerDiv = document.getElementById('reader');
-    if (!readerDiv) {
-        console.error("No se encontró el elemento 'reader' en el HTML");
-        return;
-    }
-    
+    if (!readerDiv) return;
+
     readerDiv.style.display = 'block';
     document.getElementById('btnAbrirScanner').style.display = 'none';
 
-    // 2. Si ya había una instancia, la matamos antes de crear una nueva
+    // 1. Si ya había algo, lo matamos y esperamos un milisegundo
     if (html5QrCode) {
-        html5QrCode.clear();
+        try {
+            await html5QrCode.stop();
+        } catch (e) {
+            console.log("Nada que detener");
+        }
+        html5QrCode = null;
     }
 
-    html5QrCode = new Html5Qrcode("reader");
-
-    // 3. Arrancamos la cámara
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-            // Éxito al escanear
-            procesarLecturaQR(decodedText);
-        }
-    ).catch((err) => {
-        console.error("Error al iniciar cámara:", err);
-        Swal.fire('Error', 'No se pudo acceder a la cámara. Verificá los permisos.', 'error');
-    });
+    // 2. Pequeña pausa de seguridad antes de arrancar
+    setTimeout(() => {
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            (decodedText) => {
+                // Solo detenemos si realmente leyó algo
+                detenerEscaneo(); 
+                logicaDeValidacionQR(decodedText);
+            }
+        ).catch((err) => {
+            console.error("Error al iniciar:", err);
+            // Si se cierra solo, es probable que falte este ID en el HTML
+            alert("Error de cámara. Revisa que el div 'reader' exista.");
+        });
+    }, 500); // Medio segundo de respiro para el hardware
 }
 
 function arrancarCamara() {
