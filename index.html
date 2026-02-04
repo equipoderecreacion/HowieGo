@@ -526,14 +526,17 @@ function renderAlbum() {
     
     contenedor.innerHTML = ""; 
 
-    // Dibujamos las 15 figuritas del Howard Johnson Villa Carlos Paz
-    zonasVisuales.forEach((zona, index) => {
+    zonasVisuales.forEach((zona) => {
         const div = document.createElement("div");
         div.className = "sticker-slot"; 
         
-        if (player.completadas && player.completadas.includes(zona)) {
-            const nombreArchivo = zona.toLowerCase()
-                .trim()
+        // LIMPIEZA PARA COMPARAR: Pasamos todo a minúsculas y sacamos espacios
+        const zonaParaComparar = zona.trim().toLowerCase();
+        const estaGanada = player.completadas.some(c => c.trim().toLowerCase() === zonaParaComparar);
+
+        if (estaGanada) {
+            // Generamos el nombre del archivo (mismo proceso que ya tenías)
+            const nombreArchivo = zonaParaComparar
                 .replace(/\s+/g, '-')
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, ""); 
@@ -546,19 +549,19 @@ function renderAlbum() {
         contenedor.appendChild(div);
     });
 
-    // MENSAJE DE ÉXITO FINAL (Si completó las 15 zonas)
-    if (player.completadas.length === zonasVisuales.length) {
-    const mensajeFinal = document.createElement("div");
-    mensajeFinal.style.cssText = "grid-column: 1 / -1; background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 15px; text-align: center; font-weight: bold; border: 2px solid #333;";
-    mensajeFinal.innerHTML = `
-        <h3 style="margin:0;">¡LO LOGRASTE, EXPLORADOR! 🏆</h3>
-        <p style="margin:10px 0;">Completaste todas las misiones de Howie en el hotel.</p>
-        <p><b>¡Buscá a los profes de recreación para recibir tu premio!</b></p>
-        <div style="font-size: 30px;">🦉🎖️</div>
-    `;
-    contenedor.appendChild(mensajeFinal);
+    // MENSAJE DE ÉXITO FINAL
+    if (player.completadas.length >= 15) { // Usamos >= para mayor seguridad
+        const mensajeFinal = document.createElement("div");
+        mensajeFinal.style.cssText = "grid-column: 1 / -1; background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 15px; text-align: center; font-weight: bold; border: 2px solid #333; color: #333;";
+        mensajeFinal.innerHTML = `
+            <h3 style="margin:0;">¡LO LOGRASTE, EXPLORADOR! 🏆</h3>
+            <p style="margin:10px 0;">Completaste todas las misiones de Howie en el hotel.</p>
+            <p><b>¡Buscá a los profes de recreación para recibir tu premio!</b></p>
+            <div style="font-size: 30px;">🦉🎖️</div>
+        `;
+        contenedor.appendChild(mensajeFinal);
+    }
 }
-} 
 
 
 function irA(id) {
@@ -737,22 +740,27 @@ function mostrarEstado(n) {
 
 // --- 1. GESTIÓN DE PROGRESO Y RECOMPENSA ---
 function obtenerRecompensa() {
+    // 1. Aseguramos que la lista exista
     if (!player.completadas) player.completadas = [];
 
-    if (!player.completadas.includes(player.actualNombre)) {
-        player.completadas.push(player.actualNombre);
+    // 2. Guardamos la zona que acaba de ganar (la actual)
+    // USAMOS UNA VARIABLE PARA QUE NO SE MUEVA TODAVÍA
+    const zonaGanada = player.actualNombre;
+
+    if (!player.completadas.includes(zonaGanada)) {
+        player.completadas.push(zonaGanada);
     }
 
-    // Mover estrella al siguiente punto del circuito
-    const posActual = circuitoOculto.indexOf(player.actualNombre);
-    const siguientePos = (posActual + 1) % circuitoOculto.length;
-    player.actualNombre = circuitoOculto[siguientePos];
-
-    // GUARDADO CRÍTICO
+    // --- EL CAMBIO ESTÁ AQUÍ ---
+    // NO movemos la estrella todavía. Dejamos que el usuario vea su premio.
+    // Solo guardamos el estado actual.
+    
     localStorage.setItem("howie", JSON.stringify(player));
     
-    // Actualizar interfaz al instante
+    // 3. Actualizamos la interfaz para que diga 1/15, 2/15, etc.
     actualizarInterfazHome();
+
+    // 4. Si el álbum está abierto, que se refresque con la nueva figu
     if (typeof renderAlbum === 'function') renderAlbum();
 }
 
