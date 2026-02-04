@@ -472,6 +472,16 @@ function iniciarHome() {
   document.getElementById("progreso").innerText = `Progreso: ${player.completadas.length} / 15`;
   irA("home-screen");
 }
+function cerrarSesion() {
+    // 1. Borramos absolutamente todo lo guardado del juego
+    localStorage.removeItem("howie");
+    
+    // 2. Opcional: limpiar otros datos si existen
+    localStorage.clear(); 
+    
+    // 3. Recargamos la página para volver a la pantalla de "Nombre"
+    window.location.reload(); 
+}
 
 /* =====================
    MAPA (Aquí se genera la Estrella)
@@ -818,6 +828,20 @@ window.onload = () => {
 function pedirAyuda() {
     const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Estoy en ${player.actualNombre} y necesito una pista.`);
     window.open(`https://wa.me/5493517669480?text=${mensaje}`, '_blank');
+}
+
+// Forzar que el contador se actualice siempre al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    const p = document.getElementById("progreso");
+    if (p && player && player.completadas) {
+        p.innerText = `Progreso: ${player.completadas.length} / 15`;
+    }
+});
+
+// Función de respaldo para mover la estrella manualmente si el QR falla
+function saltarMision() {
+    obtenerRecompensa();
+    irA('mapa-screen');
 }
 </script>
 
