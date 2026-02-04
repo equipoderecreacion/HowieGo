@@ -716,7 +716,7 @@ function mostrarEstado(n) {
     const zonaGanada = player.actualNombre;
     const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
-    // 3. Cartel de éxito
+    // 3. Cartel de éxito - AQUÍ ESTÁ EL MOVIMIENTO
     Swal.fire({
         title: '¡CONSEGUIDO!',
         text: `¡Ganaste la figurita de ${zonaGanada}!`,
@@ -727,14 +727,17 @@ function mostrarEstado(n) {
         confirmButtonColor: '#fbc02d',
         allowOutsideClick: false
     }).then(() => {
-        // --- EL ARREGLO ESTÁ AQUÍ ---
-        // Recién cuando el usuario cierra el cartel, movemos la estrella al siguiente punto
+        // --- MOTOR DE MOVIMIENTO FORZADO ---
         const posActual = circuitoOculto.indexOf(player.actualNombre);
         const siguientePos = (posActual + 1) % circuitoOculto.length;
+        
+        // Actualizamos el nombre de la zona actual del jugador
         player.actualNombre = circuitoOculto[siguientePos];
 
-        // Guardamos la nueva posición de la estrella en el celu
+        // GUARDADO FÍSICO INMEDIATO
         localStorage.setItem("howie", JSON.stringify(player));
+        
+        console.log("Nueva zona de estrella: " + player.actualNombre);
 
         // Vamos al álbum
         irA('album-screen');
