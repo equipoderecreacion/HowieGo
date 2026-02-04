@@ -472,16 +472,7 @@ function iniciarHome() {
   document.getElementById("progreso").innerText = `Progreso: ${player.completadas.length} / 15`;
   irA("home-screen");
 }
-function cerrarSesion() {
-    // 1. Borramos absolutamente todo lo guardado del juego
-    localStorage.removeItem("howie");
-    
-    // 2. Opcional: limpiar otros datos si existen
-    localStorage.clear(); 
-    
-    // 3. Recargamos la página para volver a la pantalla de "Nombre"
-    window.location.reload(); 
-}
+
 
 /* =====================
    MAPA (Aquí se genera la Estrella)
@@ -692,6 +683,9 @@ function ejecutarEnvioFinal(base64Image) {
 }
 
 
+/* =====================
+    ESTADOS Y MOVIMIENTO
+===================== */
 function mostrarEstado(n) {
   const e1 = document.getElementById("estado1");
   const e2 = document.getElementById("estado2");
@@ -705,37 +699,68 @@ function mostrarEstado(n) {
   if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
 
   if (n === 3) {
-    const zonaGanada = player.actualNombre;
+    // 1. Guardamos la figurita que acaba de ganar
     obtenerRecompensa();
 
-    // Lanzar confeti FORZANDO que se vea arriba de todo
+    // 2. Confeti
     if (typeof confetti === 'function') {
         confetti({
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 },
             colors: ['#fbc02d', '#ffffff', '#4CAF50'],
-            zIndex: 9999  // <--- ESTA LÍNEA ES LA CLAVE
+            zIndex: 9999
         });
     }
 
+    const zonaGanada = player.actualNombre;
     const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const rutaImagen = `./img/${nombreLimpio}.jpg`;
-
+    
+    // 3. Cartel de éxito
     Swal.fire({
         title: '¡CONSEGUIDO!',
         text: `¡Ganaste la figurita de ${zonaGanada}!`,
-        imageUrl: rutaImagen,
+        imageUrl: `./img/${nombreLimpio}.jpg`,
         imageWidth: 200,
         imageHeight: 300,
-        imageAlt: '⭐',
         confirmButtonText: 'VER MI ÁLBUM',
         confirmButtonColor: '#fbc02d',
         allowOutsideClick: false
     }).then(() => {
+        // --- EL ARREGLO ESTÁ AQUÍ ---
+        // Recién cuando el usuario cierra el cartel, movemos la estrella al siguiente punto
+        const posActual = circuitoOculto.indexOf(player.actualNombre);
+        const siguientePos = (posActual + 1) % circuitoOculto.length;
+        player.actualNombre = circuitoOculto[siguientePos];
+
+        // Guardamos la nueva posición de la estrella en el celu
+        localStorage.setItem("howie", JSON.stringify(player));
+
+        // Vamos al álbum
         irA('album-screen');
     });
   }
+}
+
+/* =====================
+    CIERRE DE SESIÓN SEGURO
+===================== */
+function cerrarSesion() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: "Se borrará todo tu progreso en Howard Johnson. ¿Estás seguro?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, borrar todo',
+        cancelButtonText: 'No, seguir jugando'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.clear();
+            window.location.reload();
+        }
+    });
 }
 
 // --- 1. GESTIÓN DE PROGRESO Y RECOMPENSA ---
@@ -860,11 +885,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Función de respaldo para mover la estrella manualmente si el QR falla
-function saltarMision() {
-    obtenerRecompensa();
-    irA('mapa-screen');
-}
 </script>
 
 </body>
