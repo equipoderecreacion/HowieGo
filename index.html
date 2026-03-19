@@ -171,7 +171,7 @@ input {
 <div id="home-screen" class="screen">
   <div class="card">
     <h2 id="saludo"></h2>
-    <p id="progreso">Progreso: 0 / 15</p>
+    <p id="progreso">Progreso: 0 / 12</p>
 
     <button class="btn-main" onclick="irA('mapa-screen')">🗺️ MAPA</button>
     <button onclick="irA('album-screen')">📘 ÁLBUM</button>
@@ -314,13 +314,12 @@ input {
    DATOS DEL JUEGO
 ===================== */
 const zonasVisuales = [
-  "Bicis", "Lobby", "Maquina de Espuma", "Tirolesa", "Resto", 
-  "Quinchos","Arqueria", "Patio cervecero", "Escaleras", "Camastros",
+  "Bicis", "Lobby", "Resto","Arqueria", "Patio cervecero", "Escaleras", "Camastros",
   "Kids", "Plaza", "Estatuas", "Pileta", "Plays"
 ];
 
 const circuitoOculto = [
-  "Plaza", "Maquina de Espuma", "Bicis", "Tirolesa", "Quinchos", "Camastros", 
+  "Plaza", "Bicis", "Camastros", 
   "Arqueria", "Kids", "Pileta", "Resto", "Lobby", 
   "Plays", "Escaleras", "Estatuas", "Patio cervecero"
 ];
@@ -336,24 +335,6 @@ const zonasData = {
     e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.",
     e2: "A Howie le preocupa el tiempo. Se quedó mirando el reloj y se pregunta: ¿A qué hora es el último adiós a la habitación?",
     respuestasValidas: ["diez", "10", "10:00", "10 am", "las diez"],
-    tipo: "auto"
-  },
-  "Maquina de Espuma": {
-    e1: "Howie escuchó un rumor: que acá las nubes caen al suelo y te permiten bailar entre burbujas. Encontrá el QR para continuar.",
-    e2: "Howie dice que para que la espuma sea perfecta, hay que ponerle ritmo. Sacate una foto simulando estar en una fiesta. Enviársela a Howie.",
-    respuesta: "FIESTA",
-    tipo: "foto"
-  },
-  "Tirolesa": {
-    e1: "Howie dice que el miedo se queda abajo, pero el coraje te hace volar. Encontrá el QR para continuar.",
-    e2: "Howie quiere verte volar. Ponete en posición, estirá los brazos y sacate una foto simulando que estás cruzando el cielo a toda velocidad.",
-    respuesta: "VUELO",
-    tipo: "foto"
-  },
-  "Quinchos": {
-    e1: "Howie busca la sombra de los techos de paja. Es el lugar donde los grupos se reúnen a compartir cuando el sol calienta. Encontrá el QR para continuar.",
-    e2: "Howie se quedó en la sombra, mirando hacia arriba, su numero favorito ahí aparecía ¿sabes cual es?",
-    respuestasValidas: ["ocho", "8"],
     tipo: "auto"
   },
   "Resto": {
@@ -469,7 +450,7 @@ document.getElementById("loginBtn").addEventListener("click", () => {
 
 function iniciarHome() {
   document.getElementById("saludo").innerText = `¡Hola ${player.nombre}!`;
-  document.getElementById("progreso").innerText = `Progreso: ${player.completadas.length} / 15`;
+  document.getElementById("progreso").innerText = `Progreso: ${player.completadas.length} / 12`;
   irA("home-screen");
 }
 
@@ -541,7 +522,7 @@ function renderAlbum() {
     });
 
     // MENSAJE DE ÉXITO FINAL
-    if (player.completadas.length >= 15) { // Usamos >= para mayor seguridad
+    if (player.completadas.length >= 12) { // Usamos >= para mayor seguridad
         const mensajeFinal = document.createElement("div");
         mensajeFinal.style.cssText = "grid-column: 1 / -1; background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 15px; text-align: center; font-weight: bold; border: 2px solid #333; color: #333;";
         mensajeFinal.innerHTML = `
@@ -785,7 +766,7 @@ function obtenerRecompensa() {
     
     localStorage.setItem("howie", JSON.stringify(player));
     
-    // 3. Actualizamos la interfaz para que diga 1/15, 2/15, etc.
+    // 3. Actualizamos la interfaz para que diga 1/12, 2/12, etc.
     actualizarInterfazHome();
 
     // 4. Si el álbum está abierto, que se refresque con la nueva figu
@@ -795,7 +776,7 @@ function obtenerRecompensa() {
 function actualizarInterfazHome() {
     const p = document.getElementById("progreso");
     if (p && player.completadas) {
-        p.innerText = `Progreso: ${player.completadas.length} / 15`;
+        p.innerText = `Progreso: ${player.completadas.length} / 12`;
     }
 }
 
@@ -884,7 +865,7 @@ function pedirAyuda() {
 document.addEventListener('DOMContentLoaded', () => {
     const p = document.getElementById("progreso");
     if (p && player && player.completadas) {
-        p.innerText = `Progreso: ${player.completadas.length} / 15`;
+        p.innerText = `Progreso: ${player.completadas.length} / 12`;
     }
 });
 
