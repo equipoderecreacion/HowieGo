@@ -547,30 +547,21 @@ function irA(id) {
    ZONA Y VALIDACIÓN
 ===================== */
 function entrarZona(zona) {
-  const data = zonasData[zona];
-  if (!data) return;
+ const data = zonasData[zona];
+ if (!data) return;
 
-  document.getElementById("zonaTitulo").innerText = zona;
-  document.getElementById("textoEstado1").innerText = data.e1 || "Buscá el QR.";
-  document.getElementById("textoEstado2").innerText = data.e2 || "Resolvé el desafío.";
-  
-  document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
-  
-  document.getElementById("previewContenedor").style.display = "none";
-  document.getElementById("respuestaInput").value = "";
-  document.getElementById("fotoInput").value = "";
+ document.getElementById("zonaTitulo").innerText = zona;
+ document.getElementById("textoEstado1").innerText = data.e1 || "Buscá el QR.";
+ document.getElementById("textoEstado2").innerText = data.e2 || "Resolvé el desafío.";
+ 
+ document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
+ 
+ document.getElementById("previewContenedor").style.display = "none";
+ document.getElementById("respuestaInput").value = "";
+ document.getElementById("fotoInput").value = "";
 
-  // --- ARREGLO DEL BOTÓN DE AYUDA (Agregá estas líneas) ---
-  const btnAyuda = document.getElementById("btnAyuda");
-  if (btnAyuda) {
-      btnAyuda.innerText = "PEDIR AYUDA A HOWIE"; // Volvemos al texto original
-      btnAyuda.style.background = "#004A97"; // El azul del Howard Johnson
-      btnAyuda.onclick = pedirAyuda; // Lo reconectamos a la función de ayuda
-  }
-  // -------------------------------------------------------
-
-  mostrarEstado(1);
-  irA("zona-screen");
+ mostrarEstado(1);
+ irA("zona-screen");
 }
 
 function validarRespuesta() {
@@ -658,7 +649,7 @@ function ejecutarEnvioFinal(base64Image) {
     link.click();
     document.body.removeChild(link);
 
-    // 2. CARTEL DE AVISO (Para que el usuario sepa que se descargó)
+    // 2. CARTEL DE AVISO
     Swal.fire({
         title: '¡Foto Guardada!',
         text: 'La imagen ya está en tu galería. Ahora adjuntala en WhatsApp.',
@@ -669,6 +660,14 @@ function ejecutarEnvioFinal(base64Image) {
         // 3. WHATSAPP CON TEXTO ACTUALIZADO
         const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Acá te mando la foto de mi misión en: ${player.actualNombre}.`);
         window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
+
+        // --- RESETEO DEL BOTÓN AQUÍ ADENTRO ---
+        const btnAyuda = document.getElementById("btnAyuda");
+        if (btnAyuda) {
+            btnAyuda.innerText = "PEDIR AYUDA A HOWIE";
+            btnAyuda.style.background = "#004A97"; // El azul Howard Johnson
+            btnAyuda.onclick = pedirAyuda; // Reconectamos la función original
+        }
     });
 }
 
