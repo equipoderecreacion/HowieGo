@@ -560,6 +560,15 @@ function entrarZona(zona) {
   document.getElementById("respuestaInput").value = "";
   document.getElementById("fotoInput").value = "";
 
+  // --- ARREGLO DEL BOTÓN DE AYUDA (Agregá estas líneas) ---
+  const btnAyuda = document.getElementById("btnAyuda");
+  if (btnAyuda) {
+      btnAyuda.innerText = "PEDIR AYUDA A HOWIE"; // Volvemos al texto original
+      btnAyuda.style.background = "#004A97"; // El azul del Howard Johnson
+      btnAyuda.onclick = pedirAyuda; // Lo reconectamos a la función de ayuda
+  }
+  // -------------------------------------------------------
+
   mostrarEstado(1);
   irA("zona-screen");
 }
