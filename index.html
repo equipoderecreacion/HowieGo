@@ -471,7 +471,7 @@ function mostrarEstado(n) {
   if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
 
   if (n === 3) {
-    // 1. Guardamos la figurita que acaba de ganar
+    // 1. Guardamos la figurita
     obtenerRecompensa();
 
     // 2. Confeti
@@ -489,9 +489,10 @@ function mostrarEstado(n) {
     const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
     // --- LÓGICA DE CIERRE (12 FIGURITAS) ---
+    // Usamos exactamente "esUltima" en todo el bloque
     const esUltima = player.completadas.length >= 12;
 
-    // 3. Cartel de éxito adaptado
+    // 3. Cartel de éxito
     Swal.fire({
         title: esUltima ? '¡ÁLBUM COMPLETADO! 🏆' : '¡CONSEGUIDO!',
         text: esUltima ? '¡Lo lograste! Hacé clic abajo para avisar a los profes y canjear tu premio.' : `¡Ganaste la figurita de ${zonaGanada}!`,
@@ -503,23 +504,17 @@ function mostrarEstado(n) {
         allowOutsideClick: false
     }).then(() => {
         if (esUltima) {
-            // WHATSAPP DE CONTROL FINAL
+            // WHATSAPP FINAL
             const mensajeFinal = encodeURIComponent(`¡TERMINÉ HOWIE-GO! 🏆\n\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}\n¡Ya tengo las 12 figuritas!`);
             window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
         } else {
-            // --- MOTOR DE MOVIMIENTO FORZADO (Solo si NO es la última) ---
+            // MOTOR DE MOVIMIENTO (Solo si NO es la última)
             const posActual = circuitoOculto.indexOf(player.actualNombre);
             const siguientePos = (posActual + 1) % circuitoOculto.length;
-            
-            // Actualizamos el nombre de la zona actual del jugador
             player.actualNombre = circuitoOculto[siguientePos];
-
-            // GUARDADO FÍSICO INMEDIATO
             localStorage.setItem("howie", JSON.stringify(player));
-            console.log("Nueva zona de estrella: " + player.actualNombre);
         }
 
-        // En ambos casos, vamos al álbum
         irA('album-screen');
     });
   }
