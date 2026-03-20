@@ -459,62 +459,60 @@ function iniciarHome() {
    MAPA (Aquí se genera la Estrella)
 ===================== */
 function mostrarEstado(n) {
-  const e1 = document.getElementById("estado1");
-  const e2 = document.getElementById("estado2");
-  const e3 = document.getElementById("estado3");
+    const e1 = document.getElementById("estado1");
+    const e2 = document.getElementById("estado2");
+    const e3 = document.getElementById("estado3");
 
-  if(e1) e1.style.display = (n === 1) ? "block" : "none";
-  if(e2) e2.style.display = (n === 2) ? "block" : "none";
-  if(e3) e3.style.display = (n === 3) ? "block" : "none";
+    if(e1) e1.style.display = (n === 1) ? "block" : "none";
+    if(e2) e2.style.display = (n === 2) ? "block" : "none";
+    if(e3) e3.style.display = (n === 3) ? "block" : "none";
 
-  const btnAyuda = document.getElementById("btnAyuda");
-  // MANTENEMOS TU LÓGICA: Si es estado 3 (ganó), ocultamos ayuda. Si no, lo mostramos.
-  if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
+    // Mantenemos tu lógica de ocultar ayuda al ganar
+    const btnAyuda = document.getElementById("btnAyuda");
+    if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
 
-  if (n === 3) {
-    obtenerRecompensa();
+    if (n === 3) {
+        obtenerRecompensa();
 
-    if (typeof confetti === 'function') {
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#fbc02d', '#ffffff', '#4CAF50'],
-            zIndex: 9999
-        });
-    }
-
-    const zonaGanada = player.actualNombre;
-    const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
-    // CHEQUEO SIMPLE: ¿Es la última?
-    const esUltima = player.completadas.length >= 12;
-
-    Swal.fire({
-        title: esUltima ? '¡JUEGO COMPLETADO! 🏆' : '¡CONSEGUIDO!',
-        text: esUltima ? '¡Lo lograste! Avisale a los profes para tu premio.' : `¡Ganaste la figurita de ${zonaGanada}!`,
-        imageUrl: `./img/${nombreLimpio}.jpg`,
-        imageWidth: 200,
-        imageHeight: 300,
-        confirmButtonText: esUltima ? '🎁 RECLAMAR PREMIO' : 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d',
-        allowOutsideClick: false
-    }).then(() => {
-        if (esUltima) {
-            // WHATSAPP SOLO AL FINAL
-            const mensajeFinal = encodeURIComponent(`¡TERMINÉ HOWIE-GO! 🏆\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}`);
-            window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
-        } else {
-            // MOTOR DE MOVIMIENTO QUE YA TENÍAS (No lo tocamos)
-            const posActual = circuitoOculto.indexOf(player.actualNombre);
-            const siguientePos = (posActual + 1) % circuitoOculto.length;
-            player.actualNombre = circuitoOculto[siguientePos];
-            localStorage.setItem("howie", JSON.stringify(player));
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#fbc02d', '#ffffff', '#4CAF50'],
+                zIndex: 9999
+            });
         }
 
-        irA('album-screen');
-    });
-  }
+        const zonaGanada = player.actualNombre;
+        // Limpiamos el nombre para la imagen: "Kids Club" -> "kids-club"
+        const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        
+        const esUltima = player.completadas.length >= 12;
+
+        Swal.fire({
+            title: esUltima ? '¡JUEGO COMPLETADO! 🏆' : '¡CONSEGUIDO!',
+            text: esUltima ? '¡Completaste el álbum! Avisale a los profes.' : `¡Ganaste la figurita de ${zonaGanada}!`,
+            imageUrl: `./img/${nombreLimpio}.jpg`,
+            imageWidth: 200,
+            imageHeight: 300,
+            confirmButtonText: esUltima ? '🎁 RECLAMAR PREMIO' : 'VER MI ÁLBUM',
+            confirmButtonColor: '#fbc02d',
+            allowOutsideClick: false
+        }).then(() => {
+            if (esUltima) {
+                const mensajeFinal = encodeURIComponent(`¡TERMINÉ EL JUEGO! 🏆\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}`);
+                window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
+            } else {
+                // Motor de movimiento:
+                const posActual = circuitoOculto.indexOf(player.actualNombre);
+                const siguientePos = (posActual + 1) % circuitoOculto.length;
+                player.actualNombre = circuitoOculto[siguientePos];
+                localStorage.setItem("howie", JSON.stringify(player));
+            }
+            irA('album-screen');
+        });
+    }
 }
 
 function renderAlbum() {
