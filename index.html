@@ -458,46 +458,63 @@ function iniciarHome() {
 /* =====================
    MAPA (Aquí se genera la Estrella)
 ===================== */
-function renderMapa() {
-  const listaContenedor = document.getElementById("listaZonas");
-  if (!listaContenedor) return; // Seguridad extra
-  listaContenedor.innerHTML = "";
+function mostrarEstado(n) {
+  const e1 = document.getElementById("estado1");
+  const e2 = document.getElementById("estado2");
+  const e3 = document.getElementById("estado3");
 
-  // DETERMINAMOS SI EL JUEGO TERMINÓ (12 FIGURITAS)
-  const juegoTerminado = player.completadas.length >= 12;
+  if(e1) e1.style.display = (n === 1) ? "block" : "none";
+  if(e2) e2.style.display = (n === 2) ? "block" : "none";
+  if(e3) e3.style.display = (n === 3) ? "block" : "none";
 
-  zonasVisuales.forEach((z) => {
-    const div = document.createElement("div");
-    div.className = "zona-item";
-    div.style.padding = "15px";
-    div.style.margin = "10px 0";
-    div.style.borderRadius = "10px";
-    div.style.display = "flex";
-    div.style.justifyContent = "space-between";
-    div.style.alignItems = "center";
-    div.style.border = "1px solid #ddd";
+  const btnAyuda = document.getElementById("btnAyuda");
+  // MANTENEMOS TU LÓGICA: Si es estado 3 (ganó), ocultamos ayuda. Si no, lo mostramos.
+  if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
 
-    // LÓGICA DE LA ESTRELLA (Solo aparece si NO terminó el juego)
-    if (!juegoTerminado && z === player.actualNombre) {
-      div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
-      div.style.border = "2px solid #fbc02d";
-      div.style.background = "#fff9c4";
-      div.style.cursor = "pointer";
-      div.onclick = () => entrarZona(z);
-    } 
-    // ZONAS YA COMPLETADAS (Siempre muestran el check verde)
-    else if (player.completadas.includes(z)) {
-      div.innerHTML = `<span>✔ ${z}</span> <span style="color:green; font-size:12px;">Completado</span>`;
-      div.style.background = "#e8f5e9";
-    } 
-    // ZONAS BLOQUEADAS
-    else {
-      div.innerHTML = `<span>🔒 ${z}</span>`;
-      div.style.opacity = "0.5";
-      div.style.background = "#f5f5f5";
+  if (n === 3) {
+    obtenerRecompensa();
+
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#fbc02d', '#ffffff', '#4CAF50'],
+            zIndex: 9999
+        });
     }
-    listaContenedor.appendChild(div);
-  });
+
+    const zonaGanada = player.actualNombre;
+    const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    // CHEQUEO SIMPLE: ¿Es la última?
+    const esUltima = player.completadas.length >= 12;
+
+    Swal.fire({
+        title: esUltima ? '¡JUEGO COMPLETADO! 🏆' : '¡CONSEGUIDO!',
+        text: esUltima ? '¡Lo lograste! Avisale a los profes para tu premio.' : `¡Ganaste la figurita de ${zonaGanada}!`,
+        imageUrl: `./img/${nombreLimpio}.jpg`,
+        imageWidth: 200,
+        imageHeight: 300,
+        confirmButtonText: esUltima ? '🎁 RECLAMAR PREMIO' : 'VER MI ÁLBUM',
+        confirmButtonColor: '#fbc02d',
+        allowOutsideClick: false
+    }).then(() => {
+        if (esUltima) {
+            // WHATSAPP SOLO AL FINAL
+            const mensajeFinal = encodeURIComponent(`¡TERMINÉ HOWIE-GO! 🏆\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}`);
+            window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
+        } else {
+            // MOTOR DE MOVIMIENTO QUE YA TENÍAS (No lo tocamos)
+            const posActual = circuitoOculto.indexOf(player.actualNombre);
+            const siguientePos = (posActual + 1) % circuitoOculto.length;
+            player.actualNombre = circuitoOculto[siguientePos];
+            localStorage.setItem("howie", JSON.stringify(player));
+        }
+
+        irA('album-screen');
+    });
+  }
 }
 
 function renderAlbum() {
