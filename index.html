@@ -460,7 +460,11 @@ function iniciarHome() {
 ===================== */
 function renderMapa() {
   const listaContenedor = document.getElementById("listaZonas");
+  if (!listaContenedor) return; // Seguridad extra
   listaContenedor.innerHTML = "";
+
+  // DETERMINAMOS SI EL JUEGO TERMINÓ (12 FIGURITAS)
+  const juegoTerminado = player.completadas.length >= 12;
 
   zonasVisuales.forEach((z) => {
     const div = document.createElement("div");
@@ -473,17 +477,21 @@ function renderMapa() {
     div.style.alignItems = "center";
     div.style.border = "1px solid #ddd";
 
-    // LÓGICA DE LA ESTRELLA
-    if (z === player.actualNombre) {
+    // LÓGICA DE LA ESTRELLA (Solo aparece si NO terminó el juego)
+    if (!juegoTerminado && z === player.actualNombre) {
       div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
       div.style.border = "2px solid #fbc02d";
       div.style.background = "#fff9c4";
       div.style.cursor = "pointer";
       div.onclick = () => entrarZona(z);
-    } else if (player.completadas.includes(z)) {
+    } 
+    // ZONAS YA COMPLETADAS (Siempre muestran el check verde)
+    else if (player.completadas.includes(z)) {
       div.innerHTML = `<span>✔ ${z}</span> <span style="color:green; font-size:12px;">Completado</span>`;
       div.style.background = "#e8f5e9";
-    } else {
+    } 
+    // ZONAS BLOQUEADAS
+    else {
       div.innerHTML = `<span>🔒 ${z}</span>`;
       div.style.opacity = "0.5";
       div.style.background = "#f5f5f5";
@@ -705,30 +713,33 @@ function mostrarEstado(n) {
     const zonaGanada = player.actualNombre;
     const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
-    // 3. Cartel de éxito - AQUÍ ESTÁ EL MOVIMIENTO
+    // --- CHEQUEO DE FINAL DE JUEGO ---
+    const esElFinal = player.completadas.length >= 12;
+
+    // 3. Cartel de éxito adaptado
     Swal.fire({
-        title: '¡CONSEGUIDO!',
-        text: `¡Ganaste la figurita de ${zonaGanada}!`,
+        title: esElFinal ? '¡ÁLBUM COMPLETADO! 🏆' : '¡CONSEGUIDO!',
+        text: esUltima ? `¡Lo lograste, ${player.nombre}! Completaste las 12 misiones del Howard Johnson.` : `¡Ganaste la figurita de ${zonaGanada}!`,
         imageUrl: `./img/${nombreLimpio}.jpg`,
         imageWidth: 200,
         imageHeight: 300,
-        confirmButtonText: 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d',
+        confirmButtonText: esElFinal ? '🎁 RECLAMAR MI PREMIO' : 'VER MI ÁLBUM',
+        confirmButtonColor: esElFinal ? '#4CAF50' : '#fbc02d', // Verde para el premio
         allowOutsideClick: false
     }).then(() => {
-        // --- MOTOR DE MOVIMIENTO FORZADO ---
-        const posActual = circuitoOculto.indexOf(player.actualNombre);
-        const siguientePos = (posActual + 1) % circuitoOculto.length;
-        
-        // Actualizamos el nombre de la zona actual del jugador
-        player.actualNombre = circuitoOculto[siguientePos];
+        if (esElFinal) {
+            // MENSAJE PARA LOS PROFES
+            const mensajeFinal = encodeURIComponent(`¡TERMINÉ EL JUEGO! 🏆\n\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}\nEstado: Álbum Completo (12/12)`);
+            window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
+        } else {
+            // MOTOR DE MOVIMIENTO NORMAL (Solo si no terminó)
+            const posActual = circuitoOculto.indexOf(player.actualNombre);
+            const siguientePos = (posActual + 1) % circuitoOculto.length;
+            player.actualNombre = circuitoOculto[siguientePos];
+            localStorage.setItem("howie", JSON.stringify(player));
+        }
 
-        // GUARDADO FÍSICO INMEDIATO
-        localStorage.setItem("howie", JSON.stringify(player));
-        
-        console.log("Nueva zona de estrella: " + player.actualNombre);
-
-        // Vamos al álbum
+        // En ambos casos, vamos al álbum para que vea su progreso final
         irA('album-screen');
     });
   }
