@@ -680,6 +680,90 @@ window.onload = () => {
         iniciarHome();
     }
 };
+/* =====================
+   CERRAR SESIÓN (Restaurado)
+===================== */
+function cerrarSesion() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: "Se borrará todo tu progreso. ¿Estás seguro?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, borrar todo',
+        cancelButtonText: 'No, seguir jugando'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.clear();
+            window.location.reload();
+        }
+    });
+}
+/* =====================
+    ESCÁNER QR (Restaurado)
+===================== */
+let html5QrCode = null;
+
+async function iniciarEscaneo() {
+    const readerDiv = document.getElementById('reader');
+    if (!readerDiv) return;
+
+    readerDiv.style.display = 'block';
+    const btnScan = document.getElementById('btnAbrirScanner');
+    if (btnScan) btnScan.style.display = 'none';
+
+    if (html5QrCode) {
+        try { await html5QrCode.stop(); } catch (e) {}
+        html5QrCode = null;
+    }
+
+    setTimeout(() => {
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            (decodedText) => {
+                detenerEscaneo(); 
+                procesarLecturaQR(decodedText);
+            }
+        ).catch(err => {
+            console.error("Error cámara:", err);
+            Swal.fire('Error', 'No se pudo acceder a la cámara.', 'error');
+        });
+    }, 300);
+}
+
+function detenerEscaneo() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+            html5QrCode = null;
+            document.getElementById('reader').style.display = 'none';
+            const btnScan = document.getElementById('btnAbrirScanner');
+            if (btnScan) btnScan.style.display = 'block';
+        }).catch(() => {
+            document.getElementById('reader').style.display = 'none';
+        });
+    }
+}
+
+function procesarLecturaQR(decodedText) {
+    // Limpieza de la URL del QR para sacar solo el nombre de la zona
+    let zonaLeida = "";
+    if (decodedText.includes("zona=")) {
+        const url = new URL(decodedText);
+        zonaLeida = url.searchParams.get("zona").replace(/-/g, " ");
+    } else {
+        zonaLeida = decodedText;
+    }
+
+    // Comparamos con la zona que le toca al jugador actualmente
+    if (zonaLeida.toLowerCase() === player.actualNombre.toLowerCase()) {
+        mostrarEstado(2); // Pasa al desafío
+    } else {
+        Swal.fire('Zona Equivocada', `Este QR no es de ${player.actualNombre}. ¡Seguí buscando!`, 'warning');
+    }
+}
 
 </script>
 </body>
