@@ -468,13 +468,18 @@ function mostrarEstado(n) {
   if(e3) e3.style.display = (n === 3) ? "block" : "none";
 
   const btnAyuda = document.getElementById("btnAyuda");
-  if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
+  
+  // RESETEO DEL BOTÓN DE AYUDA (Para que no se quede en "Enviar Foto")
+  if (btnAyuda) {
+      btnAyuda.style.display = (n === 3) ? "none" : "block";
+      btnAyuda.innerText = "🆘 PEDIR AYUDA A HOWIE";
+      btnAyuda.style.background = "#004A97";
+      btnAyuda.onclick = pedirAyuda;
+  }
 
   if (n === 3) {
-    // 1. Guardamos la figurita
     obtenerRecompensa();
 
-    // 2. Confeti
     if (typeof confetti === 'function') {
         confetti({
             particleCount: 150,
@@ -488,10 +493,9 @@ function mostrarEstado(n) {
     const zonaGanada = player.actualNombre;
     const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
-    // --- LÓGICA DE CIERRE ---
+    // CONTROL DE LAS 12 ESTACIONES
     const esUltima = player.completadas.length >= 12;
 
-    // 3. Cartel de éxito
     Swal.fire({
         title: esUltima ? '¡ÁLBUM COMPLETADO! 🏆' : '¡CONSEGUIDO!',
         text: esUltima ? '¡Lo lograste! Avisale a los profes para retirar tu premio.' : `¡Ganaste la figurita de ${zonaGanada}!`,
@@ -503,17 +507,14 @@ function mostrarEstado(n) {
         allowOutsideClick: false
     }).then(() => {
         if (esUltima) {
-            // WHATSAPP FINAL
             const mensajeFinal = encodeURIComponent(`¡TERMINÉ HOWIE-GO! 🏆\n\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}\n¡Ya tengo las 12 figuritas!`);
             window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
         } else {
-            // MOTOR DE MOVIMIENTO NORMAL
             const posActual = circuitoOculto.indexOf(player.actualNombre);
             const siguientePos = (posActual + 1) % circuitoOculto.length;
             player.actualNombre = circuitoOculto[siguientePos];
             localStorage.setItem("howie", JSON.stringify(player));
         }
-
         irA('album-screen');
     });
   }
