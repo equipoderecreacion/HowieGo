@@ -562,6 +562,47 @@ function renderAlbum() {
     }
 }
 
+function renderMapa() {
+  const listaContenedor = document.getElementById("listaZonas");
+  if (!listaContenedor) return; // Seguridad extra
+  listaContenedor.innerHTML = "";
+
+  // DETERMINAMOS SI EL JUEGO TERMINÓ (12 FIGURITAS)
+  const juegoTerminado = player.completadas.length >= 12;
+
+  zonasVisuales.forEach((z) => {
+    const div = document.createElement("div");
+    div.className = "zona-item";
+    div.style.padding = "15px";
+    div.style.margin = "10px 0";
+    div.style.borderRadius = "10px";
+    div.style.display = "flex";
+    div.style.justifyContent = "space-between";
+    div.style.alignItems = "center";
+    div.style.border = "1px solid #ddd";
+
+    // LÓGICA DE LA ESTRELLA (Solo aparece si NO terminó el juego)
+    if (!juegoTerminado && z === player.actualNombre) {
+      div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
+      div.style.border = "2px solid #fbc02d";
+      div.style.background = "#fff9c4";
+      div.style.cursor = "pointer";
+      div.onclick = () => entrarZona(z);
+    } 
+    // ZONAS YA COMPLETADAS
+    else if (player.completadas.includes(z)) {
+      div.innerHTML = `<span>✔ ${z}</span> <span style="color:green; font-size:12px;">Completado</span>`;
+      div.style.background = "#e8f5e9";
+    } 
+    // ZONAS BLOQUEADAS
+    else {
+      div.innerHTML = `<span>🔒 ${z}</span>`;
+      div.style.opacity = "0.5";
+      div.style.background = "#f5f5f5";
+    }
+    listaContenedor.appendChild(div);
+  });
+}
 
 function irA(id) {
     // 1. Ocultamos todas las pantallas
