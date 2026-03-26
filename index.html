@@ -486,9 +486,45 @@ function mostrarEstado(n) {
     }
 
     const zonaGanada = player.actualNombre;
+    
+    // Limpieza estándar
     const nombreLimpio = zonaGanada.toLowerCase().trim()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita acentos
-        .replace(/\s+/g, '-'); // Reemplaza espacios por guiones
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, '-');
+
+    const rutaFinal = `./img/${nombreLimpio}.jpg`;
+    console.log("Intentando cargar:", rutaFinal);
+
+    // 3. Cartel de éxito
+    Swal.fire({
+        title: '¡CONSEGUIDO!',
+        text: `Ganaste la figurita de ${zonaGanada}`,
+        imageUrl: rutaFinal,
+        imageWidth: 200,
+        imageHeight: 300,
+        confirmButtonText: 'VER MI ÁLBUM',
+        confirmButtonColor: '#fbc02d',
+        allowOutsideClick: false,
+        // ESTO TE AVISA SI LA IMAGEN NO EXISTE:
+        didOpen: () => {
+            const img = Swal.getImage();
+            img.onerror = () => {
+                console.error("ERROR: No se encontró el archivo " + rutaFinal + " en la carpeta img");
+                Swal.update({
+                    title: "ERROR DE IMAGEN",
+                    text: `No encuentro el archivo: img/${nombreLimpio}.jpg . Revisá que el nombre sea igual en la carpeta.`,
+                    imageUrl: "" // Quitamos la imagen rota
+                });
+            };
+        }
+    }).then(() => {
+        // Tu motor de movimiento (No lo tocamos)
+        const posActual = circuitoOculto.indexOf(player.actualNombre);
+        const siguientePos = (posActual + 1) % circuitoOculto.length;
+        player.actualNombre = circuitoOculto[siguientePos];
+        localStorage.setItem("howie", JSON.stringify(player));
+        irA('album-screen');
+    });
 
     // 3. Cartel de éxito - AQUÍ ESTÁ EL MOVIMIENTO
     Swal.fire({
