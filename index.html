@@ -411,173 +411,119 @@ let player = {
    NAVEGACIÓN
 ===================== */
 function irA(id) {
-  // 1. Manejo de clases para mostrar/ocultar pantallas
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  const target = document.getElementById(id);
-  if(target) target.classList.add("active");
-
-  // 2. Lógica de renderizado según la pantalla
-  if (id === "mapa-screen") {
-      renderMapa();
-  } else if (id === "album-screen") {
-      renderAlbum(); // ¡Esta es la línea que te faltaba!
-  }
-}
-/* =====================
-   LOGIN
-===================== */
-// Usamos addEventListener para asegurar que el botón funcione
-document.getElementById("loginBtn").addEventListener("click", () => {
-  const n = document.getElementById("inputNombre").value.trim();
-  const h = document.getElementById("inputHabitacion").value.trim();
-  
-  if (!n || !h) {
-    alert("Por favor, completá nombre y habitación");
-    return;
-  }
-
-  player.nombre = n;
-  player.habitacion = h;
-  player.completadas = [];
-  
-  // Selección inicial aleatoria del circuito oculto
-  const inicioAzar = Math.floor(Math.random() * circuitoOculto.length);
-  player.actualNombre = circuitoOculto[inicioAzar];
-
-  localStorage.setItem("howie", JSON.stringify(player));
-  iniciarHome();
-});
-
-function iniciarHome() {
-  document.getElementById("saludo").innerText = `¡Hola ${player.nombre}!`;
-  document.getElementById("progreso").innerText = `Progreso: ${player.completadas.length} / 12`;
-  irA("home-screen");
-}
-
-
-/* =====================
-   MAPA (Aquí se genera la Estrella)
-===================== */
-function mostrarEstado(n) {
-  const e1 = document.getElementById("estado1");
-  const e2 = document.getElementById("estado2");
-  const e3 = document.getElementById("estado3");
-
-  if(e1) e1.style.display = (n === 1) ? "block" : "none";
-  if(e2) e2.style.display = (n === 2) ? "block" : "none";
-  if(e3) e3.style.display = (n === 3) ? "block" : "none";
-
-  const btnAyuda = document.getElementById("btnAyuda");
-  if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
-
-  if (n === 3) {
-    // 1. Guardamos la figurita que acaba de ganar
-    obtenerRecompensa();
-
-    // 2. Confeti
-    if (typeof confetti === 'function') {
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#fbc02d', '#ffffff', '#4CAF50'],
-            zIndex: 9999
-        });
+    // 1. Manejo de clases para mostrar/ocultar pantallas
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    const target = document.getElementById(id);
+    if(target) {
+        target.classList.add("active");
+    } else {
+        console.error("No se encontró la pantalla: " + id);
+        return;
     }
 
-    const zonaGanada = player.actualNombre;
-    
-    // Limpieza estándar
-    const nombreLimpio = zonaGanada.toLowerCase().trim()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, '-');
+    // 2. Lógica de renderizado según la pantalla
+    if (id === "mapa-screen") {
+        renderMapa();
+    } else if (id === "album-screen") {
+        renderAlbum();
+    }
 
-    const rutaFinal = `./img/${nombreLimpio}.jpg`;
-    console.log("Intentando cargar:", rutaFinal);
+    // 3. RESETEO DE BOTÓN DE AYUDA (Para que siempre vuelva a ser azul al cambiar de pantalla)
+    const btnAyuda = document.getElementById("btnAyuda");
+    if (btnAyuda) {
+        btnAyuda.innerText = "🆘 PEDIR AYUDA A HOWIE";
+        btnAyuda.style.background = "#004A97";
+        btnAyuda.onclick = pedirAyuda;
+    }
+}
 
-    // 3. Cartel de éxito
-    Swal.fire({
-        title: '¡CONSEGUIDO!',
-        text: `Ganaste la figurita de ${zonaGanada}`,
-        imageUrl: rutaFinal,
-        imageWidth: 200,
-        imageHeight: 300,
-        confirmButtonText: 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d',
-        allowOutsideClick: false,
-        // ESTO TE AVISA SI LA IMAGEN NO EXISTE:
-        didOpen: () => {
-            const img = Swal.getImage();
-            img.onerror = () => {
-                console.error("ERROR: No se encontró el archivo " + rutaFinal + " en la carpeta img");
-                Swal.update({
-                    title: "ERROR DE IMAGEN",
-                    text: `No encuentro el archivo: img/${nombreLimpio}.jpg . Revisá que el nombre sea igual en la carpeta.`,
-                    imageUrl: "" // Quitamos la imagen rota
-                });
-            };
+/* =====================
+    LOGIN
+===================== */
+const loginBtn = document.getElementById("loginBtn");
+if (loginBtn) {
+    loginBtn.addEventListener("click", () => {
+        const n = document.getElementById("inputNombre").value.trim();
+        const h = document.getElementById("inputHabitacion").value.trim();
+        
+        if (!n || !h) {
+            alert("Por favor, completá nombre y habitación");
+            return;
         }
-    }).then(() => {
-        // Tu motor de movimiento (No lo tocamos)
-        const posActual = circuitoOculto.indexOf(player.actualNombre);
-        const siguientePos = (posActual + 1) % circuitoOculto.length;
-        player.actualNombre = circuitoOculto[siguientePos];
-        localStorage.setItem("howie", JSON.stringify(player));
-        irA('album-screen');
-    });
 
-    // 3. Cartel de éxito - AQUÍ ESTÁ EL MOVIMIENTO
-    Swal.fire({
-        title: '¡CONSEGUIDO!',
-        text: `¡Ganaste la figurita de ${zonaGanada}!`,
-        // --- Asegurate de que la ruta `./img/` sea correcta ---
-        imageUrl: `./img/${nombreLimpio}.jpg`,
-        imageWidth: 200,
-        imageHeight: 300,
-        confirmButtonText: 'VER MI ÁLBUM',
-        confirmButtonColor: '#fbc02d',
-        allowOutsideClick: false
-    }).then(() => {
-   
-        // --- MOTOR DE MOVIMIENTO FORZADO ---
-        const posActual = circuitoOculto.indexOf(player.actualNombre);
-        const siguientePos = (posActual + 1) % circuitoOculto.length;
+        player.nombre = n;
+        player.habitacion = h;
+        player.completadas = [];
         
-        // Actualizamos el nombre de la zona actual del jugador
-        player.actualNombre = circuitoOculto[siguientePos];
+        const inicioAzar = Math.floor(Math.random() * circuitoOculto.length);
+        player.actualNombre = circuitoOculto[inicioAzar];
 
-        // GUARDADO FÍSICO INMEDIATO
         localStorage.setItem("howie", JSON.stringify(player));
-        
-        console.log("Nueva zona de estrella: " + player.actualNombre);
-
-        // Vamos al álbum
-        irA('album-screen');
+        iniciarHome();
     });
-  }
+}
+
+function iniciarHome() {
+    const saludo = document.getElementById("saludo");
+    if (saludo) saludo.innerText = `¡Hola ${player.nombre}!`;
+    actualizarInterfazHome();
+    irA("home-screen");
+}
+
+/* =====================
+    MAPA Y ÁLBUM
+===================== */
+function renderMapa() {
+    const listaContenedor = document.getElementById("listaZonas");
+    if (!listaContenedor) return;
+    listaContenedor.innerHTML = "";
+
+    const juegoTerminado = player.completadas.length >= 12;
+
+    zonasVisuales.forEach((z) => {
+        const div = document.createElement("div");
+        div.className = "zona-item";
+        div.style.padding = "15px";
+        div.style.margin = "10px 0";
+        div.style.borderRadius = "10px";
+        div.style.display = "flex";
+        div.style.justifyContent = "space-between";
+        div.style.alignItems = "center";
+        div.style.border = "1px solid #ddd";
+
+        if (!juegoTerminado && z === player.actualNombre) {
+            div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
+            div.style.border = "2px solid #fbc02d";
+            div.style.background = "#fff9c4";
+            div.style.cursor = "pointer";
+            div.onclick = () => entrarZona(z);
+        } else if (player.completadas.includes(z)) {
+            div.innerHTML = `<span>✔ ${z}</span> <span style="color:green; font-size:12px;">Completado</span>`;
+            div.style.background = "#e8f5e9";
+        } else {
+            div.innerHTML = `<span>🔒 ${z}</span>`;
+            div.style.opacity = "0.5";
+            div.style.background = "#f5f5f5";
+        }
+        listaContenedor.appendChild(div);
+    });
 }
 
 function renderAlbum() {
     const contenedor = document.getElementById("contenedorFiguritas");
     if (!contenedor) return;
-    
     contenedor.innerHTML = ""; 
 
     zonasVisuales.forEach((zona) => {
         const div = document.createElement("div");
         div.className = "sticker-slot"; 
-        
-        // LIMPIEZA PARA COMPARAR: Pasamos todo a minúsculas y sacamos espacios
         const zonaParaComparar = zona.trim().toLowerCase();
         const estaGanada = player.completadas.some(c => c.trim().toLowerCase() === zonaParaComparar);
 
         if (estaGanada) {
-            // Generamos el nombre del archivo (mismo proceso que ya tenías)
             const nombreArchivo = zonaParaComparar
-                .replace(/\s+/g, '-')
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, ""); 
-                
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, '-');
             div.innerHTML = `<img src="img/${nombreArchivo}.jpg" class="sticker-img">`;
             div.classList.add("ganada");
         } else {
@@ -586,175 +532,102 @@ function renderAlbum() {
         contenedor.appendChild(div);
     });
 
-    // MENSAJE DE ÉXITO FINAL
-    if (player.completadas.length >= 12) { // Usamos >= para mayor seguridad
+    if (player.completadas.length >= 12) {
         const mensajeFinal = document.createElement("div");
         mensajeFinal.style.cssText = "grid-column: 1 / -1; background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 15px; text-align: center; font-weight: bold; border: 2px solid #333; color: #333;";
         mensajeFinal.innerHTML = `
-            <h3 style="margin:0;">¡LO LOGRASTE, EXPLORADOR! 🏆</h3>
-            <p style="margin:10px 0;">Completaste todas las misiones de Howie en el hotel.</p>
-            <p><b>¡Buscá a los profes de recreación para recibir tu premio!</b></p>
-            <div style="font-size: 30px;">🦉🎖️</div>
+            <h3 style="margin:0;">¡LO LOGRASTE! 🏆</h3>
+            <p>Buscá a los profes para tu premio.</p>
+            <button onclick="enviarWhatsappFinal()" style="background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">AVISAR POR WHATSAPP</button>
         `;
         contenedor.appendChild(mensajeFinal);
     }
 }
 
-function renderMapa() {
-  const listaContenedor = document.getElementById("listaZonas");
-  if (!listaContenedor) return; // Seguridad extra
-  listaContenedor.innerHTML = "";
+/* =====================
+    LÓGICA DE PREMIO (mostrarEstado única)
+===================== */
+function mostrarEstado(n) {
+    const e1 = document.getElementById("estado1");
+    const e2 = document.getElementById("estado2");
+    const e3 = document.getElementById("estado3");
 
-  // DETERMINAMOS SI EL JUEGO TERMINÓ (12 FIGURITAS)
-  const juegoTerminado = player.completadas.length >= 12;
+    if(e1) e1.style.display = (n === 1) ? "block" : "none";
+    if(e2) e2.style.display = (n === 2) ? "block" : "none";
+    if(e3) e3.style.display = (n === 3) ? "block" : "none";
 
-  zonasVisuales.forEach((z) => {
-    const div = document.createElement("div");
-    div.className = "zona-item";
-    div.style.padding = "15px";
-    div.style.margin = "10px 0";
-    div.style.borderRadius = "10px";
-    div.style.display = "flex";
-    div.style.justifyContent = "space-between";
-    div.style.alignItems = "center";
-    div.style.border = "1px solid #ddd";
+    const btnAyuda = document.getElementById("btnAyuda");
+    if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
 
-    // LÓGICA DE LA ESTRELLA (Solo aparece si NO terminó el juego)
-    if (!juegoTerminado && z === player.actualNombre) {
-      div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
-      div.style.border = "2px solid #fbc02d";
-      div.style.background = "#fff9c4";
-      div.style.cursor = "pointer";
-      div.onclick = () => entrarZona(z);
-    } 
-    // ZONAS YA COMPLETADAS
-    else if (player.completadas.includes(z)) {
-      div.innerHTML = `<span>✔ ${z}</span> <span style="color:green; font-size:12px;">Completado</span>`;
-      div.style.background = "#e8f5e9";
-    } 
-    // ZONAS BLOQUEADAS
-    else {
-      div.innerHTML = `<span>🔒 ${z}</span>`;
-      div.style.opacity = "0.5";
-      div.style.background = "#f5f5f5";
+    if (n === 3) {
+        obtenerRecompensa();
+
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#fbc02d', '#ffffff', '#4CAF50'] });
+        }
+
+        const zonaGanada = player.actualNombre;
+        const nombreLimpio = zonaGanada.toLowerCase().trim()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, '-');
+        
+        const esElFinal = player.completadas.length >= 12;
+
+        Swal.fire({
+            title: esElFinal ? '¡ÁLBUM COMPLETADO! 🏆' : '¡CONSEGUIDO!',
+            text: esElFinal ? '¡Lo lograste! Avisale a los profes para tu premio.' : `¡Ganaste la figurita de ${zonaGanada}!`,
+            imageUrl: `./img/${nombreLimpio}.jpg`,
+            imageWidth: 200,
+            imageHeight: 300,
+            confirmButtonText: esElFinal ? '🎁 RECLAMAR PREMIO' : 'VER MI ÁLBUM',
+            confirmButtonColor: esElFinal ? '#4CAF50' : '#fbc02d',
+            allowOutsideClick: false
+        }).then(() => {
+            if (esElFinal) {
+                enviarWhatsappFinal();
+            } else {
+                const posActual = circuitoOculto.indexOf(player.actualNombre);
+                const siguientePos = (posActual + 1) % circuitoOculto.length;
+                player.actualNombre = circuitoOculto[siguientePos];
+                localStorage.setItem("howie", JSON.stringify(player));
+            }
+            irA('album-screen');
+        });
     }
-    listaContenedor.appendChild(div);
-  });
 }
 
-function irA(id) {
-    // 1. Ocultamos todas las pantallas
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    
-    // 2. BUSCAMOS LA PANTALLA (Con seguro para que no tire error)
-    const target = document.getElementById(id);
-    if (target) {
-        target.classList.add("active");
-    } else {
-        console.error("No se encontró la pantalla: " + id);
-        return; // Si no existe, dejamos de ejecutar para que no se tilde
-    }
-
-    // 3. DIBUJAMOS EL CONTENIDO
-    if (id === "mapa-screen") {
-        renderMapa();
-    }
-    if (id === "album-screen") {
-        renderAlbum();
-    }
+function enviarWhatsappFinal() {
+    const mensajeFinal = encodeURIComponent(`¡TERMINÉ EL JUEGO! 🏆\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}`);
+    window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
 }
 
 /* =====================
-   ZONA Y VALIDACIÓN
+    VALIDACIÓN Y FOTO
 ===================== */
 function entrarZona(zona) {
- const data = zonasData[zona];
- if (!data) return;
-
- document.getElementById("zonaTitulo").innerText = zona;
- document.getElementById("textoEstado1").innerText = data.e1 || "Buscá el QR.";
- document.getElementById("textoEstado2").innerText = data.e2 || "Resolvé el desafío.";
- 
- document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
- 
- document.getElementById("previewContenedor").style.display = "none";
- document.getElementById("respuestaInput").value = "";
- document.getElementById("fotoInput").value = "";
-
- mostrarEstado(1);
- irA("zona-screen");
-}
-
-function validarRespuesta() {
-    const zona = player.actualNombre;
-    // Buscamos la data de la zona ignorando mayúsculas/minúsculas
-    const data = zonasData[zona]; 
-    const inputElement = document.getElementById("respuestaInput");
-    
-    if (!inputElement) return;
-    const valorEscrito = inputElement.value.trim().toLowerCase();
-
-    if (!data) {
-        console.error("No hay datos para la zona:", zona);
-        // TRUCO DE EMERGENCIA: Si no hay data, intentamos validar igual con obtenerRecompensa
-        Swal.fire('Error de Configuración', 'No se encontró la data de ' + zona, 'error');
-        return;
-    }
-
-    let esCorrecto = false;
-
-    // Validación según el tipo de desafío
-    if (data.tipo === "auto") {
-        // Validación para respuestas múltiples (ej: números)
-        if (data.respuestasValidas) {
-            esCorrecto = data.respuestasValidas.some(r => r.toString().toLowerCase() === valorEscrito);
-        }
-    } else {
-        // Validación para códigos de WhatsApp (ej: VISTA, NATATORIO)
-        if (data.respuesta) {
-            esCorrecto = (valorEscrito === data.respuesta.toLowerCase());
-        }
-    }
-
-    if (esCorrecto) {
-        // 1. SUMAMOS EL PUNTO (Esto mueve la estrella y guarda en el celu)
-        obtenerRecompensa(); 
-        
-        // 2. FESTEJO
-        mostrarEstado(3); 
-        
-        // Limpiamos el input para la próxima zona
-        inputElement.value = "";
-    } else {
-        Swal.fire({
-            title: 'Código Incorrecto',
-            text: 'Howie dice que revises bien el código que te pasaron.',
-            icon: 'warning',
-            confirmButtonColor: '#004A97' // Color Howard Johnson
-        });
-    }
+    const data = zonasData[zona];
+    if (!data) return;
+    document.getElementById("zonaTitulo").innerText = zona;
+    document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
+    document.getElementById("previewContenedor").style.display = "none";
+    mostrarEstado(1);
+    irA("zona-screen");
 }
 
 function previsualizarFoto(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            // 1. Mostrar miniatura
             const img = document.getElementById("fotoPreview");
             const cont = document.getElementById("previewContenedor");
             if (img) img.src = e.target.result;
             if (cont) cont.style.display = "block";
             
-            // 2. Transformar el botón verde COMPLETAMENTE
             const btnAyuda = document.getElementById("btnAyuda");
             if (btnAyuda) {
                 btnAyuda.innerText = "💬 ENVIAR FOTO A HOWIE";
                 btnAyuda.style.background = "#25D366";
-                
-                // Forzamos a que el botón use la nueva lógica de envío
-                btnAyuda.onclick = function() {
-                    ejecutarEnvioFinal(e.target.result);
-                };
+                btnAyuda.onclick = () => ejecutarEnvioFinal(e.target.result);
             }
         };
         reader.readAsDataURL(input.files[0]);
@@ -762,246 +635,52 @@ function previsualizarFoto(input) {
 }
 
 function ejecutarEnvioFinal(base64Image) {
-    // 1. DESCARGA REAL
-    const link = document.createElement("a");
-    link.href = base64Image;
-    link.download = `Mision_Howie_${player.actualNombre}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // 2. CARTEL DE AVISO
-    Swal.fire({
-        title: '¡Foto Guardada!',
-        text: 'La imagen ya está en tu galería. Ahora adjuntala en WhatsApp.',
-        icon: 'success',
-        confirmButtonText: 'ABRIR WHATSAPP',
-        confirmButtonColor: '#25D366'
-    }).then(() => {
-        // 3. WHATSAPP CON TEXTO ACTUALIZADO
-        const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Acá te mando la foto de mi misión en: ${player.actualNombre}.`);
-        window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
-
-        // --- RESETEO DEL BOTÓN AQUÍ ADENTRO ---
-        const btnAyuda = document.getElementById("btnAyuda");
-        if (btnAyuda) {
-            btnAyuda.innerText = "PEDIR AYUDA A HOWIE";
-            btnAyuda.style.background = "#004A97"; // El azul Howard Johnson
-            btnAyuda.onclick = pedirAyuda; // Reconectamos la función original
-        }
-    });
+    const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Envío foto de: ${player.actualNombre}.`);
+    window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
+    mostrarEstado(3); // Esto dispara el premio y el confeti
 }
 
+function validarRespuesta() {
+    const zona = player.actualNombre;
+    const data = zonasData[zona]; 
+    const valorEscrito = document.getElementById("respuestaInput").value.trim().toLowerCase();
 
-/* =====================
-    ESTADOS Y MOVIMIENTO
-===================== */
-function mostrarEstado(n) {
-  const e1 = document.getElementById("estado1");
-  const e2 = document.getElementById("estado2");
-  const e3 = document.getElementById("estado3");
-
-  if(e1) e1.style.display = (n === 1) ? "block" : "none";
-  if(e2) e2.style.display = (n === 2) ? "block" : "none";
-  if(e3) e3.style.display = (n === 3) ? "block" : "none";
-
-  const btnAyuda = document.getElementById("btnAyuda");
-  if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
-
-  if (n === 3) {
-    // 1. Guardamos la figurita que acaba de ganar
-    obtenerRecompensa();
-
-    // 2. Confeti
-    if (typeof confetti === 'function') {
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#fbc02d', '#ffffff', '#4CAF50'],
-            zIndex: 9999
-        });
+    if (data && data.respuesta && valorEscrito === data.respuesta.toLowerCase()) {
+        mostrarEstado(3);
+    } else {
+        Swal.fire('Código Incorrecto', 'Howie dice que revises el código.', 'warning');
     }
-
-    const zonaGanada = player.actualNombre;
-    const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
-    // --- CHEQUEO DE FINAL DE JUEGO ---
-    const esElFinal = player.completadas.length >= 12;
-
-    // 3. Cartel de éxito adaptado
-    Swal.fire({
-        title: esElFinal ? '¡ÁLBUM COMPLETADO! 🏆' : '¡CONSEGUIDO!',
-        text: esUltima ? `¡Lo lograste, ${player.nombre}! Completaste las 12 misiones del Howard Johnson.` : `¡Ganaste la figurita de ${zonaGanada}!`,
-        imageUrl: `./img/${nombreLimpio}.jpg`,
-        imageWidth: 200,
-        imageHeight: 300,
-        confirmButtonText: esElFinal ? '🎁 RECLAMAR MI PREMIO' : 'VER MI ÁLBUM',
-        confirmButtonColor: esElFinal ? '#4CAF50' : '#fbc02d', // Verde para el premio
-        allowOutsideClick: false
-    }).then(() => {
-        if (esElFinal) {
-            // MENSAJE PARA LOS PROFES
-            const mensajeFinal = encodeURIComponent(`¡TERMINÉ EL JUEGO! 🏆\n\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}\nEstado: Álbum Completo (12/12)`);
-            window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
-        } else {
-            // MOTOR DE MOVIMIENTO NORMAL (Solo si no terminó)
-            const posActual = circuitoOculto.indexOf(player.actualNombre);
-            const siguientePos = (posActual + 1) % circuitoOculto.length;
-            player.actualNombre = circuitoOculto[siguientePos];
-            localStorage.setItem("howie", JSON.stringify(player));
-        }
-
-        // En ambos casos, vamos al álbum para que vea su progreso final
-        irA('album-screen');
-    });
-  }
 }
 
 /* =====================
-    CIERRE DE SESIÓN SEGURO
+    AUXILIARES
 ===================== */
-function cerrarSesion() {
-    Swal.fire({
-        title: '¿Cerrar sesión?',
-        text: "Se borrará todo tu progreso en Howard Johnson. ¿Estás seguro?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, borrar todo',
-        cancelButtonText: 'No, seguir jugando'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.clear();
-            window.location.reload();
-        }
-    });
-}
-
-// --- 1. GESTIÓN DE PROGRESO Y RECOMPENSA ---
 function obtenerRecompensa() {
-    // 1. Aseguramos que la lista exista
-    if (!player.completadas) player.completadas = [];
-
-    // 2. Guardamos la zona que acaba de ganar (la actual)
-    // USAMOS UNA VARIABLE PARA QUE NO SE MUEVA TODAVÍA
-    const zonaGanada = player.actualNombre;
-
-    if (!player.completadas.includes(zonaGanada)) {
-        player.completadas.push(zonaGanada);
+    if (!player.completadas.includes(player.actualNombre)) {
+        player.completadas.push(player.actualNombre);
+        localStorage.setItem("howie", JSON.stringify(player));
+        actualizarInterfazHome();
     }
-
-    // --- EL CAMBIO ESTÁ AQUÍ ---
-    // NO movemos la estrella todavía. Dejamos que el usuario vea su premio.
-    // Solo guardamos el estado actual.
-    
-    localStorage.setItem("howie", JSON.stringify(player));
-    
-    // 3. Actualizamos la interfaz para que diga 1/12, 2/12, etc.
-    actualizarInterfazHome();
-
-    // 4. Si el álbum está abierto, que se refresque con la nueva figu
-    if (typeof renderAlbum === 'function') renderAlbum();
 }
 
 function actualizarInterfazHome() {
     const p = document.getElementById("progreso");
-    if (p && player.completadas) {
-        p.innerText = `Progreso: ${player.completadas.length} / 12`;
-    }
+    if (p) p.innerText = `Progreso: ${player.completadas.length} / 12`;
 }
 
-// --- 2. ESCÁNER QR (SIN LOOPS Y CON CIERRE SEGURO) ---
-let html5QrCode = null;
-let escaneando = false; 
-
-async function iniciarEscaneo() {
-    const readerDiv = document.getElementById('reader');
-    if (!readerDiv) return;
-
-    readerDiv.style.display = 'block';
-    const btnScan = document.getElementById('btnAbrirScanner');
-    if (btnScan) btnScan.style.display = 'none';
-
-    if (html5QrCode) {
-        try { await html5QrCode.stop(); } catch (e) {}
-        html5QrCode = null;
-    }
-
-    setTimeout(() => {
-        escaneando = true;
-        html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            (decodedText) => {
-                if (!escaneando) return;
-                escaneando = false; 
-                detenerEscaneo(); 
-                procesarLecturaQR(decodedText);
-            }
-        ).catch(err => console.error("Error cámara:", err));
-    }, 300);
+function pedirAyuda() {
+    const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Necesito una pista en ${player.actualNombre}.`);
+    window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
 }
 
-function detenerEscaneo() {
-    if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-            html5QrCode = null;
-            document.getElementById('reader').style.display = 'none';
-            const btnScan = document.getElementById('btnAbrirScanner');
-            if (btnScan) btnScan.style.display = 'block';
-        }).catch(() => {
-            document.getElementById('reader').style.display = 'none';
-        });
-    }
-}
-
-function procesarLecturaQR(decodedText) {
-    try {
-        let zonaLeida = "";
-        if (decodedText.includes("zona=")) {
-            const url = new URL(decodedText);
-            zonaLeida = url.searchParams.get("zona").replace(/-/g, " ");
-        } else {
-            zonaLeida = decodedText;
-        }
-
-        if (zonaLeida.toLowerCase() === player.actualNombre.toLowerCase()) {
-            setTimeout(() => { mostrarEstado(2); }, 300);
-        } else {
-            Swal.fire('Zona Equivocada', `Buscá: ${player.actualNombre}`, 'warning');
-        }
-    } catch (e) {
-        console.error("Error QR:", e);
-    }
-}
-
-// --- 3. INICIO Y AYUDA ---
 window.onload = () => {
     const saved = localStorage.getItem("howie");
     if (saved) {
         player = JSON.parse(saved);
-        actualizarInterfazHome();
-        if (typeof iniciarHome === 'function') iniciarHome();
+        iniciarHome();
     }
 };
 
-function pedirAyuda() {
-    const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Estoy en ${player.actualNombre} y necesito una pista.`);
-    window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
-}
-
-// Forzar que el contador se actualice siempre al cargar
-document.addEventListener('DOMContentLoaded', () => {
-    const p = document.getElementById("progreso");
-    if (p && player && player.completadas) {
-        p.innerText = `Progreso: ${player.completadas.length} / 12`;
-    }
-});
-
 </script>
-
 </body>
 </html>
