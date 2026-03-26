@@ -606,10 +606,31 @@ function enviarWhatsappFinal() {
 ===================== */
 function entrarZona(zona) {
     const data = zonasData[zona];
-    if (!data) return;
+    if (!data) {
+        console.error("No hay datos para la zona: " + zona);
+        return;
+    }
+
+    // Llenamos los textos del HTML con la info de la zona
     document.getElementById("zonaTitulo").innerText = zona;
-    document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
+    document.getElementById("textoEstado1").innerText = data.e1 || "Buscá el código QR en esta zona.";
+    document.getElementById("textoEstado2").innerText = data.e2 || "Resolvé el desafío para ganar la figurita.";
+    
+    // Mostramos u ocultamos la sección de foto según el tipo
+    const seccionFoto = document.getElementById("seccionFoto");
+    const seccionInput = document.getElementById("seccionInput"); // El div que tiene el input de texto
+    
+    if (data.tipo === "foto") {
+        if (seccionFoto) seccionFoto.style.display = "block";
+        if (seccionInput) seccionInput.style.display = "none";
+    } else {
+        if (seccionFoto) seccionFoto.style.display = "none";
+        if (seccionInput) seccionInput.style.display = "block";
+    }
+    
     document.getElementById("previewContenedor").style.display = "none";
+    
+    // IMPORTANTE: Forzamos el Estado 1 al entrar
     mostrarEstado(1);
     irA("zona-screen");
 }
@@ -643,12 +664,37 @@ function ejecutarEnvioFinal(base64Image) {
 function validarRespuesta() {
     const zona = player.actualNombre;
     const data = zonasData[zona]; 
-    const valorEscrito = document.getElementById("respuestaInput").value.trim().toLowerCase();
+    const inputElement = document.getElementById("respuestaInput");
+    
+    if (!inputElement || !data) {
+        console.error("Falta el input o la data de la zona:", zona);
+        return;
+    }
 
-    if (data && data.respuesta && valorEscrito === data.respuesta.toLowerCase()) {
-        mostrarEstado(3);
+    const valorEscrito = inputElement.value.trim().toLowerCase();
+    let esCorrecto = false;
+
+    // Validación según el tipo de desafío
+    if (data.tipo === "auto") {
+        if (data.respuestasValidas) {
+            esCorrecto = data.respuestasValidas.some(r => r.toString().toLowerCase() === valorEscrito);
+        }
     } else {
-        Swal.fire('Código Incorrecto', 'Howie dice que revises el código.', 'warning');
+        if (data.respuesta) {
+            esCorrecto = (valorEscrito === data.respuesta.toLowerCase());
+        }
+    }
+
+    if (esCorrecto) {
+        inputElement.value = ""; // Limpiamos el campo
+        mostrarEstado(3); // ¡GANÓ!
+    } else {
+        Swal.fire({
+            title: 'Código Incorrecto',
+            text: 'Howie dice que revises bien el código.',
+            icon: 'warning',
+            confirmButtonColor: '#004A97'
+        });
     }
 }
 
