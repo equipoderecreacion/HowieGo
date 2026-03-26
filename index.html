@@ -486,12 +486,15 @@ function mostrarEstado(n) {
     }
 
     const zonaGanada = player.actualNombre;
-    const nombreLimpio = zonaGanada.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
+    const nombreLimpio = zonaGanada.toLowerCase().trim()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita acentos
+        .replace(/\s+/g, '-'); // Reemplaza espacios por guiones
+
     // 3. Cartel de éxito - AQUÍ ESTÁ EL MOVIMIENTO
     Swal.fire({
         title: '¡CONSEGUIDO!',
         text: `¡Ganaste la figurita de ${zonaGanada}!`,
+        // --- Asegurate de que la ruta `./img/` sea correcta ---
         imageUrl: `./img/${nombreLimpio}.jpg`,
         imageWidth: 200,
         imageHeight: 300,
@@ -499,6 +502,7 @@ function mostrarEstado(n) {
         confirmButtonColor: '#fbc02d',
         allowOutsideClick: false
     }).then(() => {
+   
         // --- MOTOR DE MOVIMIENTO FORZADO ---
         const posActual = circuitoOculto.indexOf(player.actualNombre);
         const siguientePos = (posActual + 1) % circuitoOculto.length;
