@@ -152,6 +152,30 @@ input {
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
+
+.icono-howie {
+    width: 30px;      /* Tamaño del búho */
+    height: 30px;
+    border-radius: 50%; /* Lo hace circular */
+    margin-right: 10px; /* Separa el búho del texto */
+    vertical-align: middle;
+    border: 2px solid #fbc02d; /* Borde amarillo Howard Johnson */
+    background: white;
+    object-fit: cover;
+}
+
+.btn-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    /* Agregá aquí tus colores de fondo si ya los tenías */
+}
 </style>
 </head>
 
@@ -173,9 +197,17 @@ input {
     <h2 id="saludo"></h2>
     <p id="progreso">Progreso: 0 / 12</p>
 
-    <button class="btn-main" onclick="irA('mapa-screen')">🗺️ MAPA</button>
-    <button onclick="irA('album-screen')">📘 ÁLBUM</button>
-    <button onclick="cerrarSesion()">Cerrar sesión</button>
+   <div class="botones-container"> <button class="btn-main" onclick="irA('mapa-screen')">
+        <img src="img/boton-mapa.jpg" class="icono-howie">
+        EXPLORAR MAPA
+    </button>
+
+    <button onclick="irA('album-screen')" class="btn-main">
+        <img src="img/boton-album.jpg" class="icono-howie">
+        MI ÁLBUM
+    </button>
+
+    <button class="btn-secundario" onclick="cerrarSesion()">Cerrar sesión</button>
   </div>
 </div>
 
