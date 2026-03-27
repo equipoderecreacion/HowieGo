@@ -586,9 +586,16 @@ function mostrarEstado(n) {
             if (esElFinal) {
                 enviarWhatsappFinal();
             } else {
-                const posActual = circuitoOculto.indexOf(player.actualNombre);
-                const siguientePos = (posActual + 1) % circuitoOculto.length;
-                player.actualNombre = circuitoOculto[siguientePos];
+                // --- NUEVO MOTOR ALEATORIO ---
+                // Buscamos cuáles zonas NO completó todavía
+                const restantes = circuitoOculto.filter(zona => !player.completadas.includes(zona));
+                
+                if (restantes.length > 0) {
+                    // Elige una de las que faltan al azar
+                    const proximaAlAzar = restantes[Math.floor(Math.random() * restantes.length)];
+                    player.actualNombre = proximaAlAzar;
+                }
+                
                 localStorage.setItem("howie", JSON.stringify(player));
             }
             irA('album-screen');
