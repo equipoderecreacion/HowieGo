@@ -153,48 +153,44 @@ input {
   100% { transform: scale(1); }
 }
 
-/* =====================
-   ESTILOS HOWARD JOHNSON (Compactos y Prolijos)
-===================== */
 
+/* Estilo para los botones principales (Compactos y Centrados) */
 .btn-main {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Alineamos a la izquierda para el Howie */
-    width: 100%;
-    margin-bottom: 12px;
+    justify-content: flex-start; /* Howie a la izquierda, pegado al texto */
+    
+    /* --- EL CAMBIO CLAVE --- */
+    width: fit-content;       /* El botón solo ocupa lo que miden Howie + el texto */
+    min-width: 240px;         /* Pero le damos un mínimo para que no sea flaquito */
+    margin: 0 auto 15px auto; /* Centra el botón en la pantalla y deja espacio abajo */
+    
+    padding: 8px 20px;        /* Menos azul arriba y abajo, espacio justo a los lados */
     font-weight: bold;
-    border-radius: 12px;
+    font-size: 17px;          /* Subimos un punto la letra para que combine con Howie */
+    border-radius: 15px;      /* Bordes un poco más curvos quedan mejor */
     cursor: pointer;
     font-family: sans-serif;
     
     /* Colores Howard Johnson */
-    background-color: #004A97; /* Azul HJ */
-    color: white;             /* Texto blanco */
-    border: 2px solid #F57C00; /* Naranja HJ */
+    background-color: #004A97; 
+    color: white;             
+    border: 2px solid #F57C00; 
     
-    /* --- EL AJUSTE IMPORTANTE ESTÁ AQUÍ --- */
-    /* Sacamos min-height fija y usamos padding para que se compacte */
-    padding: 10px 18px; /* Menos padding vertical, más horizontal */
-    font-size: 16px;    /* Letra prolija, no gigante */
-    
-    transition: background-color 0.2s;
+    transition: transform 0.2s; /* Efecto de rebote al tocarlo */
 }
 
-.btn-main:hover {
-    background-color: #003366; /* Azul más oscuro al pasar el mouse */
+.btn-main:active {
+    transform: scale(0.95);    /* Se achica un poquito cuando lo apretás */
 }
 
-/* Estilo para que TUS búhos queden GRANDES y sueltos (png limpio) */
+/* El Howie lo dejamos igual porque dijiste que ese tamaño te gustaba */
 .icono-howie {
-    /* --- EL AJUSTE DEL BÚHO ESTÁ AQUÍ --- */
-    width: 50px;          /* ¡Grande, pero no tanto! Probá 50px */
-    height: 50px;
-    margin-right: 15px;   /* Un poquito más de espacio con el texto */
+    width: 55px;
+    height: 55px;
+    margin-right: 15px;
     vertical-align: middle;
-    object-fit: contain;  /* Esto asegura que el búho no se estire */
-    
-    /* Sombrita suave para efecto sticker */
+    object-fit: contain;
     filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
 }
 </style>
