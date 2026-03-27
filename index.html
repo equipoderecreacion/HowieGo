@@ -33,23 +33,30 @@ body {
 }
 
 /* 2. PANTALLA DE LOGIN (IDENTIDAD HOWARD JOHNSON) */
+/* 1. Fondo completo que ocupa TODO el celular */
 .full-page-login {
-    background: linear-gradient(135deg, #004A97 0%, #003366 100%) !important;
+    background: linear-gradient(135deg, #004A97 0%, #003366 100%);
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed; /* Esto evita que se mueva o queden huecos blancos */
+    top: 0;
+    left: 0;
     padding: 20px;
+    box-sizing: border-box;
 }
 
+/* 2. La tarjeta blanca ajustada */
 .login-card-sticker {
     background: white;
-    padding: 30px 40px;
+    padding: 25px;
     border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     width: 100%;
-    max-width: 350px;
+    max-width: 320px; /* Un poquito más angosta para que no toque los bordes */
     text-align: center;
-    position: relative;
 }
 
 .logo-howiego-container {
