@@ -193,19 +193,154 @@ input {
     object-fit: contain;
     filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
 }
+/* =====================
+   ESTILOS LOGIN IDENTIDAD HJ
+   Fondo: #004A97 (Azul Marino) / Destacados: #F57C00 (Naranja)
+===================== */
+
+/* 1. Fondo completo de la pantalla (Azul HJ Profundo) */
+.full-page-login {
+    background: linear-gradient(135deg, #004A97 0%, #003366 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #333; /* Texto oscuro para la tarjeta blanca */
+}
+
+/* 2. La tarjeta de login (Efecto Sticker) */
+.login-card-sticker {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 400px; /* Un poco más ancha para el logo */
+    text-align: center;
+    position: relative; /* Para el branding-corner */
+    
+    /* Efecto troquelado */
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)); 
+}
+
+/* 3. El contenedor del Logo Integrado */
+.logo-howiego-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #F57C00; /* Separador naranja */
+    padding-bottom: 10px;
+}
+
+/* El Howie del Mapa en el logo (Grande) */
+.logo-howie-init {
+    width: 65px; /* Un tamaño importante */
+    height: 65px;
+    object-fit: contain;
+    margin-right: 15px;
+    
+    /* Sombrita sticker */
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2)); 
+}
+
+/* El texto del logo "Howie GO" */
+.text-logo-title {
+    font-size: 30px;
+    font-weight: bold;
+    color: #004A97; /* Azul HJ */
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+}
+
+.highlight-orange {
+    color: #F57C00; /* Naranja HJ */
+}
+
+/* 4. Textos y Campos de Entrada */
+.welcome-text {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.input-form-container input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box; /* Para que el padding no lo estire */
+    
+    /* Pequeño resalte naranja al hacer foco */
+    transition: border-color 0.2s;
+}
+
+.input-form-container input:focus {
+    border-color: #F57C00;
+    outline: none;
+}
+
+/* 5. El Botón "COMENZAR" (Naranja HJ) */
+.btn-hj-primary {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #F57C00; /* Naranja HJ */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    
+    /* Pequeño efecto al pasar el mouse */
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-hj-primary:hover {
+    background-color: #E66A00; /* Naranja más oscuro */
+    transform: scale(1.02); /* Se agranda un poquito */
+}
+
+/* Detalle de Branding en la esquina */
+.branding-corner {
+    position: absolute;
+    bottom: -20px;
+    right: 10px;
+    font-size: 10px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="login-screen" class="screen active">
-  <div class="card">
-    <h1>Howie GO</h1>
-    <input id="inputNombre" placeholder="Tu nombre">
-    <input id="inputHabitacion" placeholder="Habitación">
-    <button class="btn-main" id="loginBtn">COMENZAR</button>
-  </div>
+<div id="login-screen" class="screen full-page-login">
+    <div class="login-card-sticker">
+        
+        <div class="logo-howiego-container">
+            <img src="img/howie-mapa.png" class="logo-howie-init" alt="Howie Explorador">
+            <h1 class="text-logo-title">Howie <span class="highlight-orange">GO</span></h1>
+        </div>
+        
+        <p class="welcome-text">¡Bienvenida, Familia! Completen los datos para empezar la búsqueda del tesoro.</p>
+
+        <div class="input-form-container">
+            <input type="text" id="inputNombre" placeholder="Nombre de la Familia (ej: Familia López)" maxlength="20">
+            <input type="text" id="inputHabitacion" placeholder="Número de Habitación (ej: 102)" maxlength="5">
+        </div>
+
+        <button id="loginBtn" class="btn-hj-primary">¡COMENZAR AVENTURA!</button>
+        
+        <div class="branding-corner">by Howard Johnson</div>
+    </div>
 </div>
 
 <!-- HOME -->
