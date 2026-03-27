@@ -7,314 +7,221 @@
 <title>Howie GO</title>
 
 <style>
+/* 1. BASES GENERALES */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background: #f4f4f4;
   margin: 0;
+  color: #333;
 }
 
+/* Manejo de Pantallas: Fundamental para que funcione el juego */
 .screen {
   display: none;
-  padding: 20px;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .screen.active {
   display: block;
 }
 
-.card {
-  background: white;
-  max-width: 480px;
-  margin: 40px auto;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  text-align: center;
+/* Ajuste para que las pantallas de juego NO tengan el fondo azul del login */
+#mapa-screen, #album-screen, #camera-screen, #home-screen {
+    padding: 20px;
+    background: #f4f4f4;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-main {
-  background: #4CAF50;
-  color: white;
-  font-weight: bold;
-}
-
-input {
-  width: 90%;
-  padding: 12px;
-  margin-bottom: 12px;
-  font-size: 16px;
-}
-
-.zona-item {
-  padding: 12px;
-  margin-bottom: 8px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  display: flex;
-  justify-content: space-between;
-}
-/* Contenedor del escáner */
-#reader {
-  width: 100% !important;
-  max-width: 350px;
-  margin: 15px auto;
-  border: 4px solid #fbc02d; /* Color amarillo Howie */
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* El video dentro del escáner */
-#reader video {
-  border-radius: 10px;
-  object-fit: cover;
-}
-
-/* Botón de Escanear (para que resalte) */
-#btnAbrirScanner {
-  width: 100%;
-  padding: 15px;
-  font-size: 18px;
-  border-radius: 30px;
-  border: none;
-  background: #fbc02d;
-  color: #333;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transition: transform 0.2s;
-}
-
-#btnAbrirScanner:active {
-  transform: scale(0.95);
-}
-#contenedorStickers {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 por fila */
-  gap: 12px;
-  padding: 15px;
-  background: #f0f0f0; /* Fondo gris claro como álbum de papel */
-}
-
-.sticker-slot {
-  aspect-ratio: 2 / 3; /* Proporción vertical (tipo figurita) */
-  background: #ddd;
-  border-radius: 8px;
-  border: 2px dashed #bbb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.sticker-slot.ganada {
-  border: none;
-  background: white;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombrita de papel pegado */
-}
-
-.sticker-img {
-  width: 92%; /* Pequeño margen blanco alrededor como figurita real */
-  height: 92%;
-  object-fit: cover; /* Para que llene el espacio sin deformarse */
-  border-radius: 4px;
-}
-
-.numero-guia {
-  font-weight: bold;
-  color: #aaa;
-  font-size: 20px;
-}
-
-/* Efecto de brillo al aparecer */
-.bounceIn {
-  animation: appearance 0.6s ease-out;
-}
-
-@keyframes appearance {
-  0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
-  70% { transform: scale(1.1) rotate(5deg); }
-  100% { transform: scale(1) rotate(0deg); opacity: 1; }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-
-/* Estilo para los botones principales (Compactos y Centrados) */
-.btn-main {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* Howie a la izquierda, pegado al texto */
-    
-    /* --- EL CAMBIO CLAVE --- */
-    width: fit-content;       /* El botón solo ocupa lo que miden Howie + el texto */
-    min-width: 240px;         /* Pero le damos un mínimo para que no sea flaquito */
-    margin: 0 auto 15px auto; /* Centra el botón en la pantalla y deja espacio abajo */
-    
-    padding: 8px 20px;        /* Menos azul arriba y abajo, espacio justo a los lados */
-    font-weight: bold;
-    font-size: 17px;          /* Subimos un punto la letra para que combine con Howie */
-    border-radius: 15px;      /* Bordes un poco más curvos quedan mejor */
-    cursor: pointer;
-    font-family: sans-serif;
-    
-    /* Colores Howard Johnson */
-    background-color: #004A97; 
-    color: white;             
-    border: 2px solid #F57C00; 
-    
-    transition: transform 0.2s; /* Efecto de rebote al tocarlo */
-}
-
-.btn-main:active {
-    transform: scale(0.95);    /* Se achica un poquito cuando lo apretás */
-}
-
-/* El Howie lo dejamos igual porque dijiste que ese tamaño te gustaba */
-.icono-howie {
-    width: 55px;
-    height: 55px;
-    margin-right: 15px;
-    vertical-align: middle;
-    object-fit: contain;
-    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
-}
-/* =====================
-   ESTILOS LOGIN IDENTIDAD HJ
-   Fondo: #004A97 (Azul Marino) / Destacados: #F57C00 (Naranja)
-===================== */
-
-/* 1. Fondo completo de la pantalla (Azul HJ Profundo) */
+/* 2. PANTALLA DE LOGIN (IDENTIDAD HOWARD JOHNSON) */
 .full-page-login {
-    background: linear-gradient(135deg, #004A97 0%, #003366 100%);
+    background: linear-gradient(135deg, #004A97 0%, #003366 100%) !important;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: #333; /* Texto oscuro para la tarjeta blanca */
+    padding: 20px;
 }
 
-/* 2. La tarjeta de login (Efecto Sticker) */
 .login-card-sticker {
     background: white;
     padding: 30px 40px;
     border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 400px; /* Un poco más ancha para el logo */
+    width: 100%;
+    max-width: 350px;
     text-align: center;
-    position: relative; /* Para el branding-corner */
-    
-    /* Efecto troquelado */
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)); 
+    position: relative;
 }
 
-/* 3. El contenedor del Logo Integrado */
 .logo-howiego-container {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 25px;
-    border-bottom: 2px solid #F57C00; /* Separador naranja */
+    border-bottom: 2px solid #F57C00;
     padding-bottom: 10px;
 }
 
-/* El Howie del Mapa en el logo (Grande) */
 .logo-howie-init {
-    width: 65px; /* Un tamaño importante */
+    width: 65px;
     height: 65px;
     object-fit: contain;
     margin-right: 15px;
-    
-    /* Sombrita sticker */
     filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2)); 
 }
 
-/* El texto del logo "Howie GO" */
 .text-logo-title {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: bold;
-    color: #004A97; /* Azul HJ */
+    color: #004A97;
     margin: 0;
     text-transform: uppercase;
-    letter-spacing: -1px;
 }
 
-.highlight-orange {
-    color: #F57C00; /* Naranja HJ */
-}
+.highlight-orange { color: #F57C00; }
 
-/* 4. Textos y Campos de Entrada */
-.welcome-text {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 25px;
-}
+.welcome-text { font-size: 14px; color: #666; margin-bottom: 20px; }
 
+/* Inputs del Login */
 .input-form-container input {
     width: 100%;
-    padding: 12px 15px;
+    padding: 12px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 16px;
-    box-sizing: border-box; /* Para que el padding no lo estire */
-    
-    /* Pequeño resalte naranja al hacer foco */
-    transition: border-color 0.2s;
+    box-sizing: border-box;
 }
 
-.input-form-container input:focus {
-    border-color: #F57C00;
-    outline: none;
-}
+.input-form-container input:focus { border-color: #F57C00; outline: none; }
 
-/* 5. El Botón "COMENZAR" (Naranja HJ) */
+/* Botón Comenzar (Naranja) */
 .btn-hj-primary {
-    display: block;
     width: 100%;
     padding: 15px;
     font-size: 18px;
     font-weight: bold;
     color: white;
-    background-color: #F57C00; /* Naranja HJ */
+    background-color: #F57C00;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     text-transform: uppercase;
-    
-    /* Pequeño efecto al pasar el mouse */
-    transition: transform 0.2s, background-color 0.2s;
+    transition: transform 0.2s;
 }
 
-.btn-hj-primary:hover {
-    background-color: #E66A00; /* Naranja más oscuro */
-    transform: scale(1.02); /* Se agranda un poquito */
+.btn-hj-primary:active { transform: scale(0.95); }
+
+/* 3. BOTONES DEL JUEGO (AZULES CON HOWIE) */
+.btn-main {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: fit-content;
+    min-width: 260px;
+    margin: 0 auto 15px auto;
+    padding: 8px 20px;
+    font-weight: bold;
+    font-size: 17px;
+    border-radius: 15px;
+    cursor: pointer;
+    background-color: #004A97; 
+    color: white;             
+    border: 2px solid #F57C00; 
+    transition: transform 0.2s;
 }
 
-/* Detalle de Branding en la esquina */
+.icono-howie {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
+}
+
+/* 4. MAPA Y ESTACIONES */
+.card {
+    background: white;
+    max-width: 480px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.zona-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+}
+
+/* 5. ESCÁNER QR */
+#reader {
+    width: 100% !important;
+    max-width: 320px;
+    margin: 15px auto;
+    border: 4px solid #F57C00;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+/* 6. ÁLBUM DE FIGURITAS */
+#contenedorStickers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 15px;
+    background: #e0e0e0;
+    border-radius: 10px;
+}
+
+.sticker-slot {
+    aspect-ratio: 2 / 3;
+    background: #ccc;
+    border-radius: 5px;
+    border: 1px dashed #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.sticker-slot.ganada {
+    border: none;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.sticker-img { width: 95%; height: 95%; object-fit: cover; }
+
+/* Botón Cerrar Sesión (Naranja) */
+.btn-secundario {
+    display: block;
+    width: fit-content;
+    min-width: 200px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #F57C00;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
 .branding-corner {
     position: absolute;
-    bottom: -20px;
-    right: 10px;
+    bottom: 10px;
+    width: 100%;
+    left: 0;
     font-size: 10px;
-    color: white;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
 }
 </style>
 </head>
