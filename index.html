@@ -656,9 +656,40 @@ function previsualizarFoto(input) {
 }
 
 function ejecutarEnvioFinal(base64Image) {
-    const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Envío foto de: ${player.actualNombre}.`);
-    window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
-    mostrarEstado(3); // Esto dispara el premio y el confeti
+    // 1. DESCARGA DE LA IMAGEN
+    const link = document.createElement("a");
+    link.href = base64Image;
+    link.download = `Mision_Howie_${player.actualNombre}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // 2. CARTEL DE AVISO
+    Swal.fire({
+        title: '¡Foto Guardada!',
+        text: 'Enviá la foto por WhatsApp y esperá que Howie te pase el código secreto para continuar.',
+        icon: 'success',
+        confirmButtonText: 'ABRIR WHATSAPP',
+        confirmButtonColor: '#25D366'
+    }).then(() => {
+        // 3. ABRIMOS WHATSAPP
+        const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Acá te mando la foto de mi misión en: ${player.actualNombre}.`);
+        window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
+
+        // 4. RESETEO DEL BOTÓN DE AYUDA (Vuelve a ser azul)
+        const btnAyuda = document.getElementById("btnAyuda");
+        if (btnAyuda) {
+            btnAyuda.innerText = "🆘 PEDIR AYUDA A HOWIE";
+            btnAyuda.style.background = "#004A97";
+            btnAyuda.onclick = pedirAyuda;
+        }
+
+        // 5. IMPORTANTE: Mostramos el input de texto para que ponga el código que recibió
+        const seccionInput = document.getElementById("seccionInput");
+        if (seccionInput) seccionInput.style.display = "block";
+        
+        // No llamamos a mostrarEstado(3), el usuario se queda en la pantalla de la misión
+    });
 }
 
 function validarRespuesta() {
@@ -674,26 +705,32 @@ function validarRespuesta() {
     const valorEscrito = inputElement.value.trim().toLowerCase();
     let esCorrecto = false;
 
-    // Validación según el tipo de desafío
+    // --- 1. VALIDACIÓN PARA DESAFÍOS NUMÉRICOS (TIPO AUTO) ---
+    // Esto es lo que faltaba: permite que haya varias respuestas válidas (ej: [4, "cuatro"])
     if (data.tipo === "auto") {
         if (data.respuestasValidas) {
             esCorrecto = data.respuestasValidas.some(r => r.toString().toLowerCase() === valorEscrito);
         }
-    } else {
+    } 
+    // --- 2. VALIDACIÓN PARA CÓDIGOS DE WHATSAPP O FOTOS ---
+    // Aquí es donde entra el código que el profe le manda al huésped
+    else {
         if (data.respuesta) {
             esCorrecto = (valorEscrito === data.respuesta.toLowerCase());
         }
     }
 
     if (esCorrecto) {
-        inputElement.value = ""; // Limpiamos el campo
-        mostrarEstado(3); // ¡GANÓ!
+        inputElement.value = ""; // Limpiamos el campo para la próxima
+        
+        // IMPORTANTE: Solo cuando el código es correcto damos el punto y el premio
+        mostrarEstado(3); 
     } else {
         Swal.fire({
             title: 'Código Incorrecto',
-            text: 'Howie dice que revises bien el código.',
+            text: 'Howie dice que revises bien el código o la respuesta. ¡Intentá de nuevo!',
             icon: 'warning',
-            confirmButtonColor: '#004A97'
+            confirmButtonColor: '#004A97' // Azul HJ
         });
     }
 }
