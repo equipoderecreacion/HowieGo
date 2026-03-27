@@ -77,14 +77,21 @@ body {
 }
 
 .text-logo-title {
-    font-size: 28px;
-    font-weight: bold;
-    color: #004A97;
+    font-size: 30px;
+    font-weight: 900; /* Más negrita para que parezca un logo */
+    color: #004A97;    /* Azul HJ */
     margin: 0;
     text-transform: uppercase;
+    
+    /* --- EL CAMBIO CLAVE --- */
+    letter-spacing: -2px; /* Valores negativos juntan las letras */
+    display: inline-block; 
 }
 
-.highlight-orange { color: #F57C00; }
+.highlight-orange {
+    color: #F57C00;   /* Naranja HJ */
+    margin-left: -2px; /* Empuja el GO todavía más hacia la izquierda */
+}
 
 .welcome-text { font-size: 14px; color: #666; margin-bottom: 20px; }
 
@@ -230,7 +237,9 @@ body {
 <div id="login-screen" class="screen active">
     <div class="card"> <div class="logo-howiego-container" style="display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #F57C00; margin-bottom: 20px; padding-bottom: 10px;">
             <img src="img/howie-mapa.png" class="logo-howie-init" style="width: 80px; height: auto; margin-bottom: 10px;">
-            <h1 style="color: #004A97; margin: 0; font-size: 28px;">HOWIE <span style="color: #F57C00;">GO</span></h1>
+            <h1 style="color: #004A97; margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1.5px; display: flex; align-items: center; justify-content: center;">
+    Howie<span style="color: #F57C00; margin-left: -1px;">GO</span>
+</h1>
         </div>
         
         <p style="font-size: 14px; color: #666;">¡Bienvenida, Familia! Completen los datos para empezar la aventura.</p>
