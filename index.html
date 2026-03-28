@@ -228,6 +228,17 @@ body {
     color: rgba(255,255,255,0.7);
     text-align: center;
 }
+    /* El truco del 2% y el saludo real */
+    @keyframes saludoReal {
+        0% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(-18deg) scale(0.98); } /* Sube y se achica un pelín */
+        100% { transform: rotate(0deg) scale(1); }
+    }
+
+    .ala-animada {
+        /* Esto hace que el movimiento sea fluido */
+        animation: saludoReal 2s ease-in-out infinite;
+    }
 </style>
 </head>
 
@@ -235,12 +246,20 @@ body {
 
 <!-- LOGIN -->
 <div id="login-screen" class="screen active">
-    <div class="card"> <div class="logo-howiego-container" style="display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #F57C00; margin-bottom: 20px; padding-bottom: 10px;">
-            <img src="img/inicio.png" class="logo-howie-init" style="width: 80px; height: auto; margin-bottom: 10px;">
-            <h1 style="color: #004A97; margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1.5px; display: flex; align-items: center; justify-content: center;">
-    Howie<span style="color: #F57C00; margin-left: -1px;">GO</span>
-</h1>
+   <div class="card"> 
+    <div class="logo-howiego-container" style="display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #F57C00; margin-bottom: 20px; padding-bottom: 10px;">
+        
+        <div style="position: relative; width: 100px; height: 110px; margin-bottom: 10px;">
+            <img src="img/howie-cuerpo.png" style="width: 100%; position: absolute; bottom: 0; left: 0; z-index: 1;">
+            
+            <img src="img/howie-ala.png" class="ala-animada" 
+                 style="width: 35px; position: absolute; top: 40px; left: 8px; z-index: 2; transform-origin: bottom right;">
         </div>
+
+        <h1 style="color: #004A97; margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1.5px; display: flex; align-items: center; justify-content: center;">
+            Howie<span style="color: #F57C00; margin-left: -1px;">GO</span>
+        </h1>
+    </div>
         
         <p style="font-size: 14px; color: #666;">¡Bienvenida, Familia! Completen los datos para empezar la aventura.</p>
 
