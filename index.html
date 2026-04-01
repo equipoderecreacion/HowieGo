@@ -72,7 +72,53 @@
         #contenedorFiguritas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
         .sticker-slot { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px dashed #999; }
         .img-sticker { width: 100%; height: 100%; object-fit: cover; }
-    </style>
+    /* ESTILOS PARA ESTOS NUEVOS BOTONES */
+.btn-contenedor-sticker {
+    background: #F57C00; /* Naranja HJ */
+    color: white;
+    width: 90%;
+    max-width: 320px;
+    height: 100px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 6px 15px rgba(245, 124, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.1s;
+    position: relative;
+    overflow: visible; /* Para que el sticker pueda sobresalir un poquito */
+}
+
+.btn-azul {
+    background: #004A97; /* Azul HJ */
+    box-shadow: 0 6px 15px rgba(0, 74, 151, 0.3);
+}
+
+.btn-contenedor-sticker:active {
+    transform: scale(0.96);
+}
+
+.btn-texto-lado {
+    text-align: left;
+    flex: 1;
+}
+
+.btn-sticker-lado {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-sticker-lado img {
+    width: 120%; /* El sticker es un poquito más grande que el botón */
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+}
+</style>
+
 </head>
 <body>
 
@@ -90,31 +136,39 @@
         </div>
     </div>
 
-    <div id="home-screen" class="screen">
-    <div class="card-sticker" style="border: none; background: none; box-shadow: none; max-width: 350px;">
+   <div id="home-screen" class="screen">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; gap: 20px;">
         
-        <h1 id="saludo" style="color: #004A97; margin-bottom: 5px; font-size: 32px;">¡Hola!</h1>
-        <p style="color: #666; font-size: 18px; margin-bottom: 30px; font-weight: bold;">
-            ¡Vamos a la aventura! 🦉✨
-        </p>
-        
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
-            
-            <div onclick="irA('mapa-screen')" style="cursor: pointer; width: 100%; max-width: 240px;">
-                <img src="img/boton-mapa.png" alt="Mapa" style="width: 100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: transform 0.1s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-            </div>
-            
-            <div onclick="irA('album-screen')" style="cursor: pointer; width: 100%; max-width: 240px;">
-                <img src="img/boton-album.png" alt="Álbum" style="width: 100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: transform 0.1s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-            </div>
-
-            <button onclick="cerrarSesion()" style="margin-top: 25px; background: #e0e0e0; color: #666; border: none; padding: 10px 20px; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: bold; text-transform: uppercase;">
-                Cerrar Sesión / Salir
-            </button>
+        <div style="text-align: center; margin-bottom: 10px;">
+            <h1 id="saludo" style="color: #004A97; margin: 0; font-size: 32px; text-transform: uppercase;">¡HOLA!</h1>
+            <p style="color: #666; font-size: 18px; margin: 5px 0;">¡Vamos a la aventura! 🦉✨</p>
         </div>
+        
+        <div class="btn-contenedor-sticker" onclick="irA('mapa-screen')">
+            <div class="btn-texto-lado">
+                <span style="font-size: 14px; opacity: 0.8; display: block; text-transform: uppercase;">Misiones</span>
+                <span style="font-size: 22px; font-weight: bold;">VER MAPA</span>
+            </div>
+            <div class="btn-sticker-lado">
+                <img src="img/boton-mapa.png" alt="Howie Mapa">
+            </div>
+        </div>
+        
+        <div class="btn-contenedor-sticker btn-azul" onclick="irA('album-screen')">
+            <div class="btn-texto-lado">
+                <span style="font-size: 14px; opacity: 0.8; display: block; text-transform: uppercase;">Mis Figus</span>
+                <span style="font-size: 22px; font-weight: bold;">MI ÁLBUM</span>
+            </div>
+            <div class="btn-sticker-lado">
+                <img src="img/boton-album.png" alt="Howie Álbum">
+            </div>
+        </div>
+
+        <button onclick="cerrarSesion()" style="margin-top: 20px; background: none; border: none; color: #999; text-decoration: underline; font-size: 13px; cursor: pointer;">
+            Cerrar Sesión / Salir
+        </button>
     </div>
 </div>
-
     <div id="mapa-screen" class="screen">
         <h2>Misiones en el Hotel</h2>
         <div id="listaZonas"></div>
