@@ -120,20 +120,21 @@
 
 /* REGLA GENERAL PARA LOS DOS HOWIES */
 .btn-sticker-lado img {
-    width: 140px; 
+    width: 150px; /* Tamaño ideal */
     height: auto;
     position: absolute;
-    bottom: 5px; 
+    bottom: -15px; /* Los bajamos para que "pisen" el botón abajo */
+    right: -15px;  /* Los tiramos hacia la derecha por defecto */
     filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
-    right: -10px; /* Por defecto a la derecha (Botón Mapa) */
     z-index: 10;
+    pointer-events: none;
 }
 
-/* REGLA ESPECÍFICA PARA EL HOWIE DEL ÁLBUM (EL ESPEJADO) */
-/* Usamos "img.espejado" para que tenga más fuerza que la regla de arriba */
+/* REGLA PARA EL ESPEJADO (ÁLBUM) */
 img.espejado {
     right: auto !important; 
-    left: -15px !important; 
+    left: -20px !important; /* Lo saca hacia la izquierda */
+    bottom: -15px !important;
 }
 </style>
 
@@ -155,9 +156,9 @@ img.espejado {
     </div>
 
    <div id="home-screen" class="screen">
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; gap: 20px;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; gap: 25px; padding-top: 40px;">
         
-        <div style="text-align: center; margin-bottom: 10px;">
+        <div style="text-align: center; margin-bottom: 20px;">
             <h1 id="saludo" style="color: #004A97; margin: 0; font-size: 32px; text-transform: uppercase;">¡HOLA!</h1>
             <p style="color: #666; font-size: 18px; margin: 5px 0;">¡Vamos a la aventura! 🦉✨</p>
         </div>
@@ -176,13 +177,13 @@ img.espejado {
             <div class="btn-sticker-lado">
                 <img src="img/boton-album.png" alt="Howie Álbum" class="espejado">
             </div>
-            <div class="btn-texto-lado" style="text-align: right;">
+            <div class="btn-texto-lado" style="text-align: right; padding-right: 10px;">
                 <span style="font-size: 13px; opacity: 0.8; display: block; text-transform: uppercase;">Mis Figus</span>
                 <span style="font-size: 21px; font-weight: bold;">MI ÁLBUM</span>
             </div>
         </div>
 
-        <button onclick="cerrarSesion()" style="margin-top: 25px; background: none; border: none; color: #999; text-decoration: underline; font-size: 12px; cursor: pointer;">
+        <button onclick="cerrarSesion()" style="margin-top: 30px; background: none; border: none; color: #999; text-decoration: underline; font-size: 12px; cursor: pointer;">
             Cerrar Sesión / Salir
         </button>
     </div>
