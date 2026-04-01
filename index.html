@@ -155,29 +155,29 @@ img.espejado {
         </div>
     </div>
 
-   <div id="home-screen" class="screen">
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; gap: 25px; padding-top: 40px;">
+<div id="home-screen" class="screen">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; gap: 30px; padding: 40px 10px;">
         
         <div style="text-align: center; margin-bottom: 20px;">
-            <h1 id="saludo" style="color: #004A97; margin: 0; font-size: 32px; text-transform: uppercase;">¡HOLA!</h1>
+            <h1 id="saludo" style="color: #004A97; margin: 0; font-size: 32px; text-transform: uppercase; font-family: sans-serif;">¡HOLA!</h1>
             <p style="color: #666; font-size: 18px; margin: 5px 0;">¡Vamos a la aventura! 🦉✨</p>
         </div>
         
-        <div class="btn-contenedor-sticker" onclick="irA('mapa-screen')">
-            <div class="btn-texto-lado">
+        <div class="btn-contenedor-sticker" onclick="irA('mapa-screen')" style="background: #F57C00; color: white; width: 90%; max-width: 320px; height: 100px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 6px 15px rgba(245, 124, 0, 0.3); cursor: pointer; position: relative; overflow: visible;">
+            <div style="text-align: left; flex: 1; z-index: 5;">
                 <span style="font-size: 13px; opacity: 0.8; display: block; text-transform: uppercase;">Misiones</span>
                 <span style="font-size: 21px; font-weight: bold;">VER MAPA</span>
             </div>
-            <div class="btn-sticker-lado">
-                <img src="img/boton-mapa.png" alt="Howie Mapa">
+            <div style="width: 100px; height: 100px; position: relative;">
+                <img src="img/boton-mapa.png" alt="Mapa" style="width: 160px !important; height: auto !important; position: absolute !important; right: -30px !important; bottom: -15px !important; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)) !important; z-index: 20 !important; display: block !important;">
             </div>
         </div>
         
-        <div class="btn-contenedor-sticker btn-azul" onclick="irA('album-screen')">
-            <div class="btn-sticker-lado">
-                <img src="img/boton-album.png" alt="Howie Álbum" class="espejado">
+        <div class="btn-contenedor-sticker btn-azul" onclick="irA('album-screen')" style="background: #004A97; color: white; width: 90%; max-width: 320px; height: 100px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 6px 15px rgba(0, 74, 151, 0.3); cursor: pointer; position: relative; overflow: visible;">
+            <div style="width: 100px; height: 100px; position: relative;">
+                <img src="img/boton-album.png" alt="Álbum" style="width: 160px !important; height: auto !important; position: absolute !important; left: -30px !important; right: auto !important; bottom: -15px !important; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)) !important; z-index: 20 !important; display: block !important;">
             </div>
-            <div class="btn-texto-lado" style="text-align: right; padding-right: 10px;">
+            <div style="text-align: right; flex: 1; z-index: 5; padding-right: 10px;">
                 <span style="font-size: 13px; opacity: 0.8; display: block; text-transform: uppercase;">Mis Figus</span>
                 <span style="font-size: 21px; font-weight: bold;">MI ÁLBUM</span>
             </div>
