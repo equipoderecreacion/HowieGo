@@ -10,21 +10,40 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* 1. BASES Y PANTALLAS */
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: #f4f4f4; color: #333; }
-        .screen { display: none; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; }
-        .screen.active { display: block !important; }
+        /* 1. BASES Y PANTALLAS (SISTEMA ANTIBLOQUEO) */
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: #f4f4f4; color: #333; overflow-x: hidden; }
+        
+        .screen { 
+            display: none !important; 
+            min-height: 100vh; 
+            width: 100%; 
+            box-sizing: border-box; 
+            padding: 20px; 
+        }
+        
+        .screen.active { 
+            display: block !important; 
+        }
 
-        /* 2. LOGIN ESTILO STICKER (AZUL HJ) */
+        /* Especial para el Login y Home para centrar contenido */
+        #login-screen.active, #home-screen.active {
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* 2. DISEÑO DE IDENTIDAD (AZUL Y NARANJA HJ) */
         #login-screen {
             background: linear-gradient(135deg, #004A97 0%, #003366 100%);
-            display: flex; justify-content: center; align-items: center;
         }
-        .login-card-sticker {
-            background: white; padding: 30px; border-radius: 25px;
+
+        .card-sticker {
+            background: white; padding: 25px; border-radius: 25px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.4);
             width: 85%; max-width: 320px; text-align: center;
-            border: 3px solid #F57C00; /* Borde naranja característico */
+            border: 3px solid #F57C00;
         }
 
         /* 3. HOWIE ANIMADO */
@@ -34,74 +53,92 @@
             width: 85px; position: absolute; top: 18px; left: 10px; z-index: 2;
             transform-origin: 30% 70%; animation: saludoHowie 2s ease-in-out infinite;
         }
-        @keyframes saludoHowie { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-20deg); } }
+        @keyframes saludoHowie { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-25deg); } }
 
-        /* 4. BOTONES Y DISEÑO DE INTERFAZ */
+        /* 4. COMPONENTES */
         h1 { color: #004A97; margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: -1px; }
         .highlight { color: #F57C00; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
-        .btn-hj { background: #F57C00; color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        .btn-blue { background: #004A97; }
         
-        .zona-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 15px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .sticker-slot { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px dashed #999; }
+        .btn-hj { background: #F57C00; color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; font-size: 14px; box-shadow: 0 4px 0 #b35a00; }
+        .btn-hj:active { transform: translateY(2px); box-shadow: 0 2px 0 #b35a00; }
+        .btn-blue { background: #004A97; box-shadow: 0 4px 0 #002d5c; }
+        .btn-blue:active { box-shadow: 0 2px 0 #002d5c; }
+
+        .zona-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 15px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
         #contenedorFiguritas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
+        .sticker-slot { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px dashed #999; }
         .img-sticker { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="screen active">
-        <div class="login-card-sticker">
+        <div class="card-sticker">
             <div class="howie-container">
                 <img src="img/howie-cuerpo.png" class="howie-cuerpo">
                 <img src="img/howie-ala.png" class="ala-animada">
             </div>
             <h1>Howie<span class="highlight">GO</span></h1>
-            <p style="color:#666; font-size:14px; margin-bottom:20px;">¡Bienvenidos a la aventura!</p>
-            <input type="text" id="inputNombre" placeholder="Nombre del Huésped">
+            <p style="color:#666; font-size:13px;">¡Bienvenidos, Familia!</p>
+            <input type="text" id="inputNombre" placeholder="Nombre del Equipo">
             <input type="text" id="inputHabitacion" placeholder="Nro de Habitación">
-            <button class="btn-hj" onclick="comenzarJuego()">¡Empezar Juego!</button>
+            <button class="btn-hj" onclick="comenzarJuego()">¡Empezar Aventura!</button>
+        </div>
+    </div>
+
+    <div id="home-screen" class="screen">
+        <div class="card-sticker">
+            <div class="howie-container">
+                <img src="img/howie-cuerpo.png" class="howie-cuerpo">
+                <img src="img/howie-ala.png" class="ala-animada">
+            </div>
+            <h2 id="saludo" style="color: #004A97; margin:0;">¡Hola!</h2>
+            <p style="color: #666; margin-bottom:20px;">¿Qué vamos a hacer?</p>
+            
+            <button class="btn-hj" onclick="irA('mapa-screen')">🗺️ VER MAPA DE MISIONES</button>
+            <button class="btn-hj btn-blue" onclick="irA('album-screen')">📖 MI ÁLBUM DE FIGUS</button>
+            
+            <button onclick="cerrarSesion()" style="margin-top: 25px; background: none; border: none; color: #999; text-decoration: underline; font-size:12px;">Cerrar Sesión / Salir</button>
         </div>
     </div>
 
     <div id="mapa-screen" class="screen">
-        <h2 style="text-align:center; color:#004A97;">Misiones en el Hotel</h2>
+        <h2 style="text-align:center; color:#004A97;">Misiones Activas</h2>
         <div id="listaZonas"></div>
-        <button class="btn-hj btn-blue" onclick="irA('album-screen')">📖 Ver mi Álbum</button>
-        <button onclick="cerrarSesion()" style="display:block; margin:20px auto; color:#999; border:none; background:none; text-decoration:underline;">Cambiar Datos / Salir</button>
+        <button class="btn-hj btn-blue" onclick="irA('home-screen')">⬅ Volver al Inicio</button>
     </div>
 
     <div id="zona-screen" class="screen">
-        <div style="background:white; padding:20px; border-radius:20px; text-align:center;">
+        <div style="background:white; padding:20px; border-radius:25px; text-align:center; border: 2px solid #ddd;">
             <h2 id="zonaTitulo" style="color:#F57C00; margin-top:0;"></h2>
-            <p id="textoEstado1" style="line-height:1.4;"></p>
+            <p id="textoEstado1" style="line-height:1.4; color:#555;"></p>
             
             <div id="estado1">
-                <button class="btn-hj" onclick="iniciarEscaneo()">🔍 ESCANEAR CÓDIGO QR</button>
+                <button class="btn-hj" onclick="iniciarEscaneo()">🔍 BUSCAR CÓDIGO QR</button>
             </div>
             
             <div id="estado2" style="display:none;">
-                <p id="textoEstado2" style="font-weight:bold; color:#004A97;"></p>
+                <p id="textoEstado2" style="font-weight:bold; color:#004A97; padding:10px;"></p>
                 <div id="seccionInput">
-                    <input type="text" id="respuestaInput" placeholder="Escribí la respuesta aquí...">
-                    <button class="btn-hj" onclick="validarRespuesta()">Enviar Respuesta</button>
+                    <input type="text" id="respuestaInput" placeholder="Tu respuesta...">
+                    <button class="btn-hj" onclick="validarRespuesta()">Enviar a Howie</button>
                 </div>
                 <div id="seccionFoto" style="display:none;">
                     <input type="file" accept="image/*" id="inputFoto" onchange="previsualizarFoto(this)" style="display:none;">
-                    <button class="btn-hj" onclick="document.getElementById('inputFoto').click()">📸 TOMAR O SUBIR FOTO</button>
+                    <button class="btn-hj" onclick="document.getElementById('inputFoto').click()">📸 TOMAR FOTO</button>
                 </div>
             </div>
             
-            <button onclick="irA('mapa-screen')" style="margin-top:25px; border:none; background:none; color:#666;">⬅ Volver al mapa</button>
+            <button onclick="irA('mapa-screen')" style="margin-top:25px; border:none; background:none; color:#999; font-size:13px;">⬅ Cancelar y volver al mapa</button>
         </div>
-        <div id="reader" style="width:100%; max-width:350px; margin:20px auto; border-radius:15px; overflow:hidden; display:none;"></div>
+        <div id="reader" style="width:100%; max-width:300px; margin:20px auto; border-radius:15px; overflow:hidden; display:none;"></div>
     </div>
 
     <div id="album-screen" class="screen">
-        <h2 style="text-align:center; color:#004A97;">Mis Figuritas</h2>
+        <h2 style="text-align:center; color:#004A97;">Tus Figuritas</h2>
         <div id="contenedorFiguritas"></div>
-        <button class="btn-hj btn-blue" style="margin-top:20px;" onclick="irA('mapa-screen')">Volver al Mapa</button>
+        <button class="btn-hj btn-blue" style="margin-top:20px;" onclick="irA('home-screen')">⬅ Volver al Inicio</button>
     </div>
 
     <script>
@@ -110,28 +147,29 @@
         
         const zonasData = {
             "Bicis": { e1: "Howie dice que el viento solo se siente real a dos ruedas.", e2: "¿Cuántas bicis con rueditas ves?", respuestasValidas: ["0","cero","ninguna"], tipo: "auto" },
-            "Lobby": { e1: "Howie mira a los que llegan y se van.", e2: "¿A qué hora es el check-out?", respuestasValidas: ["10","diez"], tipo: "auto" },
+            "Lobby": { e1: "Howie mira a los que llegan y se van.", e2: "¿Horario máximo de check-out?", respuestasValidas: ["10","diez"], tipo: "auto" },
             "Resto": { e1: "Su lugar favorito para comer en familia.", e2: "Pizza nro 3 de la carta:", respuestasValidas: ["especial"], tipo: "auto" },
-            "Arqueria": { e1: "La paciencia es como una flecha.", e2: "¿Color de más valor?", respuestasValidas: ["amarillo"], tipo: "auto" },
-            "Patio cervecero": { e1: "Bajo las luces se cuentan mejores historias.", e2: "Inicial del encargado con piedritas.", respuesta: "PIEDRA", tipo: "foto" },
-            "Escaleras": { e1: "Desde acá las cosas se ven distintas.", e2: "Foto de la vista de la ciudad.", respuesta: "VISTA", tipo: "foto" },
-            "Camastros": { e1: "Donde el tiempo se detiene.", e2: "¿Nombre del escenario?", respuestasValidas: ["escenario"], tipo: "auto" },
-            "Kids": { e1: "Howie se siente chiquito de nuevo.", e2: "Animal que mueve la cola:", respuestasValidas: ["perro","perrito"], tipo: "auto" },
+            "Arqueria": { e1: "La paciencia es como una flecha.", e2: "¿Color de más valor en el blanco?", respuestasValidas: ["amarillo"], tipo: "auto" },
+            "Patio cervecero": { e1: "Bajo las luces se cuentan mejores historias.", e2: "Formá la inicial del encargado con piedritas.", respuesta: "PIEDRA", tipo: "foto" },
+            "Escaleras": { e1: "Desde acá las cosas se ven distintas.", e2: "Tomale una foto a la vista de la ciudad.", respuesta: "VISTA", tipo: "foto" },
+            "Camastros": { e1: "Donde el tiempo se detiene.", e2: "¿Cómo se llama el escenario?", respuestasValidas: ["escenario"], tipo: "auto" },
+            "Kids": { e1: "Howie se siente chiquito de nuevo.", e2: "Animal que mueve la cola y cuida el lugar:", respuestasValidas: ["perro","perrito"], tipo: "auto" },
             "Plaza": { e1: "Sigue el rastro de la arena.", e2: "¿Cuántos balcones tiene el edificio de enfrente?", respuestasValidas: ["16"], tipo: "auto" },
             "Estatuas": { e1: "Figuras que no se mueven.", e2: "Siglas en la base del guerrero:", respuestasValidas: ["osn"], tipo: "auto" },
-            "Pileta": { e1: "¡No se corre en la pile!", e2: "¿Quién vigila el agua?", respuestasValidas: ["bañero","guardavidas"], tipo: "auto" },
+            "Pileta": { e1: "¡Recordá no correr en el borde!", e2: "¿Quién vigila el agua?", respuestasValidas: ["bañero","guardavidas"], tipo: "auto" },
             "Plays": { e1: "Sonidos de victoria.", e2: "Personaje famoso en lo alto:", respuestasValidas: ["kratos","cratos"], tipo: "auto" }
         };
 
         let player = { nombre: "", habitacion: "", actualNombre: "", completadas: [] };
 
-        /* ===================== LÓGICA DE NAVEGACIÓN ===================== */
+        /* ===================== NAVEGACIÓN ===================== */
         function irA(id) {
             document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
             const target = document.getElementById(id);
             if(target) target.classList.add("active");
             if (id === "mapa-screen") renderMapa();
             if (id === "album-screen") renderAlbum();
+            window.scrollTo(0, 0);
         }
 
         function seleccionarNuevaMision() {
@@ -140,64 +178,18 @@
             localStorage.setItem("howie", JSON.stringify(player));
         }
 
-       /* 1. REEMPLAZÁ TU FUNCIÓN comenzarJuego POR ESTA */
-function comenzarJuego() {
-    console.log("Intentando iniciar sesión...");
-    
-    const nInput = document.getElementById("inputNombre");
-    const hInput = document.getElementById("inputHabitacion");
-    
-    const n = nInput ? nInput.value.trim() : "";
-    const h = hInput ? hInput.value.trim() : "";
-    
-    if (n === "" || h === "") {
-        Swal.fire({
-            title: "¡Faltan datos!",
-            text: "Por favor, ingresá tu nombre y habitación para que Howie te encuentre.",
-            icon: "warning",
-            confirmButtonColor: "#F57C00"
-        });
-        return;
-    }
-
-    // Guardamos los datos nuevos
-    player.nombre = n;
-    player.habitacion = h;
-    player.completadas = [];
-    
-    // Elegimos la primera misión
-    seleccionarNuevaMision();
-
-    // Guardamos en la memoria del celular
-    localStorage.setItem("howie", JSON.stringify(player));
-    
-    console.log("Datos guardados, navegando al mapa...");
-    
-    // Forzamos el cambio de pantalla
-    irA("mapa-screen");
-}
-
-/* 2. REEMPLAZÁ TU window.onload POR ESTE */
-window.onload = () => {
-    console.log("App HowieGO lista.");
-    const saved = localStorage.getItem("howie");
-    
-    if (saved) {
-        try {
-            player = JSON.parse(saved);
-            console.log("Jugador recuperado:", player.nombre);
-            // Si ya existe el jugador, saltamos el login
-            irA("mapa-screen");
-        } catch (e) {
-            console.error("Error en datos guardados, reiniciando...");
-            localStorage.clear();
-            irA("login-screen");
+        function comenzarJuego() {
+            const n = document.getElementById("inputNombre").value.trim();
+            const h = document.getElementById("inputHabitacion").value.trim();
+            if(!n || !h) { Swal.fire("¡Ups!", "Ingresá nombre y habitación", "warning"); return; }
+            player.nombre = n; player.habitacion = h; player.completadas = [];
+            seleccionarNuevaMision();
+            
+            const saludo = document.getElementById("saludo");
+            if(saludo) saludo.innerText = `¡Hola ${player.nombre}!`;
+            
+            irA("home-screen");
         }
-    } else {
-        // Si es la primera vez, nos quedamos en el Login
-        irA("login-screen");
-    }
-};
 
         function renderMapa() {
             const lista = document.getElementById("listaZonas");
@@ -206,13 +198,13 @@ window.onload = () => {
                 const div = document.createElement("div");
                 div.className = "zona-item";
                 if(z === player.actualNombre) {
-                    div.innerHTML = `<span>⭐ <b>${z}</b></span> <small style="color:#F57C00">¡IR AQUÍ!</small>`;
+                    div.innerHTML = `<span>⭐ <b>${z}</b></span> <small style="color:#F57C00; font-weight:bold;">¡MISION!</small>`;
                     div.style.border = "2px solid #F57C00"; div.style.background = "#fff9c4";
                     div.onclick = () => entrarZona(z);
                 } else {
-                    const completada = player.completadas.includes(z);
-                    div.innerHTML = `<span>${completada ? '✔' : '🔒'} ${z}</span>`;
-                    div.style.opacity = completada ? "1" : "0.5";
+                    const ok = player.completadas.includes(z);
+                    div.innerHTML = `<span>${ok ? '✔' : '🔒'} ${z}</span>`;
+                    div.style.opacity = ok ? "1" : "0.4";
                 }
                 lista.appendChild(div);
             });
@@ -235,7 +227,7 @@ window.onload = () => {
             if(n===3) {
                 if(!player.completadas.includes(player.actualNombre)) {
                     player.completadas.push(player.actualNombre);
-                    confetti();
+                    confetti({ particleCount: 150, origin: { y: 0.7 } });
                     Swal.fire("¡Excelente!", `Ganaste la figurita de ${player.actualNombre}`, "success").then(() => {
                         seleccionarNuevaMision();
                         irA("album-screen");
@@ -249,7 +241,7 @@ window.onload = () => {
             const val = document.getElementById("respuestaInput").value.trim().toLowerCase();
             const ok = data.tipo === "auto" ? data.respuestasValidas.includes(val) : val === data.respuesta.toLowerCase();
             if(ok) { document.getElementById("respuestaInput").value=""; mostrarEstado(3); }
-            else { Swal.fire("Casi...", "Howie dice que revises bien", "error"); }
+            else { Swal.fire("Mmm...", "Revisá bien el dato e intentá de nuevo", "error"); }
         }
 
         function renderAlbum() {
@@ -274,14 +266,14 @@ window.onload = () => {
                 scanner.stop().then(() => {
                     reader.style.display = "none";
                     if(text.toLowerCase().includes(player.actualNombre.toLowerCase())) mostrarEstado(2);
-                    else Swal.fire("Zona Incorrecta", "Este QR no es de " + player.actualNombre, "warning");
+                    else Swal.fire("QR Incorrecto", "Este no es el QR de " + player.actualNombre, "warning");
                 });
-            }).catch(err => Swal.fire("Error", "No se pudo abrir la cámara", "error"));
+            }).catch(() => Swal.fire("Error", "No se detecta la cámara", "error"));
         }
 
         function previsualizarFoto(input) {
             if (input.files && input.files[0]) {
-                Swal.fire("¡Foto Lista!", "Enviando misión a Howie...", "success").then(() => {
+                Swal.fire("¡Recibida!", "Enviando misión a Howie...", "success").then(() => {
                     const msg = encodeURIComponent(`¡Howie! Misión cumplida en ${player.actualNombre}. Soy ${player.nombre}.`);
                     window.open(`https://wa.me/5493541215391?text=${msg}`, '_blank');
                     mostrarEstado(3);
@@ -290,13 +282,18 @@ window.onload = () => {
         }
 
         function cerrarSesion() {
-            Swal.fire({ title: '¿Salir?', text: "Se borrará tu progreso", showCancelButton: true, confirmButtonText: 'Sí, salir' })
+            Swal.fire({ title: '¿Cerrar Juego?', text: "Se perderá el progreso de figuritas.", showCancelButton: true, confirmButtonText: 'Sí, salir' })
             .then(r => { if(r.isConfirmed) { localStorage.clear(); window.location.reload(); } });
         }
 
         window.onload = () => {
             const saved = localStorage.getItem("howie");
-            if(saved) { player = JSON.parse(saved); irA("mapa-screen"); }
+            if(saved) { 
+                player = JSON.parse(saved); 
+                const saludo = document.getElementById("saludo");
+                if(saludo) saludo.innerText = `¡Hola ${player.nombre}!`;
+                irA("home-screen"); 
+            }
         };
     </script>
 </body>
