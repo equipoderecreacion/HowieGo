@@ -1020,6 +1020,31 @@ function procesarLecturaQR(decodedText) {
     }
 }
 
+function comenzarJuego() {
+    console.log("Iniciando aventura en HJ...");
+
+    // 1. Buscamos los datos de los inputs (por si los necesitás después)
+    const nombre = document.getElementById('inputNombre').value;
+    const habitacion = document.getElementById('inputHabitacion').value;
+
+    if (nombre === "" || habitacion === "") {
+        alert("¡Por favor, completen el nombre y la habitación para empezar!");
+        return;
+    }
+
+    // 2. LA MAGIA: Apagamos el Login y prendemos el Mapa
+    // Asegurate de que tu div del mapa tenga id="mapa-screen"
+    const login = document.getElementById('login-screen');
+    const mapa = document.getElementById('mapa-screen');
+
+    if (login && mapa) {
+        login.classList.remove('active'); // Se va el azul y Howie
+        mapa.classList.add('active');    // Aparece el mapa y el álbum
+        console.log("¡Mapa cargado!");
+    } else {
+        console.error("No encontré las pantallas. Revisá que el mapa tenga id='mapa-screen'");
+    }
+}
 </script>
 </body>
 </html>
