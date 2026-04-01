@@ -15,15 +15,18 @@ body {
   color: #333;
 }
 
-/* Manejo de Pantallas: Fundamental para que funcione el juego */
+/* --- MANEJO DE PANTALLAS (ÚNICA VERSIÓN) --- */
 .screen {
-  display: none;
-  min-height: 100vh;
-  box-sizing: border-box;
+    display: none !important; /* Escondemos todo por defecto */
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #f4f4f4; /* Fondo gris claro para el juego */
 }
 
 .screen.active {
-  display: block;
+    display: block !important; /* Mostramos solo la activa como bloque */
 }
 
 /* Ajuste para que las pantallas de juego NO tengan el fondo azul del login */
@@ -424,19 +427,7 @@ body {
     0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
-/* Esto asegura que todas las pantallas centren su contenido igual que el menú */
-.screen {
-    display: none;
-    width: 100%;
-    min-height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
-    /* Quitamos el flex-direction y demás de acá si no es login */
-}
 
-.screen.active {
-    display: block !important; /* <--- CAMBIÁ 'flex' POR 'block' */
-}
 
 /* Y agregamos esto para que la card del mapa se vea bien */
 #mapa-screen .card {
