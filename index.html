@@ -32,28 +32,67 @@
         .btn-hj { background: #F57C00; color: white; border: none; padding: 15px; min-width: 260px; border-radius: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .btn-blue { background: #004A97; }
 
-        /* BOTONES HOME CON STICKERS */
-        .btn-contenedor-sticker {
-            background: #F57C00; color: white; width: 95%; max-width: 320px; height: 100px; border-radius: 20px;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-            box-shadow: 0 6px 15px rgba(245, 124, 0, 0.3); cursor: pointer; position: relative; overflow: visible; margin-bottom: 25px;
-        }
-        .btn-texto-lado { text-align: left; flex: 1; z-index: 5; }
-        .btn-sticker-lado { width: 100px; height: 100px; position: relative; }
-        
-        .btn-sticker-lado img {
-            width: 155px !important; height: auto !important; position: absolute !important;
-            bottom: -15px !important; right: -20px !important; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
-            z-index: 10; pointer-events: none;
-        }
-        img.espejado { right: auto !important; left: -25px !important; }
+        /* --- ESTILO INDESTRUCTIBLE PARA BOTONES HOME --- */
 
-        /* LISTADOS */
-        .zona-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 15px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
-        .zona-completada { background-color: #e8f5e9; }
-        #contenedorFiguritas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .sticker-slot { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px dashed #999; }
-        .img-sticker { width: 100%; height: 100%; object-fit: cover; }
+.btn-contenedor-sticker {
+    width: 90% !important;
+    max-width: 320px !important;
+    height: 100px !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 20px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: visible !important;
+    margin-bottom: 25px !important;
+    border: none !important;
+    transition: transform 0.1s;
+}
+
+/* Color NARANJA para el Mapa */
+#btn-mapa-principal {
+    background-color: #F57C00 !important;
+    box-shadow: 0 6px 15px rgba(245, 124, 0, 0.4) !important;
+}
+
+/* Color AZUL para el Álbum */
+#btn-album-principal {
+    background-color: #004A97 !important;
+    box-shadow: 0 6px 15px rgba(0, 74, 151, 0.4) !important;
+}
+
+.btn-contenedor-sticker:active {
+    transform: scale(0.96);
+}
+
+.btn-sticker-lado {
+    width: 100px;
+    height: 100px;
+    position: relative;
+}
+
+/* LOS HOWIES: Bajamos el bottom para que "pisen" el botón */
+.btn-sticker-lado img {
+    width: 155px !important; 
+    height: auto !important;
+    position: absolute !important;
+    bottom: -25px !important; /* <--- MÁS ABAJO QUE NUNCA */
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)) !important;
+    z-index: 20 !important;
+}
+
+/* El del Mapa a la derecha */
+.img-derecha {
+    right: -25px !important;
+}
+
+/* El del Álbum a la izquierda */
+.img-izquierda {
+    right: auto !important;
+    left: -25px !important;
+}
     </style>
 </head>
 <body>
