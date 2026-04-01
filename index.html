@@ -140,14 +140,64 @@
             localStorage.setItem("howie", JSON.stringify(player));
         }
 
-        function comenzarJuego() {
-            const n = document.getElementById("inputNombre").value.trim();
-            const h = document.getElementById("inputHabitacion").value.trim();
-            if(!n || !h) { Swal.fire("¡Opa!", "Completá tus datos", "warning"); return; }
-            player.nombre = n; player.habitacion = h;
-            seleccionarNuevaMision();
+       /* 1. REEMPLAZÁ TU FUNCIÓN comenzarJuego POR ESTA */
+function comenzarJuego() {
+    console.log("Intentando iniciar sesión...");
+    
+    const nInput = document.getElementById("inputNombre");
+    const hInput = document.getElementById("inputHabitacion");
+    
+    const n = nInput ? nInput.value.trim() : "";
+    const h = hInput ? hInput.value.trim() : "";
+    
+    if (n === "" || h === "") {
+        Swal.fire({
+            title: "¡Faltan datos!",
+            text: "Por favor, ingresá tu nombre y habitación para que Howie te encuentre.",
+            icon: "warning",
+            confirmButtonColor: "#F57C00"
+        });
+        return;
+    }
+
+    // Guardamos los datos nuevos
+    player.nombre = n;
+    player.habitacion = h;
+    player.completadas = [];
+    
+    // Elegimos la primera misión
+    seleccionarNuevaMision();
+
+    // Guardamos en la memoria del celular
+    localStorage.setItem("howie", JSON.stringify(player));
+    
+    console.log("Datos guardados, navegando al mapa...");
+    
+    // Forzamos el cambio de pantalla
+    irA("mapa-screen");
+}
+
+/* 2. REEMPLAZÁ TU window.onload POR ESTE */
+window.onload = () => {
+    console.log("App HowieGO lista.");
+    const saved = localStorage.getItem("howie");
+    
+    if (saved) {
+        try {
+            player = JSON.parse(saved);
+            console.log("Jugador recuperado:", player.nombre);
+            // Si ya existe el jugador, saltamos el login
             irA("mapa-screen");
+        } catch (e) {
+            console.error("Error en datos guardados, reiniciando...");
+            localStorage.clear();
+            irA("login-screen");
         }
+    } else {
+        // Si es la primera vez, nos quedamos en el Login
+        irA("login-screen");
+    }
+};
 
         function renderMapa() {
             const lista = document.getElementById("listaZonas");
