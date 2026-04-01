@@ -61,11 +61,17 @@ body {
 
 .logo-howiego-container {
     display: flex;
+    flex-direction: column; /* Esto pone a Howie ARRIBA del título, no al costado */
     align-items: center;
     justify-content: center;
     margin-bottom: 25px;
     border-bottom: 2px solid #F57C00;
     padding-bottom: 10px;
+    
+    /* Agregamos esto para que el contenedor no sea infinito */
+    position: relative; 
+    height: auto; 
+    min-height: 160px; /* Le damos un espacio fijo para que Howie no "pise" al mapa */
 }
 
 .logo-howie-init {
