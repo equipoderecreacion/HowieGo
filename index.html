@@ -91,20 +91,27 @@
     </div>
 
     <div id="home-screen" class="screen">
-    <div class="card-sticker" style="border: none; background: none; box-shadow: none;">
-        <h2 id="saludo" style="color: #004A97; margin-bottom: 30px; font-size: 32px;">¡Hola!</h2>
+    <div class="card-sticker" style="border: none; background: none; box-shadow: none; max-width: 350px;">
         
-        <div onclick="irA('mapa-screen')" style="cursor: pointer; margin-bottom: 20px;">
-            <img src="img/boton-mapa.png" alt="Mapa de Misiones" style="width: 100%; max-width: 280px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        </div>
+        <h1 id="saludo" style="color: #004A97; margin-bottom: 5px; font-size: 32px;">¡Hola!</h1>
+        <p style="color: #666; font-size: 18px; margin-bottom: 30px; font-weight: bold;">
+            ¡Vamos a la aventura! 🦉✨
+        </p>
         
-        <div onclick="irA('album-screen')" style="cursor: pointer;">
-            <img src="img/boton-album.png" alt="Mi Álbum" style="width: 100%; max-width: 280px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            
+            <div onclick="irA('mapa-screen')" style="cursor: pointer; width: 100%; max-width: 240px;">
+                <img src="img/boton-mapa.png" alt="Mapa" style="width: 100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: transform 0.1s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+            </div>
+            
+            <div onclick="irA('album-screen')" style="cursor: pointer; width: 100%; max-width: 240px;">
+                <img src="img/boton-album.png" alt="Álbum" style="width: 100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: transform 0.1s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+            </div>
 
-        <button onclick="cerrarSesion()" style="margin-top: 40px; background: none; border: none; color: #004A97; text-decoration: underline; font-size: 14px; cursor: pointer; font-weight: bold;">
-            Cerrar Sesión / Salir
-        </button>
+            <button onclick="cerrarSesion()" style="margin-top: 25px; background: #e0e0e0; color: #666; border: none; padding: 10px 20px; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: bold; text-transform: uppercase;">
+                Cerrar Sesión / Salir
+            </button>
+        </div>
     </div>
 </div>
 
