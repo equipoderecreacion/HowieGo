@@ -115,13 +115,18 @@
 }
 
 .btn-sticker-lado img {
-    /* USAMOS PÍXELES FIJOS PARA QUE SEAN IGUALES */
     width: 140px; 
     height: auto;
     position: absolute;
-    bottom: -5px; /* Esto hace que "pisen" el borde inferior */
+    right: -10px; /* Por defecto todos a la derecha */
+    bottom: 5px;  
     filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
-    z-index: 10;
+}
+
+/* AGREGÁ ESTA REGLA JUSTO ABAJO: */
+.espejado {
+    right: auto !important; /* Cancela la derecha */
+    left: -10px !important;  /* Lo manda a la izquierda */
 }
 </style>
 
