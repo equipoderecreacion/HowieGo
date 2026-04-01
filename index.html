@@ -473,95 +473,28 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-/* =====================
-   DATOS DEL JUEGO
-===================== */
+/* ==========================================
+    1. DATOS Y CONFIGURACIÓN DEL JUEGO
+========================================== */
 const zonasVisuales = [
   "Bicis", "Lobby", "Resto","Arqueria", "Patio cervecero", "Escaleras", "Camastros",
   "Kids", "Plaza", "Estatuas", "Pileta", "Plays"
 ];
 
-const circuitoOculto = [
-  "Plaza", "Bicis", "Camastros", 
-  "Arqueria", "Kids", "Pileta", "Resto", "Lobby", 
-  "Plays", "Escaleras", "Estatuas", "Patio cervecero"
-];
-
 const zonasData = {
-  "Bicis": {
-    e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas. Encontrá el QR para continuar.",
-    e2: "Howie estuvo contando rayos y pedales. Dice que para los más aventureros, el equilibrio es un arte. ¿Cuántas bicicletas con rueditas de aprendizaje ves acá?",
-    respuestasValidas: ["ninguna", "cero", "0", "no hay", "0 rueditas"],
-    tipo: "auto"
-  },
-  "Lobby": {
-    e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.",
-    e2: "A Howie le preocupa el tiempo. Se quedó mirando el reloj y se pregunta: ¿A qué hora es el último adiós a la habitación?",
-    respuestasValidas: ["diez", "10", "10:00", "10 am", "las diez"],
-    tipo: "auto"
-  },
-  "Resto": {
-    e1: "Howie dice que es su lugar favorito, lo que más le gusta es compartir en familia, repasar las anécdotas y que no falten las risas.",
-    e2: "Howie es un gran comensal. Para saber cuál es su plato favorito, en la carta de pizza contá hasta 3.",
-    respuestasValidas: ["especial", "la especial", "pizza especial"],
-    tipo: "auto"
-  },
-  "Arqueria": {
-    e1: "Howie dice que la paciencia es como una flecha: cuanto más la tensás, más lejos llegás. Encontrá el QR para continuar.",
-    e2: "Howie estuvo mirando los círculos que nunca terminan: ¿Cuál es el de más valor?",
-    respuestasValidas: ["amarillo", "el amarillo", "centro", "el centro"],
-    tipo: "auto"
-  },
-  "Patio cervecero": {
-    e1: "Howie busca la brisa de la tarde y el tintineo de los vasos fríos. Bajo las luces, las historias se cuentan mejor. Encontrá el QR para continuar.",
-    e2: "Howie dice que el suelo está lleno de tesoros pequeños. Usá las piedritas para formar la inicial de la persona que atiende el foodtruck.",
-    respuesta: "PIEDRA",
-    tipo: "foto"
-  },
-  "Escaleras": {
-    e1: "Howie siempre se detiene un momento antes de subir. Dice que desde acá las cosas se ven distintas… Encontrá el QR para continuar.",
-    e2: "Howie se queda justo donde el esfuerzo afloja. Desde ahí, los colores cuentan historias de la ciudad. Tomale una foto y envíasela a Howie.",
-    respuesta: "VISTA",
-    tipo: "foto"
-  },
-  "Camastros": {
-    e1: "Howie encontró el lugar donde el tiempo se detiene y el sol te abraza en silencio. Encontrá el QR para continuar.",
-    e2: "No siempre es el lugar más ruidoso, pero cuando algo importante pasa, todas las miradas terminan ahí. ¿Sabés qué es?",
-    respuestasValidas: ["escenario", "el escenario", "la tarima"],
-    tipo: "auto"
-  },
-  "Kids": {
-    e1: "Howie se siente chiquito otra vez, así que acá se pone a jugar. Encontrá el QR para continuar.",
-    e2: "Tiene cuatro patas, cuida este lugar sin hablar, y cuando esta contento mueve la cola sin parar.",
-    respuestasValidas: ["perro", "perros", "perrito", "perritos", "el perro"],
-    tipo: "auto"
-  },
-  "Plaza": {
-    e1: "Howie sigue el rastro de la arena y el sonido de los saltos. Encontrá el QR para continuar.",
-    e2: "Sube a lo mas alto y desde ahí cuenta cuantos balcones tiene el edificio frente a ti.",
-    respuestasValidas: ["16", "dieceis", "dieciséis"],
-    tipo: "auto"
-  },
-  "Estatuas": {
-    e1: "Howie se detiene frente a figuras que no se mueven, pero son centro de atracción. Encontrá el QR para continuar.",
-    e2: "El guerrero protege un mensaje. La aprobación está escrita más de una vez. Decinos qué siglas ves.",
-    respuestasValidas: ["aprobado por o.s.n.", "aprobado por osn", "osn", "o.s.n."],
-    tipo: "auto"
-  },
-  "Pileta": {
-    e1: "Acá todo es diversión. Howie se acuerda de una regla importante: acá se juega… pero no se corre 😉 Encontrá el QR para continuar.",
-    e2: "No se mete a jugar, pero cuida el juego. Está siempre atento mientras otros chapotean. ¿Quién es?",
-    respuestasValidas: ["guardavidas", "el guardavidas", "bañero", "el bañero", "socorrista"],
-    tipo: "auto"
-  },
-  "Plays": {
-    e1: "Howie se dejó llevar por las luces parpadeantes y los sonidos de victoria. Encontrá el QR para continuar.",
-    e2: "Famoso soy, en lo alto estoy, si queres completar el desafío deci que personaje soy.",
-    respuestasValidas: ["cratos", "kratos"],
-    tipo: "auto"
-  }
+  "Bicis": { e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas.", e2: "¿Cuántas bicicletas con rueditas de aprendizaje ves acá?", respuestasValidas: ["ninguna", "cero", "0", "no hay"], tipo: "auto" },
+  "Lobby": { e1: "Aquí Howie se relaja y mira a los que llegan y se van.", e2: "¿A qué hora es el último adiós a la habitación?", respuestasValidas: ["diez", "10", "10:00", "10 am"], tipo: "auto" },
+  "Resto": { e1: "Howie dice que es su lugar favorito para compartir en familia.", e2: "En la carta de pizza contá hasta 3. ¿Cuál es?", respuestasValidas: ["especial", "la especial"], tipo: "auto" },
+  "Arqueria": { e1: "La paciencia es como una flecha: cuanto más la tensás, más lejos llegás.", e2: "¿Cuál es el círculo de más valor?", respuestasValidas: ["amarillo", "el amarillo", "centro"], tipo: "auto" },
+  "Patio cervecero": { e1: "Bajo las luces, las historias se cuentan mejor.", e2: "Formá la inicial de la persona que atiende el foodtruck con piedritas.", respuesta: "PIEDRA", tipo: "foto" },
+  "Escaleras": { e1: "Desde acá las cosas se ven distintas…", e2: "Los colores cuentan historias de la ciudad. Tomale una foto.", respuesta: "VISTA", tipo: "foto" },
+  "Camastros": { e1: "El lugar donde el tiempo se detiene y el sol te abraza.", e2: "Donde todas las miradas terminan cuando algo pasa. ¿Qué es?", respuestasValidas: ["escenario", "la tarima"], tipo: "auto" },
+  "Kids": { e1: "Howie se siente chiquito otra vez.", e2: "Tiene cuatro patas, mueve la cola y no habla.", respuestasValidas: ["perro", "perrito"], tipo: "auto" },
+  "Plaza": { e1: "Howie sigue el rastro de la arena.", e2: "Sube a lo más alto: ¿cuántos balcones tiene el edificio de enfrente?", respuestasValidas: ["16", "dieciséis"], tipo: "auto" },
+  "Estatuas": { e1: "Figuras que no se mueven, pero son centro de atracción.", e2: "El guerrero protege un mensaje. ¿Qué siglas ves?", respuestasValidas: ["osn", "o.s.n."], tipo: "auto" },
+  "Pileta": { e1: "Acá todo es diversión, pero recordá: ¡no se corre!", e2: "Está siempre atento mientras otros chapotean. ¿Quién es?", respuestasValidas: ["guardavidas", "bañero"], tipo: "auto" },
+  "Plays": { e1: "Luces parpadeantes y sonidos de victoria.", e2: "Famoso soy, en lo alto estoy. ¿Qué personaje soy?", respuestasValidas: ["cratos", "kratos"], tipo: "auto" }
 };
- 
 
 let player = {
   nombre: "",
@@ -570,485 +503,203 @@ let player = {
   completadas: []
 };
 
-/* =====================
-   NAVEGACIÓN
-===================== */
+/* ==========================================
+    2. MOTOR ALEATORIO Y NAVEGACIÓN
+========================================== */
 function irA(id) {
-    // 1. Manejo de clases para mostrar/ocultar pantallas
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     const target = document.getElementById(id);
-    if(target) {
-        target.classList.add("active");
+    if(target) target.classList.add("active");
+    if (id === "mapa-screen") renderMapa();
+    if (id === "album-screen") renderAlbum();
+}
+
+function seleccionarProximaZona() {
+    const restantes = zonasVisuales.filter(z => !player.completadas.includes(z));
+    if (restantes.length > 0) {
+        player.actualNombre = restantes[Math.floor(Math.random() * restantes.length)];
     } else {
-        console.error("No se encontró la pantalla: " + id);
-        return;
+        player.actualNombre = "¡FINAL!";
     }
-
-    // 2. Lógica de renderizado según la pantalla
-    if (id === "mapa-screen") {
-        renderMapa();
-    } else if (id === "album-screen") {
-        renderAlbum();
-    }
-
-    // 3. RESETEO DE BOTÓN DE AYUDA (Para que siempre vuelva a ser azul al cambiar de pantalla)
-    const btnAyuda = document.getElementById("btnAyuda");
-    if (btnAyuda) {
-        btnAyuda.innerText = "🆘 PEDIR AYUDA A HOWIE";
-        btnAyuda.style.background = "#004A97";
-        btnAyuda.onclick = pedirAyuda;
-    }
+    localStorage.setItem("howie", JSON.stringify(player));
 }
 
-/* =====================
-    LOGIN
-===================== */
-const loginBtn = document.getElementById("loginBtn");
-if (loginBtn) {
-    loginBtn.addEventListener("click", () => {
-        const n = document.getElementById("inputNombre").value.trim();
-        const h = document.getElementById("inputHabitacion").value.trim();
-        
-        if (!n || !h) {
-            alert("Por favor, completá nombre y habitación");
-            return;
-        }
+function comenzarJuego() {
+    const n = document.getElementById("inputNombre").value.trim();
+    const h = document.getElementById("inputHabitacion").value.trim();
+    if (!n || !h) { Swal.fire('¡Atención!', 'Completá tus datos', 'warning'); return; }
 
-        player.nombre = n;
-        player.habitacion = h;
-        player.completadas = [];
-        
-        const inicioAzar = Math.floor(Math.random() * circuitoOculto.length);
-        player.actualNombre = circuitoOculto[inicioAzar];
-
-        localStorage.setItem("howie", JSON.stringify(player));
-        iniciarHome();
-    });
+    player.nombre = n;
+    player.habitacion = h;
+    player.completadas = [];
+    seleccionarProximaZona();
+    irA("mapa-screen");
 }
 
-function iniciarHome() {
-    const saludo = document.getElementById("saludo");
-    if (saludo) saludo.innerText = `¡Hola ${player.nombre}!`;
-    actualizarInterfazHome();
-    irA("home-screen");
-}
-
-/* =====================
-    MAPA Y ÁLBUM
-===================== */
+/* ==========================================
+    3. RENDERIZADO (MAPA Y ÁLBUM)
+========================================== */
 function renderMapa() {
-    const listaContenedor = document.getElementById("listaZonas");
-    if (!listaContenedor) return;
-    listaContenedor.innerHTML = "";
-
-    const juegoTerminado = player.completadas.length >= 12;
-
+    const lista = document.getElementById("listaZonas");
+    if (!lista) return;
+    lista.innerHTML = "";
+    
     zonasVisuales.forEach((z) => {
         const div = document.createElement("div");
         div.className = "zona-item";
-        div.style.padding = "15px";
-        div.style.margin = "10px 0";
-        div.style.borderRadius = "10px";
-        div.style.display = "flex";
-        div.style.justifyContent = "space-between";
-        div.style.alignItems = "center";
-        div.style.border = "1px solid #ddd";
-
-        if (!juegoTerminado && z === player.actualNombre) {
+        if (z === player.actualNombre) {
             div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
-            div.style.border = "2px solid #fbc02d";
             div.style.background = "#fff9c4";
-            div.style.cursor = "pointer";
+            div.style.border = "2px solid #fbc02d";
             div.onclick = () => entrarZona(z);
         } else if (player.completadas.includes(z)) {
-            div.innerHTML = `<span>✔ ${z}</span> <span style="color:green; font-size:12px;">Completado</span>`;
+            div.innerHTML = `<span>✔ ${z}</span> <small>Completado</small>`;
             div.style.background = "#e8f5e9";
         } else {
             div.innerHTML = `<span>🔒 ${z}</span>`;
             div.style.opacity = "0.5";
-            div.style.background = "#f5f5f5";
         }
-        listaContenedor.appendChild(div);
+        lista.appendChild(div);
     });
 }
 
 function renderAlbum() {
-    const contenedor = document.getElementById("contenedorFiguritas");
+    const contenedor = document.getElementById("contenedorFiguritas") || document.getElementById("contenedorStickers");
     if (!contenedor) return;
     contenedor.innerHTML = ""; 
 
     zonasVisuales.forEach((zona) => {
         const div = document.createElement("div");
         div.className = "sticker-slot"; 
-        const zonaParaComparar = zona.trim().toLowerCase();
-        const estaGanada = player.completadas.some(c => c.trim().toLowerCase() === zonaParaComparar);
+        const estaGanada = player.completadas.includes(zona);
 
         if (estaGanada) {
-            const nombreArchivo = zonaParaComparar
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/\s+/g, '-');
+            const nombreArchivo = zona.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
             div.innerHTML = `<img src="img/${nombreArchivo}.jpg" class="sticker-img">`;
             div.classList.add("ganada");
         } else {
-            div.innerHTML = `<span class="candado">🔒</span>`;
+            div.innerHTML = `<span>🔒</span>`;
         }
         contenedor.appendChild(div);
     });
-
-    if (player.completadas.length >= 12) {
-        const mensajeFinal = document.createElement("div");
-        mensajeFinal.style.cssText = "grid-column: 1 / -1; background: #fbc02d; padding: 20px; border-radius: 15px; margin-top: 15px; text-align: center; font-weight: bold; border: 2px solid #333; color: #333;";
-        mensajeFinal.innerHTML = `
-            <h3 style="margin:0;">¡LO LOGRASTE! 🏆</h3>
-            <p>Buscá a los profes para tu premio.</p>
-            <button onclick="enviarWhatsappFinal()" style="background:#25D366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">AVISAR POR WHATSAPP</button>
-        `;
-        contenedor.appendChild(mensajeFinal);
-    }
 }
 
-/* =====================
-    LÓGICA DE PREMIO (mostrarEstado única)
-===================== */
-function mostrarEstado(n) {
-    const e1 = document.getElementById("estado1");
-    const e2 = document.getElementById("estado2");
-    const e3 = document.getElementById("estado3");
-
-    if(e1) e1.style.display = (n === 1) ? "block" : "none";
-    if(e2) e2.style.display = (n === 2) ? "block" : "none";
-    if(e3) e3.style.display = (n === 3) ? "block" : "none";
-
-    const btnAyuda = document.getElementById("btnAyuda");
-    if (btnAyuda) btnAyuda.style.display = (n === 3) ? "none" : "block";
-
-    if (n === 3) {
-        obtenerRecompensa();
-
-        if (typeof confetti === 'function') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#fbc02d', '#ffffff', '#4CAF50'] });
-        }
-
-        const zonaGanada = player.actualNombre;
-        const nombreLimpio = zonaGanada.toLowerCase().trim()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, '-');
-        
-        const esElFinal = player.completadas.length >= 12;
-
-        Swal.fire({
-            title: esElFinal ? '¡ÁLBUM COMPLETADO! 🏆' : '¡CONSEGUIDO!',
-            text: esElFinal ? '¡Lo lograste! Avisale a los profes para tu premio.' : `¡Ganaste la figurita de ${zonaGanada}!`,
-            imageUrl: `./img/${nombreLimpio}.jpg`,
-            imageWidth: 200,
-            imageHeight: 300,
-            confirmButtonText: esElFinal ? '🎁 RECLAMAR PREMIO' : 'VER MI ÁLBUM',
-            confirmButtonColor: esElFinal ? '#4CAF50' : '#fbc02d',
-            allowOutsideClick: false
-        }).then(() => {
-            if (esElFinal) {
-                enviarWhatsappFinal();
-            } else {
-                // --- MOTOR ALEATORIO REFORZADO ---
-                // Filtramos circuitoOculto buscando las que NO están en player.completadas
-                const restantes = circuitoOculto.filter(z => !player.completadas.includes(z));
-                
-                if (restantes.length > 0) {
-                    // Elegimos una al azar de las que sobran
-                    const indiceAzar = Math.floor(Math.random() * restantes.length);
-                    player.actualNombre = restantes[indiceAzar];
-                    
-                    console.log("Próxima parada aleatoria: " + player.actualNombre);
-                }
-                
-                localStorage.setItem("howie", JSON.stringify(player));
-            }
-            irA('album-screen');
-        });
-    }
-}
-
-function enviarWhatsappFinal() {
-    const mensajeFinal = encodeURIComponent(`¡TERMINÉ EL JUEGO! 🏆\nNombre: ${player.nombre}\nHabitación: ${player.habitacion}`);
-    window.open(`https://wa.me/5493541215391?text=${mensajeFinal}`, '_blank');
-}
-
-/* =====================
-    VALIDACIÓN Y FOTO
-===================== */
+/* ==========================================
+    4. DESAFÍOS Y VALIDACIONES
+========================================== */
 function entrarZona(zona) {
     const data = zonasData[zona];
-    if (!data) {
-        console.error("No hay datos para la zona: " + zona);
-        return;
-    }
-
-    // Llenamos los textos del HTML con la info de la zona
     document.getElementById("zonaTitulo").innerText = zona;
-    document.getElementById("textoEstado1").innerText = data.e1 || "Buscá el código QR en esta zona.";
-    document.getElementById("textoEstado2").innerText = data.e2 || "Resolvé el desafío para ganar la figurita.";
+    document.getElementById("textoEstado1").innerText = data.e1;
+    document.getElementById("textoEstado2").innerText = data.e2;
     
-    // Mostramos u ocultamos la sección de foto según el tipo
-    const seccionFoto = document.getElementById("seccionFoto");
-    const seccionInput = document.getElementById("seccionInput"); // El div que tiene el input de texto
+    document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
+    document.getElementById("seccionInput").style.display = (data.tipo === "foto") ? "none" : "block";
     
-    if (data.tipo === "foto") {
-        if (seccionFoto) seccionFoto.style.display = "block";
-        if (seccionInput) seccionInput.style.display = "none";
-    } else {
-        if (seccionFoto) seccionFoto.style.display = "none";
-        if (seccionInput) seccionInput.style.display = "block";
-    }
-    
-    document.getElementById("previewContenedor").style.display = "none";
-    
-    // IMPORTANTE: Forzamos el Estado 1 al entrar
     mostrarEstado(1);
     irA("zona-screen");
 }
 
+function mostrarEstado(n) {
+    for(let i=1; i<=3; i++) {
+        const e = document.getElementById("estado" + i);
+        if(e) e.style.display = (i === n) ? "block" : "none";
+    }
+    if (n === 3) {
+        if (!player.completadas.includes(player.actualNombre)) {
+            player.completadas.push(player.actualNombre);
+            const fueElFinal = player.completadas.length >= 12;
+            
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+            Swal.fire({
+                title: fueElFinal ? '¡ÁLBUM COMPLETO!' : '¡FIGURITA GANADA!',
+                text: `¡Conseguiste la de ${player.actualNombre}!`,
+                confirmButtonText: 'VER ÁLBUM',
+                allowOutsideClick: false
+            }).then(() => {
+                seleccionarProximaZona();
+                irA('album-screen');
+            });
+        }
+    }
+}
+
+function validarRespuesta() {
+    const data = zonasData[player.actualNombre]; 
+    const val = document.getElementById("respuestaInput").value.trim().toLowerCase();
+    let ok = false;
+
+    if (data.tipo === "auto") {
+        ok = data.respuestasValidas.some(r => r.toLowerCase() === val);
+    } else {
+        ok = (val === data.respuesta.toLowerCase());
+    }
+
+    if (ok) {
+        document.getElementById("respuestaInput").value = "";
+        mostrarEstado(3);
+    } else {
+        Swal.fire('Incorrecto', 'Howie dice que revises bien.', 'error');
+    }
+}
+
+/* ==========================================
+    5. CÁMARA Y QR
+========================================== */
 function previsualizarFoto(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.getElementById("fotoPreview");
-            const cont = document.getElementById("previewContenedor");
-            if (img) img.src = e.target.result;
-            if (cont) cont.style.display = "block";
-            
-            const btnAyuda = document.getElementById("btnAyuda");
-            if (btnAyuda) {
-                btnAyuda.innerText = "💬 ENVIAR FOTO A HOWIE";
-                btnAyuda.style.background = "#25D366";
-                btnAyuda.onclick = () => ejecutarEnvioFinal(e.target.result);
-            }
+        reader.onload = (e) => {
+            document.getElementById("fotoPreview").src = e.target.result;
+            document.getElementById("previewContenedor").style.display = "block";
+            const btn = document.getElementById("btnAyuda");
+            btn.innerText = "💬 ENVIAR FOTO";
+            btn.style.background = "#25D366";
+            btn.onclick = () => {
+                const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Envío foto de ${player.actualNombre}.`);
+                window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
+                document.getElementById("seccionInput").style.display = "block";
+            };
         };
         reader.readAsDataURL(input.files[0]);
     }
 }
 
-function ejecutarEnvioFinal(base64Image) {
-    // 1. DESCARGA DE LA IMAGEN
-    const link = document.createElement("a");
-    link.href = base64Image;
-    link.download = `Mision_Howie_${player.actualNombre}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // 2. CARTEL DE AVISO
-    Swal.fire({
-        title: '¡Foto Guardada!',
-        text: 'Enviá la foto por WhatsApp y esperá que Howie te pase el código secreto para continuar.',
-        icon: 'success',
-        confirmButtonText: 'ABRIR WHATSAPP',
-        confirmButtonColor: '#25D366'
-    }).then(() => {
-        // 3. ABRIMOS WHATSAPP
-        const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Acá te mando la foto de mi misión en: ${player.actualNombre}.`);
-        window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
-
-        // 4. RESETEO DEL BOTÓN DE AYUDA (Vuelve a ser azul)
-        const btnAyuda = document.getElementById("btnAyuda");
-        if (btnAyuda) {
-            btnAyuda.innerText = "🆘 PEDIR AYUDA A HOWIE";
-            btnAyuda.style.background = "#004A97";
-            btnAyuda.onclick = pedirAyuda;
+let html5QrCode = null;
+async function iniciarEscaneo() {
+    document.getElementById('reader').style.display = 'block';
+    html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+        html5QrCode.stop();
+        document.getElementById('reader').style.display = 'none';
+        if (text.toLowerCase().includes(player.actualNombre.toLowerCase())) {
+            mostrarEstado(2);
+        } else {
+            Swal.fire('Zona incorrecta', 'Buscá el QR de ' + player.actualNombre, 'warning');
         }
-
-        // 5. IMPORTANTE: Mostramos el input de texto para que ponga el código que recibió
-        const seccionInput = document.getElementById("seccionInput");
-        if (seccionInput) seccionInput.style.display = "block";
-        
-        // No llamamos a mostrarEstado(3), el usuario se queda en la pantalla de la misión
     });
 }
 
-function validarRespuesta() {
-    const zona = player.actualNombre;
-    const data = zonasData[zona]; 
-    const inputElement = document.getElementById("respuestaInput");
-    
-    if (!inputElement || !data) {
-        console.error("Falta el input o la data de la zona:", zona);
-        return;
-    }
-
-    const valorEscrito = inputElement.value.trim().toLowerCase();
-    let esCorrecto = false;
-
-    // --- 1. VALIDACIÓN PARA DESAFÍOS NUMÉRICOS (TIPO AUTO) ---
-    // Esto es lo que faltaba: permite que haya varias respuestas válidas (ej: [4, "cuatro"])
-    if (data.tipo === "auto") {
-        if (data.respuestasValidas) {
-            esCorrecto = data.respuestasValidas.some(r => r.toString().toLowerCase() === valorEscrito);
-        }
-    } 
-    // --- 2. VALIDACIÓN PARA CÓDIGOS DE WHATSAPP O FOTOS ---
-    // Aquí es donde entra el código que el profe le manda al huésped
-    else {
-        if (data.respuesta) {
-            esCorrecto = (valorEscrito === data.respuesta.toLowerCase());
-        }
-    }
-
-    if (esCorrecto) {
-        inputElement.value = ""; // Limpiamos el campo para la próxima
-        
-        // IMPORTANTE: Solo cuando el código es correcto damos el punto y el premio
-        mostrarEstado(3); 
-    } else {
-        Swal.fire({
-            title: 'Código Incorrecto',
-            text: 'Howie dice que revises bien el código o la respuesta. ¡Intentá de nuevo!',
-            icon: 'warning',
-            confirmButtonColor: '#004A97' // Azul HJ
-        });
-    }
-}
-
-/* =====================
-    AUXILIARES
-===================== */
-function obtenerRecompensa() {
-    if (!player.completadas.includes(player.actualNombre)) {
-        player.completadas.push(player.actualNombre);
-        localStorage.setItem("howie", JSON.stringify(player));
-        actualizarInterfazHome();
-    }
-}
-
-function actualizarInterfazHome() {
-    const p = document.getElementById("progreso");
-    if (p) p.innerText = `Progreso: ${player.completadas.length} / 12`;
-}
-
-function pedirAyuda() {
-    const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Necesito una pista en ${player.actualNombre}.`);
-    window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
-}
-
+/* ==========================================
+    6. INICIO Y CIERRE
+========================================= */
 window.onload = () => {
     const saved = localStorage.getItem("howie");
     if (saved) {
         player = JSON.parse(saved);
-        iniciarHome();
+        irA("mapa-screen");
     }
 };
-/* =====================
-   CERRAR SESIÓN (Restaurado)
-===================== */
+
+function pedirAyuda() {
+    const msg = encodeURIComponent(`Ayuda para ${player.nombre} en ${player.actualNombre}`);
+    window.open(`https://wa.me/5493541215391?text=${msg}`, '_blank');
+}
+
 function cerrarSesion() {
-    Swal.fire({
-        title: '¿Cerrar sesión?',
-        text: "Se borrará todo tu progreso. ¿Estás seguro?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, borrar todo',
-        cancelButtonText: 'No, seguir jugando'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.clear();
-            window.location.reload();
-        }
-    });
-}
-/* =====================
-    ESCÁNER QR (Restaurado)
-===================== */
-let html5QrCode = null;
-
-async function iniciarEscaneo() {
-    const readerDiv = document.getElementById('reader');
-    if (!readerDiv) return;
-
-    readerDiv.style.display = 'block';
-    const btnScan = document.getElementById('btnAbrirScanner');
-    if (btnScan) btnScan.style.display = 'none';
-
-    if (html5QrCode) {
-        try { await html5QrCode.stop(); } catch (e) {}
-        html5QrCode = null;
-    }
-
-    setTimeout(() => {
-        html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            (decodedText) => {
-                detenerEscaneo(); 
-                procesarLecturaQR(decodedText);
-            }
-        ).catch(err => {
-            console.error("Error cámara:", err);
-            Swal.fire('Error', 'No se pudo acceder a la cámara.', 'error');
-        });
-    }, 300);
-}
-
-function detenerEscaneo() {
-    if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-            html5QrCode = null;
-            document.getElementById('reader').style.display = 'none';
-            const btnScan = document.getElementById('btnAbrirScanner');
-            if (btnScan) btnScan.style.display = 'block';
-        }).catch(() => {
-            document.getElementById('reader').style.display = 'none';
-        });
-    }
-}
-
-function procesarLecturaQR(decodedText) {
-    // Limpieza de la URL del QR para sacar solo el nombre de la zona
-    let zonaLeida = "";
-    if (decodedText.includes("zona=")) {
-        const url = new URL(decodedText);
-        zonaLeida = url.searchParams.get("zona").replace(/-/g, " ");
-    } else {
-        zonaLeida = decodedText;
-    }
-
-    // Comparamos con la zona que le toca al jugador actualmente
-    if (zonaLeida.toLowerCase() === player.actualNombre.toLowerCase()) {
-        mostrarEstado(2); // Pasa al desafío
-    } else {
-        Swal.fire('Zona Equivocada', `Este QR no es de ${player.actualNombre}. ¡Seguí buscando!`, 'warning');
-    }
-}
-
-/* Reemplazá tu función comenzarJuego (la última de todas) por esta: */
-function comenzarJuego() {
-    console.log("Iniciando aventura en HJ...");
-
-    const n = document.getElementById("inputNombre").value.trim();
-    const h = document.getElementById("inputHabitacion").value.trim();
-    
-    if (!n || !h) {
-        alert("¡Por favor, completen el nombre y la habitación para empezar!");
-        return;
-    }
-
-    // Guardamos los datos del jugador
-    player.nombre = n;
-    player.habitacion = h;
-    player.completadas = [];
-    
-    // Elegimos la primera parada al azar
-    const inicioAzar = Math.floor(Math.random() * circuitoOculto.length);
-    player.actualNombre = circuitoOculto[inicioAzar];
-
-    // Guardamos en memoria
-    localStorage.setItem("howie", JSON.stringify(player));
-
-    // CAMBIO CLAVE: Apagamos el login y vamos al MAPA directamente
-    const login = document.getElementById('login-screen');
-    if (login) login.classList.remove('active');
-    
-    irA("mapa-screen"); // <--- Aquí es donde antes fallaba porque iba a "home-screen"
+    localStorage.clear();
+    window.location.reload();
 }
 </script>
 </body>
