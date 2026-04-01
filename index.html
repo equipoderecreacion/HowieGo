@@ -474,42 +474,40 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
 /* ==========================================
-    1. DATOS Y CONFIGURACIÓN DEL JUEGO
+    1. DATOS Y ESTADO (Howie GO)
 ========================================== */
-const zonasVisuales = [
-  "Bicis", "Lobby", "Resto","Arqueria", "Patio cervecero", "Escaleras", "Camastros",
-  "Kids", "Plaza", "Estatuas", "Pileta", "Plays"
-];
+const zonasVisuales = ["Bicis", "Lobby", "Resto","Arqueria", "Patio cervecero", "Escaleras", "Camastros", "Kids", "Plaza", "Estatuas", "Pileta", "Plays"];
 
 const zonasData = {
   "Bicis": { e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas.", e2: "¿Cuántas bicicletas con rueditas de aprendizaje ves acá?", respuestasValidas: ["ninguna", "cero", "0", "no hay"], tipo: "auto" },
   "Lobby": { e1: "Aquí Howie se relaja y mira a los que llegan y se van.", e2: "¿A qué hora es el último adiós a la habitación?", respuestasValidas: ["diez", "10", "10:00", "10 am"], tipo: "auto" },
   "Resto": { e1: "Howie dice que es su lugar favorito para compartir en familia.", e2: "En la carta de pizza contá hasta 3. ¿Cuál es?", respuestasValidas: ["especial", "la especial"], tipo: "auto" },
   "Arqueria": { e1: "La paciencia es como una flecha: cuanto más la tensás, más lejos llegás.", e2: "¿Cuál es el círculo de más valor?", respuestasValidas: ["amarillo", "el amarillo", "centro"], tipo: "auto" },
-  "Patio cervecero": { e1: "Bajo las luces, las historias se cuentan mejor.", e2: "Formá la inicial de la persona que atiende el foodtruck con piedritas.", respuesta: "PIEDRA", tipo: "foto" },
-  "Escaleras": { e1: "Desde acá las cosas se ven distintas…", e2: "Los colores cuentan historias de la ciudad. Tomale una foto.", respuesta: "VISTA", tipo: "foto" },
-  "Camastros": { e1: "El lugar donde el tiempo se detiene y el sol te abraza.", e2: "Donde todas las miradas terminan cuando algo pasa. ¿Qué es?", respuestasValidas: ["escenario", "la tarima"], tipo: "auto" },
-  "Kids": { e1: "Howie se siente chiquito otra vez.", e2: "Tiene cuatro patas, mueve la cola y no habla.", respuestasValidas: ["perro", "perrito"], tipo: "auto" },
-  "Plaza": { e1: "Howie sigue el rastro de la arena.", e2: "Sube a lo más alto: ¿cuántos balcones tiene el edificio de enfrente?", respuestasValidas: ["16", "dieciséis"], tipo: "auto" },
-  "Estatuas": { e1: "Figuras que no se mueven, pero son centro de atracción.", e2: "El guerrero protege un mensaje. ¿Qué siglas ves?", respuestasValidas: ["osn", "o.s.n."], tipo: "auto" },
-  "Pileta": { e1: "Acá todo es diversión, pero recordá: ¡no se corre!", e2: "Está siempre atento mientras otros chapotean. ¿Quién es?", respuestasValidas: ["guardavidas", "bañero"], tipo: "auto" },
-  "Plays": { e1: "Luces parpadeantes y sonidos de victoria.", e2: "Famoso soy, en lo alto estoy. ¿Qué personaje soy?", respuestasValidas: ["cratos", "kratos"], tipo: "auto" }
+  "Patio cervecero": { e1: "Bajo las luces, las historias se cuentan mejor.", e2: "Formá la inicial del encargado con piedritas.", respuesta: "PIEDRA", tipo: "foto" },
+  "Escaleras": { e1: "Desde acá las cosas se ven distintas…", e2: "Tomale una foto a la vista de la ciudad.", respuesta: "VISTA", tipo: "foto" },
+  "Camastros": { e1: "El lugar donde el tiempo se detiene.", e2: "¿Qué nombre tiene el escenario?", respuestasValidas: ["escenario", "la tarima"], tipo: "auto" },
+  "Kids": { e1: "Howie se siente chiquito otra vez.", e2: "Tiene cuatro patas y mueve la cola.", respuestasValidas: ["perro", "perrito"], tipo: "auto" },
+  "Plaza": { e1: "Howie sigue el rastro de la arena.", e2: "¿Cuántos balcones tiene el edificio de enfrente?", respuestasValidas: ["16", "dieciséis"], tipo: "auto" },
+  "Estatuas": { e1: "Figuras que no se mueven.", e2: "¿Qué siglas ves en la base del guerrero?", respuestasValidas: ["osn", "o.s.n."], tipo: "auto" },
+  "Pileta": { e1: "¡Recordá: acá no se corre!", e2: "¿Quién vigila la pileta?", respuestasValidas: ["guardavidas", "bañero"], tipo: "auto" },
+  "Plays": { e1: "Sonidos de victoria.", e2: "¿Qué personaje famoso está en lo alto?", respuestasValidas: ["cratos", "kratos"], tipo: "auto" }
 };
 
-let player = {
-  nombre: "",
-  habitacion: "",
-  actualNombre: "", 
-  completadas: []
-};
+let player = { nombre: "", habitacion: "", actualNombre: "", completadas: [] };
 
 /* ==========================================
-    2. MOTOR ALEATORIO Y NAVEGACIÓN
+    2. NAVEGACIÓN Y MOTOR ALEATORIO
 ========================================== */
 function irA(id) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".screen").forEach(s => {
+        s.classList.remove("active");
+        s.style.display = "none";
+    });
     const target = document.getElementById(id);
-    if(target) target.classList.add("active");
+    if(target) {
+        target.classList.add("active");
+        target.style.display = "block";
+    }
     if (id === "mapa-screen") renderMapa();
     if (id === "album-screen") renderAlbum();
 }
@@ -527,11 +525,9 @@ function seleccionarProximaZona() {
 function comenzarJuego() {
     const n = document.getElementById("inputNombre").value.trim();
     const h = document.getElementById("inputHabitacion").value.trim();
-    if (!n || !h) { Swal.fire('¡Atención!', 'Completá tus datos', 'warning'); return; }
+    if (!n || !h) { alert("Completá nombre y habitación"); return; }
 
-    player.nombre = n;
-    player.habitacion = h;
-    player.completadas = [];
+    player.nombre = n; player.habitacion = h; player.completadas = [];
     seleccionarProximaZona();
     irA("mapa-screen");
 }
@@ -543,17 +539,15 @@ function renderMapa() {
     const lista = document.getElementById("listaZonas");
     if (!lista) return;
     lista.innerHTML = "";
-    
     zonasVisuales.forEach((z) => {
         const div = document.createElement("div");
         div.className = "zona-item";
         if (z === player.actualNombre) {
             div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
             div.style.background = "#fff9c4";
-            div.style.border = "2px solid #fbc02d";
             div.onclick = () => entrarZona(z);
         } else if (player.completadas.includes(z)) {
-            div.innerHTML = `<span>✔ ${z}</span> <small>Completado</small>`;
+            div.innerHTML = `<span>✔ ${z}</span>`;
             div.style.background = "#e8f5e9";
         } else {
             div.innerHTML = `<span>🔒 ${z}</span>`;
@@ -567,16 +561,12 @@ function renderAlbum() {
     const contenedor = document.getElementById("contenedorFiguritas") || document.getElementById("contenedorStickers");
     if (!contenedor) return;
     contenedor.innerHTML = ""; 
-
     zonasVisuales.forEach((zona) => {
         const div = document.createElement("div");
         div.className = "sticker-slot"; 
-        const estaGanada = player.completadas.includes(zona);
-
-        if (estaGanada) {
-            const nombreArchivo = zona.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
-            div.innerHTML = `<img src="img/${nombreArchivo}.jpg" class="sticker-img">`;
-            div.classList.add("ganada");
+        if (player.completadas.includes(zona)) {
+            const img = zona.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
+            div.innerHTML = `<img src="img/${img}.jpg" style="width:100%; height:100%; object-fit:cover;">`;
         } else {
             div.innerHTML = `<span>🔒</span>`;
         }
@@ -587,119 +577,58 @@ function renderAlbum() {
 /* ==========================================
     4. DESAFÍOS Y VALIDACIONES
 ========================================== */
+function mostrarEstado(n) {
+    const e1 = document.getElementById("estado1"), e2 = document.getElementById("estado2"), e3 = document.getElementById("estado3");
+    if(e1) e1.style.display = (n === 1) ? "block" : "none";
+    if(e2) e2.style.display = (n === 2) ? "block" : "none";
+    if(e3) e3.style.display = (n === 3) ? "block" : "none";
+
+    if (n === 3) {
+        if (!player.completadas.includes(player.actualNombre)) {
+            player.completadas.push(player.actualNombre);
+            localStorage.setItem("howie", JSON.stringify(player));
+            if (typeof confetti === 'function') confetti({ particleCount: 100, origin: { y: 0.6 } });
+            alert("¡Figurita ganada!");
+            seleccionarProximaZona();
+            irA('album-screen');
+        }
+    }
+}
+
 function entrarZona(zona) {
     const data = zonasData[zona];
     document.getElementById("zonaTitulo").innerText = zona;
     document.getElementById("textoEstado1").innerText = data.e1;
     document.getElementById("textoEstado2").innerText = data.e2;
-    
     document.getElementById("seccionFoto").style.display = (data.tipo === "foto") ? "block" : "none";
     document.getElementById("seccionInput").style.display = (data.tipo === "foto") ? "none" : "block";
-    
     mostrarEstado(1);
     irA("zona-screen");
-}
-
-function mostrarEstado(n) {
-    for(let i=1; i<=3; i++) {
-        const e = document.getElementById("estado" + i);
-        if(e) e.style.display = (i === n) ? "block" : "none";
-    }
-    if (n === 3) {
-        if (!player.completadas.includes(player.actualNombre)) {
-            player.completadas.push(player.actualNombre);
-            const fueElFinal = player.completadas.length >= 12;
-            
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
-            Swal.fire({
-                title: fueElFinal ? '¡ÁLBUM COMPLETO!' : '¡FIGURITA GANADA!',
-                text: `¡Conseguiste la de ${player.actualNombre}!`,
-                confirmButtonText: 'VER ÁLBUM',
-                allowOutsideClick: false
-            }).then(() => {
-                seleccionarProximaZona();
-                irA('album-screen');
-            });
-        }
-    }
 }
 
 function validarRespuesta() {
     const data = zonasData[player.actualNombre]; 
     const val = document.getElementById("respuestaInput").value.trim().toLowerCase();
-    let ok = false;
-
-    if (data.tipo === "auto") {
-        ok = data.respuestasValidas.some(r => r.toLowerCase() === val);
-    } else {
-        ok = (val === data.respuesta.toLowerCase());
-    }
-
-    if (ok) {
-        document.getElementById("respuestaInput").value = "";
-        mostrarEstado(3);
-    } else {
-        Swal.fire('Incorrecto', 'Howie dice que revises bien.', 'error');
-    }
+    let ok = (data.tipo === "auto") ? data.respuestasValidas.some(r => r.toLowerCase() === val) : (val === data.respuesta.toLowerCase());
+    if (ok) { document.getElementById("respuestaInput").value = ""; mostrarEstado(3); }
+    else { alert("Incorrecto, ¡probá de nuevo!"); }
 }
 
 /* ==========================================
-    5. CÁMARA Y QR
+    5. CARGA INICIAL
 ========================================== */
-function previsualizarFoto(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById("fotoPreview").src = e.target.result;
-            document.getElementById("previewContenedor").style.display = "block";
-            const btn = document.getElementById("btnAyuda");
-            btn.innerText = "💬 ENVIAR FOTO";
-            btn.style.background = "#25D366";
-            btn.onclick = () => {
-                const mensaje = encodeURIComponent(`¡Hola Howie! Soy ${player.nombre}. Envío foto de ${player.actualNombre}.`);
-                window.open(`https://wa.me/5493541215391?text=${mensaje}`, '_blank');
-                document.getElementById("seccionInput").style.display = "block";
-            };
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-let html5QrCode = null;
-async function iniciarEscaneo() {
-    document.getElementById('reader').style.display = 'block';
-    html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-        html5QrCode.stop();
-        document.getElementById('reader').style.display = 'none';
-        if (text.toLowerCase().includes(player.actualNombre.toLowerCase())) {
-            mostrarEstado(2);
-        } else {
-            Swal.fire('Zona incorrecta', 'Buscá el QR de ' + player.actualNombre, 'warning');
-        }
-    });
-}
-
-/* ==========================================
-    6. INICIO Y CIERRE
-========================================= */
 window.onload = () => {
     const saved = localStorage.getItem("howie");
     if (saved) {
         player = JSON.parse(saved);
         irA("mapa-screen");
+    } else {
+        irA("login-screen");
     }
 };
 
 function pedirAyuda() {
-    const msg = encodeURIComponent(`Ayuda para ${player.nombre} en ${player.actualNombre}`);
-    window.open(`https://wa.me/5493541215391?text=${msg}`, '_blank');
-}
-
-function cerrarSesion() {
-    localStorage.clear();
-    window.location.reload();
+    window.open(`https://wa.me/5493541215391?text=Ayuda para ${player.nombre}`, '_blank');
 }
 </script>
 </body>
