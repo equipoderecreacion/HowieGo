@@ -238,8 +238,8 @@ body {
     .ala-animada {
         width: 85px !important; /* El !important obliga al navegador a hacernos caso */
         position: absolute !important;
-        top: 18px;   /* Ajustá este número si vuela */
-        left: 10px; /* Ajustá este si está muy a la derecha */
+        top: 18px !important;   /* Ajustá este número si vuela */
+        left: 10px !important; /* Ajustá este si está muy a la derecha */
         z-index: 99 !important;
         transform-origin:30% 70% !important;
         animation: saludoReal 2s ease-in-out infinite;
@@ -257,7 +257,7 @@ body {
 <body>
 
 <!-- LOGIN -->
-<div id="login-screen" class="screen active">
+<div id="login-screen" class="screen full-page-login active">
    <div class="card"> 
     <div class="logo-howiego-container" style="display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #F57C00; margin-bottom: 20px; padding-bottom: 10px;">
         
