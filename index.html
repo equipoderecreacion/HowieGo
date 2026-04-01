@@ -108,14 +108,20 @@
 .btn-sticker-lado {
     width: 100px;
     height: 100px;
+    position: relative; /* Esto es clave para que el sticker flote bien */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .btn-sticker-lado img {
-    width: 120%; /* El sticker es un poquito más grande que el botón */
-    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+    /* USAMOS PÍXELES FIJOS PARA QUE SEAN IGUALES */
+    width: 140px; 
+    height: auto;
+    position: absolute;
+    bottom: -5px; /* Esto hace que "pisen" el borde inferior */
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+    z-index: 10;
 }
 </style>
 
