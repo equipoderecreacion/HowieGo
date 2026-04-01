@@ -285,9 +285,6 @@ body {
                 ¡COMENZAR!
             </button>
             
-    </div> </div> <h1 style="color: black !important; background: orange !important; padding: 20px;">¿ME VES?</h1>
-        </div>
-    </div>
 </div>
 
 <!-- HOME -->
@@ -1023,30 +1020,35 @@ function procesarLecturaQR(decodedText) {
     }
 }
 
+/* Reemplazá tu función comenzarJuego (la última de todas) por esta: */
 function comenzarJuego() {
     console.log("Iniciando aventura en HJ...");
 
-    // 1. Buscamos los datos de los inputs (por si los necesitás después)
-    const nombre = document.getElementById('inputNombre').value;
-    const habitacion = document.getElementById('inputHabitacion').value;
-
-    if (nombre === "" || habitacion === "") {
+    const n = document.getElementById("inputNombre").value.trim();
+    const h = document.getElementById("inputHabitacion").value.trim();
+    
+    if (!n || !h) {
         alert("¡Por favor, completen el nombre y la habitación para empezar!");
         return;
     }
 
-    // 2. LA MAGIA: Apagamos el Login y prendemos el Mapa
-    // Asegurate de que tu div del mapa tenga id="mapa-screen"
-    const login = document.getElementById('login-screen');
-    const mapa = document.getElementById('mapa-screen');
+    // Guardamos los datos del jugador
+    player.nombre = n;
+    player.habitacion = h;
+    player.completadas = [];
+    
+    // Elegimos la primera parada al azar
+    const inicioAzar = Math.floor(Math.random() * circuitoOculto.length);
+    player.actualNombre = circuitoOculto[inicioAzar];
 
-    if (login && mapa) {
-        login.classList.remove('active'); // Se va el azul y Howie
-        mapa.classList.add('active');    // Aparece el mapa y el álbum
-        console.log("¡Mapa cargado!");
-    } else {
-        console.error("No encontré las pantallas. Revisá que el mapa tenga id='mapa-screen'");
-    }
+    // Guardamos en memoria
+    localStorage.setItem("howie", JSON.stringify(player));
+
+    // CAMBIO CLAVE: Apagamos el login y vamos al MAPA directamente
+    const login = document.getElementById('login-screen');
+    if (login) login.classList.remove('active');
+    
+    irA("mapa-screen"); // <--- Aquí es donde antes fallaba porque iba a "home-screen"
 }
 </script>
 </body>
