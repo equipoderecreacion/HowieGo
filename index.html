@@ -14,8 +14,8 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: var(--fondo); color: #333; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .screen { display: none; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; flex-direction: column; align-items: center; position: relative; }
         .screen.active { display: flex; }
-
-        /* Estilos Login */
+        
+        /* LOGIN */
         #login-screen { background: linear-gradient(135deg, var(--azul) 0%, #002d5c 100%); justify-content: center; }
         .card-login { background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 340px; text-align: center; border: 4px solid var(--naranja); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .howie-container { position: relative; width: 120px; height: 130px; margin: 0 auto 15px; }
@@ -26,7 +26,7 @@
         .logo-go { color: var(--naranja); }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
 
-        /* Home Stickers */
+        /* HOME STICKERS */
         #saludo { color: var(--azul); font-weight: 900; margin-top: 40px; font-size: 30px; text-transform: uppercase; text-align: center; }
         .btn-home { width: 92%; max-width: 320px; height: 110px; border-radius: 25px; margin: 15px 0; border: none; cursor: pointer; position: relative; color: white; display: flex; align-items: center; padding: 0 25px; transition: transform 0.1s; z-index: 5; }
         #btn-mapa { background: var(--naranja); text-align: left; }
@@ -35,17 +35,19 @@
         .pos-der { right: -25px; }
         .pos-izq { left: -25px; transform: scaleX(-1); }
 
-        /* Misiones y Mapa */
+        /* MAPA Y ZONAS */
         .zona-item { width: 100%; background: white; margin: 10px 0; padding: 15px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; border: 2px solid transparent; box-sizing: border-box; }
         .zona-actual { border-color: var(--naranja); background: #fff9e6; }
         .zona-hecha { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
         .zona-bloqueada { opacity: 0.5; filter: grayscale(1); }
+
+        /* MISION */
         .card-mision { background: white; width: 100%; max-width: 360px; padding: 25px; border-radius: 25px; border: 4px solid var(--naranja); text-align: center; box-sizing: border-box; }
         .btn-hj { background: var(--naranja); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; margin: 10px 0; font-size: 16px; cursor: pointer; }
         .btn-ayuda { background: var(--azul); width: 85%; font-size: 14px; }
         #reader { width: 100%; border-radius: 15px; margin-top: 15px; display: none; overflow: hidden; border: 3px solid var(--naranja); background: #000; }
-        
-        /* Album */
+
+        /* ALBUM */
         .grid-album { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 380px; margin: 20px 0; }
         .slot-figu { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px dashed #999; overflow: hidden; position: relative; }
         .slot-figu img { width: 100%; height: 100%; object-fit: cover; }
@@ -79,12 +81,11 @@
 
     <div id="mision-screen" class="screen">
         <div class="card-mision">
-            <h2 id="m-titulo" style="color:var(--naranja); margin:0;"></h2>
-            <p id="m-texto" style="font-size:16px; margin:20px 0;"></p>
+            <h2 id="m-titulo" style="color:var(--naranja); margin:0; text-transform:uppercase;"></h2>
+            <p id="m-texto" style="font-size:16px; margin:20px 0; color:#444;"></p>
             <div id="cont-e1">
-                <button class="btn-hj" onclick="abrirEscaner()">🔍 ESCANEAR CÓDIGO QR</button>
+                <button id="btn-scan" class="btn-hj" onclick="abrirEscaner()">🔍 ESCANEAR CÓDIGO QR</button>
                 <div id="reader"></div>
-                <button id="btn-retry-cam" style="display:none; background:none; border:none; color:var(--azul); text-decoration:underline; font-size:12px; margin-top:10px;" onclick="abrirEscaner()">¿No abre la cámara? Reintentar</button>
             </div>
             <div id="cont-e2" style="display:none;">
                 <div id="modo-normal">
@@ -102,7 +103,7 @@
     </div>
 
     <div id="e3-screen" class="screen">
-        <div class="card-mision" style="border-color:#4CAF50; padding:35px;"><h2 id="e3-tit" style="color:#4CAF50; margin:0;">¡EXCELENTE! 🎉</h2><p id="e3-txt" style="margin:15px 0;"></p><div id="figu-slot" class="slot-figu" style="width:160px; height:240px; margin:20px auto; border:4px solid #4CAF50;"></div><button class="btn-hj" style="background:#4CAF50" onclick="irA('album-screen')">📖 VER MI ÁLBUM</button></div>
+        <div class="card-mision" style="border-color:#4CAF50; padding:35px;"><h2 id="e3-tit" style="color:#4CAF50; margin:0;">¡EXCELENTE! 🎉</h2><p id="e3-txt" style="margin:15px 0; color:#555;"></p><div id="figu-slot" class="slot-figu" style="width:160px; height:240px; margin:20px auto; border:4px solid #4CAF50;"></div><button class="btn-hj" style="background:#4CAF50" onclick="irA('album-screen')">📖 VER MI ÁLBUM</button></div>
     </div>
 
     <div id="album-screen" class="screen"><h2>MI ÁLBUM HOWIEGO</h2><div id="grid-album" class="grid-album"></div><button class="btn-hj btn-ayuda" onclick="irA('home-screen')">🏠 VOLVER</button></div>
@@ -165,6 +166,7 @@
                     document.getElementById('m-texto').innerText = misiones[db.actual].e1;
                     document.getElementById('cont-e1').style.display = "block";
                     document.getElementById('cont-e2').style.display = "none";
+                    document.getElementById('btn-scan').style.display = "block";
                     document.getElementById('btn-ayuda-wa').innerText = "🆘 PEDIR AYUDA";
                     irA('mision-screen');
                 };
@@ -173,44 +175,38 @@
         }
 
         function detenerCamara() {
-            if (html5QrCode) {
+            if (html5QrCode && html5QrCode.isScanning) {
                 html5QrCode.stop().catch(() => {}).finally(() => {
                     html5QrCode = null;
                     document.getElementById('reader').innerHTML = "";
                     document.getElementById('reader').style.display = "none";
-                    document.getElementById('btn-retry-cam').style.display = "none";
                 });
             }
         }
 
         function abrirEscaner() {
-            detenerCamara();
-            setTimeout(() => {
-                const rd = document.getElementById('reader');
-                rd.style.display = "block";
-                document.getElementById('btn-retry-cam').style.display = "block";
-                
-                html5QrCode = new Html5Qrcode("reader");
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-                html5QrCode.start(
-                    { facingMode: "environment" }, 
-                    config, 
-                    (txt) => {
-                        const leido = txt.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
-                        const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
-                        if(leido.includes(esperado) || esperado.includes(leido)) {
-                            detenerCamara();
-                            pasarE2();
-                        } else {
-                            Swal.fire("Epa", "Este no es el QR de " + db.actual, "error");
-                        }
+            const rd = document.getElementById('reader');
+            rd.style.display = "block";
+            document.getElementById('btn-scan').style.display = "none";
+            
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: 250 }, 
+                (txt) => {
+                    const leido = txt.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
+                    const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
+                    if(leido.includes(esperado) || esperado.includes(leido)) {
+                        detenerCamara();
+                        pasarE2();
+                    } else {
+                        Swal.fire("Epa", "Buscá el QR de " + db.actual, "error");
                     }
-                ).catch(err => {
-                    console.error("Error al iniciar cámara:", err);
-                    Swal.fire("Cámara bloqueada", "Permití la cámara o refrescá la página.", "error");
-                });
-            }, 300);
+                }
+            ).catch(err => {
+                Swal.fire("Error", "No se pudo abrir la cámara.", "error");
+                document.getElementById('btn-scan').style.display = "block";
+            });
         }
 
         function pasarE2() {
@@ -225,7 +221,7 @@
         }
 
         function fotoCapturada() {
-            Swal.fire("📸 ¡Foto Lista!", "Ahora enviala por WhatsApp para recibir el código.", "success");
+            Swal.fire("📸 ¡Foto Lista!", "Ahora enviala por WhatsApp.", "success");
             document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
             document.getElementById('modo-normal').style.display = "block";
         }
@@ -241,6 +237,7 @@
                 document.getElementById('figu-slot').innerHTML = `<img src="img/${img}.jpg">`;
                 proximaMision(); save(); irA('e3-screen');
                 document.getElementById('res-input').value = "";
+                document.getElementById('btn-ayuda-wa').innerText = "🆘 PEDIR AYUDA";
             } else { Swal.fire("¡Intentalo de nuevo!", "Vos podés.", "error"); }
         }
 
