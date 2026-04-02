@@ -15,7 +15,6 @@
         .screen { display: none; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; flex-direction: column; align-items: center; position: relative; }
         .screen.active { display: flex; }
         
-        /* LOGIN ANIMADO */
         #login-screen { background: linear-gradient(135deg, var(--azul) 0%, #002d5c 100%); justify-content: center; }
         .card-login { background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 340px; text-align: center; border: 4px solid var(--naranja); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .howie-container { position: relative; width: 120px; height: 130px; margin: 0 auto 15px; }
@@ -27,7 +26,6 @@
         .logo-go { color: var(--naranja); }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
 
-        /* HOME CON STICKERS */
         #saludo { color: var(--azul); font-weight: 900; margin-top: 40px; font-size: 30px; text-transform: uppercase; text-align: center; }
         .btn-home { width: 92%; max-width: 320px; height: 110px; border-radius: 25px; margin: 15px 0; border: none; cursor: pointer; position: relative; color: white; display: flex; align-items: center; padding: 0 25px; z-index: 5; }
         #btn-mapa { background: var(--naranja); text-align: left; box-shadow: 0 6px 15px rgba(245,124,0,0.3); }
@@ -36,17 +34,14 @@
         .pos-der { right: -25px; }
         .pos-izq { left: -25px; transform: scaleX(-1); }
 
-        /* MAPA ORIGINAL */
         .zona-item { width: 100%; background: white; margin: 10px 0; padding: 15px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .zona-actual { border-color: var(--naranja); background: #fff9e6; }
         .zona-hecha { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
-        .zona-bloqueada { opacity: 0.5; filter: grayscale(1); }
 
-        /* MISIONES */
         .card-mision { background: white; width: 100%; max-width: 360px; padding: 25px; border-radius: 25px; border: 4px solid var(--naranja); text-align: center; box-sizing: border-box; }
         .btn-hj { background: var(--naranja); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; margin: 10px 0; font-size: 16px; cursor: pointer; text-transform: uppercase; }
         #reader { width: 100%; border-radius: 15px; margin-top: 15px; display: none; overflow: hidden; border: 3px solid var(--naranja); background: #000; min-height: 250px; }
-        #preview-foto { width: 100%; max-width: 200px; border-radius: 15px; margin: 10px auto; display: none; border: 2px solid var(--naranja); }
+        #preview-foto { width: 100%; max-width: 180px; border-radius: 15px; margin: 10px auto; display: none; border: 3px solid var(--naranja); }
     </style>
 </head>
 <body>
@@ -70,6 +65,7 @@
         <button id="btn-mapa" class="btn-home" onclick="irA('mapa-screen')"><div><span>Misiones</span><b>VER MAPA</b></div><img src="img/boton-mapa.png" class="sticker-img pos-der"></button>
         <button id="btn-album" class="btn-home" onclick="irA('album-screen')"><img src="img/boton-album.png" class="sticker-img pos-izq"><div><span>Mis Figus</span><b>MI ÁLBUM</b></div></button>
         <div id="cont-campeon" style="display:none; width:100%; text-align:center;"><button class="btn-hj" style="background:#4CAF50; width:92%;" onclick="reclamarPremio()">🎁 ¡RECLAMAR MI PREMIO!</button></div>
+        <button onclick="cerrarSesion()" style="background:none; border:none; color:#999; text-decoration:underline; margin-top:50px; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
     <div id="mapa-screen" class="screen"><h2 style="color:var(--azul)">MAPA DE MISIONES</h2><div id="listaZonas" style="width:100%"></div><button class="btn-hj" onclick="irA('home-screen')" style="background:var(--azul); width:85%">⬅ VOLVER</button></div>
@@ -95,6 +91,7 @@
             </div>
             <button id="btn-ayuda-wa" class="btn-hj" style="background:var(--azul); width:85%; font-size:14px;" onclick="ayudaWA()">🆘 PEDIR AYUDA</button>
         </div>
+        <button class="btn-hj" onclick="irA('mapa-screen')" style="background:var(--azul); width:85%; margin-top:20px;">⬅ VOLVER AL MAPA</button>
     </div>
 
     <div id="e3-screen" class="screen">
@@ -154,7 +151,7 @@
                 const ok = db.ganadas.includes(z); const esHoy = z === db.actual;
                 const item = document.createElement('div');
                 item.className = `zona-item ${esHoy ? 'zona-actual' : ''} ${ok ? 'zona-hecha' : ''}`;
-                item.style.opacity = (!ok && !esHoy) ? "0.5" : "1";
+                item.style.opacity = (!ok && !esHoy) ? "0.4" : "1";
                 item.innerHTML = `<b>${ok ? '✔️' : (esHoy ? '⭐' : '🔒')} ${z}</b>`;
                 if(esHoy && !ok) item.onclick = () => {
                     document.getElementById('m-titulo').innerText = db.actual;
@@ -184,7 +181,10 @@
                 if(leido.includes(esperado) || esperado.includes(leido)) {
                     detenerScanner().then(() => pasarE2());
                 } else { Swal.fire("Epa", "Buscá el QR de " + db.actual, "error"); }
-            }).catch(() => { Swal.fire("Error", "Cámara bloqueada", "error"); detenerScanner(); });
+            }).catch(() => { 
+                Swal.fire("Error", "Permití la cámara para jugar.", "error"); 
+                document.getElementById('btn-scan').style.display = "block";
+            });
         }
 
         function pasarE2() {
@@ -207,6 +207,7 @@
                     document.getElementById('preview-foto').style.display = "block";
                     Swal.fire("📸 ¡HERMOSA FOTO!", "Ya está guardada... adjuntala desde tu galería al enviarle el mensaje a Howie.", "success");
                     document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
+                    document.getElementById('modo-normal').style.display = "block"; // Habilita el botón de enviar
                 };
                 reader.readAsDataURL(file);
             }
@@ -217,8 +218,9 @@
             if(misiones[db.actual].tipo === "foto" || misiones[db.actual].r.some(r => val.includes(r))) {
                 db.ganadas.push(db.actual);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                const img = db.actual.toLowerCase().normalize("NFD").replace(/\s+/g, '-');
-                document.getElementById('figu-slot').innerHTML = `<img src="img/${img}.jpg">`;
+                const imgName = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
+                document.getElementById('figu-slot').innerHTML = `<img src="img/${imgName}.jpg">`;
+                document.getElementById('e3-txt').innerText = `¡Ganaste la figu de ${db.actual}!`;
                 proximaMision(); save(); irA('e3-screen');
                 document.getElementById('res-input').value = "";
             } else { Swal.fire("Casi", "Intentalo de nuevo", "error"); }
@@ -229,8 +231,8 @@
             zonas.forEach(z => {
                 const ok = db.ganadas.includes(z);
                 const slot = document.createElement('div'); slot.className = "slot-figu";
-                const img = z.toLowerCase().normalize("NFD").replace(/\s+/g, '-');
-                slot.innerHTML = ok ? `<img src="img/${img}.jpg">` : `🔒<br><small>${z}</small>`;
+                const imgName = z.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
+                slot.innerHTML = ok ? `<img src="img/${imgName}.jpg">` : `🔒<br><small>${z}</small>`;
                 grid.appendChild(slot);
             });
         }
