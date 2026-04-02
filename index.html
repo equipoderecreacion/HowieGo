@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Howie GO - Howard Johnson</title>
+    <title>HowieGO - Howard Johnson</title>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,48 +12,34 @@
     <style>
         :root { --azul: #004A97; --naranja: #F57C00; --fondo: #f8f9fa; }
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: var(--fondo); color: #333; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
-        
         .screen { display: none; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; flex-direction: column; align-items: center; position: relative; }
         .screen.active { display: flex; }
-
-        /* --- 1. LOGIN (AZUL + TARJETA BLANCA + HOWIE ANIMADO) --- */
         #login-screen { background: linear-gradient(135deg, var(--azul) 0%, #002d5c 100%); justify-content: center; }
         .card-login { background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 340px; text-align: center; border: 4px solid var(--naranja); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
-        
         .howie-container { position: relative; width: 120px; height: 130px; margin: 0 auto 15px; }
         .howie-cuerpo { width: 100%; position: absolute; bottom: 0; left: 0; z-index: 1; }
         .ala-animada { width: 100px; position: absolute; top: 20px; left: 12px; z-index: 2; transform-origin: 30% 70%; animation: saludo 2s ease-in-out infinite; }
         @keyframes saludo { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-25deg); } }
-        
         .logo-txt { font-size: 32px; font-weight: 900; color: var(--azul); margin: 5px 0; text-transform: uppercase; letter-spacing: -1px; }
         .logo-go { color: var(--naranja); }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
-
-        /* --- 2. HOME (BOTONES STICKER ESPEJADOS) --- */
         #saludo { color: var(--azul); font-weight: 900; margin-top: 40px; font-size: 30px; text-transform: uppercase; text-align: center; }
         .btn-home { width: 92%; max-width: 320px; height: 110px; border-radius: 25px; margin: 15px 0; border: none; cursor: pointer; position: relative; overflow: visible; color: white; display: flex; align-items: center; padding: 0 25px; transition: transform 0.1s; z-index: 5; }
         #btn-mapa { background: var(--naranja); box-shadow: 0 6px 15px rgba(245,124,0,0.3); text-align: left; }
         #btn-album { background: var(--azul); box-shadow: 0 6px 15px rgba(0,74,151,0.3); text-align: right; justify-content: flex-end; }
         .btn-home b { font-size: 22px; display: block; }
         .btn-home span { font-size: 13px; opacity: 0.9; text-transform: uppercase; }
-        
         .sticker-img { position: absolute; width: 155px; bottom: -15px; z-index: 10; pointer-events: none; filter: drop-shadow(2px 5px 8px rgba(0,0,0,0.2)); }
         .pos-der { right: -25px; }
         .pos-izq { left: -25px; transform: scaleX(-1); }
-
-        /* --- 3. MAPA (ESTRELLA ALEATORIA) --- */
         .zona-item { width: 100%; background: white; margin: 10px 0; padding: 15px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 2px solid transparent; box-sizing: border-box; }
         .zona-actual { border-color: var(--naranja); background: #fff9e6; }
         .zona-bloqueada { opacity: 0.5; filter: grayscale(1); }
         .zona-hecha { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
-
-        /* --- 4. MISIONES (E1, E2, E3) --- */
         .card-mision { background: white; width: 100%; max-width: 360px; padding: 25px; border-radius: 25px; border: 4px solid var(--naranja); text-align: center; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .btn-hj { background: var(--naranja); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; margin: 10px 0; font-size: 16px; cursor: pointer; text-transform: uppercase; }
         .btn-ayuda { background: var(--azul); width: 85%; font-size: 14px; margin-top: 5px; }
         #reader { width: 100%; border-radius: 15px; margin-top: 15px; display: none; overflow: hidden; border: 3px solid var(--naranja); }
-
-        /* --- 5. ÁLBUM --- */
         .grid-album { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 380px; margin: 20px 0; }
         .slot-figu { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px dashed #999; overflow: hidden; position: relative; }
         .slot-figu img { width: 100%; height: 100%; object-fit: cover; }
@@ -70,92 +56,53 @@
             <h1 class="logo-txt">Howie<span class="logo-go">GO</span></h1>
             <input type="text" id="inputNombre" placeholder="Tu Nombre">
             <input type="text" id="inputHab" placeholder="Nro Habitación">
-            <button class="btn-hj" onclick="comenzar()">¡EMPEZAR JUEGO!</button>
+            <button class="btn-hj" onclick="comenzar()">¡EMPEZAR!</button>
         </div>
     </div>
 
     <div id="home-screen" class="screen">
         <h1 id="saludo">HOLA</h1>
         <p style="color:#666; font-size: 18px;">¡Vamos a la aventura! 🦉✨</p>
-        
-        <button id="btn-mapa" class="btn-home" onclick="irA('mapa-screen')">
-            <div><span>Misiones</span><b>VER MAPA</b></div>
-            <img src="img/boton-mapa.png" class="sticker-img pos-der">
-        </button>
-
-        <button id="btn-album" class="btn-home" onclick="irA('album-screen')">
-            <img src="img/boton-album.png" class="sticker-img pos-izq">
-            <div><span>Mis Figus</span><b>MI ÁLBUM</b></div>
-        </button>
-
-        <div id="cont-campeon" style="display:none; width:100%; text-align:center;">
-            <button class="btn-hj" style="background:#4CAF50; width:92%;" onclick="reclamarPremio()">🎁 ¡RECLAMAR MI PREMIO!</button>
-        </div>
-
-        <button onclick="cerrarSesion()" style="background:none; border:none; color:#999; text-decoration:underline; margin-top:50px; cursor:pointer;">Cerrar Sesión / Salir</button>
+        <button id="btn-mapa" class="btn-home" onclick="irA('mapa-screen')"><div><span>Misiones</span><b>VER MAPA</b></div><img src="img/boton-mapa.png" class="sticker-img pos-der"></button>
+        <button id="btn-album" class="btn-home" onclick="irA('album-screen')"><img src="img/boton-album.png" class="sticker-img pos-izq"><div><span>Mis Figus</span><b>MI ÁLBUM</b></div></button>
+        <div id="cont-campeon" style="display:none; width:100%; text-align:center;"><button class="btn-hj" style="background:#4CAF50; width:92%;" onclick="reclamarPremio()">🎁 ¡RECLAMAR MI PREMIO!</button></div>
+        <button onclick="cerrarSesion()" style="background:none; border:none; color:#999; text-decoration:underline; margin-top:50px; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
-    <div id="mapa-screen" class="screen">
-        <h2 style="color:var(--azul)">MAPA DE MISIONES</h2>
-        <div id="listaZonas" style="width:100%"></div>
-        <button class="btn-hj btn-ayuda" onclick="irA('home-screen')">⬅ VOLVER AL INICIO</button>
-    </div>
+    <div id="mapa-screen" class="screen"><h2 style="color:var(--azul)">MAPA DE MISIONES</h2><div id="listaZonas" style="width:100%"></div><button class="btn-hj btn-ayuda" onclick="irA('home-screen')">⬅ VOLVER</button></div>
 
     <div id="mision-screen" class="screen">
         <div class="card-mision">
             <h2 id="m-titulo" style="color:var(--naranja); margin:0; text-transform:uppercase;"></h2>
             <p id="m-texto" style="font-size:16px; color:#444; line-height:1.5; margin:20px 0;"></p>
-            
-            <div id="cont-e1">
-                <button class="btn-hj" onclick="abrirEscaner()">🔍 ESCANEAR CÓDIGO QR</button>
-                <div id="reader"></div>
-            </div>
-
-            <div id="cont-e2" style="display:none;">
-                <div id="modo-normal">
-                    <input type="text" id="res-input" placeholder="Tu respuesta...">
-                    <button class="btn-hj" onclick="validarRespuesta()">ENVIAR DESAFÍO</button>
-                </div>
-                <div id="modo-foto" style="display:none;">
-                    <button class="btn-hj" onclick="tomarFoto()">📸 TOMAR FOTO</button>
-                </div>
-            </div>
-
-            <button id="btn-ayuda-wa" class="btn-hj btn-ayuda" onclick="ayudaWA()">🆘 PEDIR AYUDA A HOWIE</button>
+            <div id="cont-e1"><button class="btn-hj" onclick="abrirEscaner()">🔍 ESCANEAR CÓDIGO QR</button><div id="reader"></div></div>
+            <div id="cont-e2" style="display:none;"><div id="modo-normal"><input type="text" id="res-input" placeholder="Tu respuesta..."><button class="btn-hj" onclick="validarRespuesta()">ENVIAR DESAFÍO</button></div><div id="modo-foto" style="display:none;"><button class="btn-hj" onclick="tomarFoto()">📸 TOMAR FOTO</button></div></div>
+            <button id="btn-ayuda-wa" class="btn-hj btn-ayuda" onclick="ayudaWA()">🆘 PEDIR AYUDA</button>
         </div>
         <button class="btn-hj btn-ayuda" onclick="irA('mapa-screen')" style="margin-top:20px;">⬅ VOLVER AL MAPA</button>
     </div>
 
     <div id="e3-screen" class="screen">
-        <div class="card-mision" style="border-color:#4CAF50; padding:35px;">
-            <h2 id="e3-tit" style="color:#4CAF50; margin:0;">¡EXCELENTE! 🎉</h2>
-            <p id="e3-txt" style="margin:15px 0; color:#555;"></p>
-            <div id="figu-slot" class="slot-figu" style="width:160px; height:240px; margin:20px auto; border:4px solid #4CAF50;"></div>
-            <button class="btn-hj" style="background:#4CAF50" onclick="irA('album-screen')">📖 VER MI ÁLBUM</button>
-        </div>
+        <div class="card-mision" style="border-color:#4CAF50; padding:35px;"><h2 id="e3-tit" style="color:#4CAF50; margin:0;">¡EXCELENTE! 🎉</h2><p id="e3-txt" style="margin:15px 0; color:#555;"></p><div id="figu-slot" class="slot-figu" style="width:160px; height:240px; margin:20px auto; border:4px solid #4CAF50;"></div><button class="btn-hj" style="background:#4CAF50" onclick="irA('album-screen')">📖 VER MI ÁLBUM</button></div>
     </div>
 
-    <div id="album-screen" class="screen">
-        <h2 style="color:var(--azul); margin-top:20px;">MI ÁLBUM HOWIEGO</h2>
-        <div id="grid-album" class="grid-album"></div>
-        <button class="btn-hj btn-ayuda" style="width:90%" onclick="irA('home-screen')">🏠 VOLVER AL INICIO</button>
-    </div>
+    <div id="album-screen" class="screen"><h2 style="color:var(--azul); margin-top:20px;">MI ÁLBUM HOWIEGO</h2><div id="grid-album" class="grid-album"></div><button class="btn-hj btn-ayuda" style="width:90%" onclick="irA('home-screen')">🏠 VOLVER AL INICIO</button></div>
 
     <script>
-        const zonas = ["Bicis", "Lobby", "Resto", "Arqueria", "Patio cervecero", "Escaleras", "Camastros", "Kids", "Plaza", "Estatuas", "Pileta", "Plays"];
+        const zonas = ["Bicis", "Lobby", "Resto", "Arqueria", "Patio Cervecero", "Escaleras", "Camastros", "Kids", "Plaza", "Estatuas", "Pileta", "Plays"];
         const misiones = {
-            "Bicis": { e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas. Encontrá el QR para continuar.", e2: "Howie estuvo contando rayos y pedales. Dice que para los más aventureros, el equilibrio es un arte. ¿Cuántas bicicletas con rueditas de aprendizaje ves acá?", r: ["0", "cero", "ninguna"] },
-            "Lobby": { e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.", e2: "A Howie le preocupa el tiempo. Se quedó mirando el reloj y se pregunta: ¿A qué hora es el último adiós a la habitación?", r: ["10", "diez", "las 10", "10 am"] },
-            "Resto": { e1: "Howie dice que es su lugar favorito, lo que más le gusta es compartir en familia, repasar las anécdotas y que no falten las risas.", e2: "Howie es un gran comensal. Para saber cuál es su plato favorito, en la carta de pizza contá hasta 3.", r: ["especial", "la especial"] },
-            "Arqueria": { e1: "Howie dice que la paciencia es como una flecha: cuanto más la tensás, más lejos llegás. Encontrá el QR para continuar.", e2: "Howie estuvo mirando los círculos que nunca terminan: ¿Cuál es el de más valor?", r: ["amarillo", "el amarillo", "centro"] },
-            "Patio cervecero": { e1: "Howie busca la brisa de la tarde y el tintineo de los vasos fríos. Bajo las luces, las historias se cuentan mejor. Encontrá el QR para continuar.", e2: "Howie dice que el suelo está lleno de tesoros pequeños. Usá las piedritas para formar la inicial de la persona que atiende el foodtruck.", tipo: "foto", r: ["foto", "piedra"] },
-            "Escaleras": { e1: "Howie siempre se detiene un momento antes de subir. Dice que desde acá las cosas se ven distintas… Encontrá el QR para continuar.", e2: "Howie se queda justo donde el esfuerzo afloja. Desde ahí, los colores cuentan historias de la ciudad. Tomale una foto y envíasela a Howie.", tipo: "foto", r: ["foto", "vista"] },
-            "Camastros": { e1: "Howie encontró el lugar donde el tiempo se detiene y el sol te abraza en silencio. Encontrá el QR para continuar.", e2: "No siempre es el lugar más ruidoso, pero cuando algo importante pasa, todas las miradas terminan ahí. ¿Sabés qué es?", r: ["escenario", "el escenario"] },
-            "Kids": { e1: "Howie se siente chiquito otra vez, así que acá se pone a jugar. Encontrá el QR para continuar.", e2: "Tiene cuatro patas, cuida este lugar sin hablar, y cuando está contento mueve la cola sin parar.", r: ["perro", "perros", "perrito", "perritos"] },
-            "Plaza": { e1: "Howie sigue el rastro de la arena y el sonido de los saltos. Encontrá el QR para continuar.", e2: "Sube a lo mas alto y desde ahí cuenta cuantos balcones tiene el edificio frente a ti.", r: ["16", "dieceis", "dieciséis"] },
-            "Estatuas": { e1: "Howie se detiene frente a figuras que no se mueven, pero son centro de atracción. Encontrá el QR para continuar.", e2: "El guerrero protege un mensaje. La aprobación está escrita más de una vez. Decinos qué siglas ves.", r: ["osn", "o.s.n."] },
-            "Pileta": { e1: "Acá todo es diversión. Howie se acuerda de una regla importante: acá se juega… pero no se corre 😉 Encontrá el QR para continuar.", e2: "No se mete a jugar, pero cuida el juego. Está siempre atento mientras otros chapotean. ¿Quién es?", r: ["bañero", "el bañero", "guardavidas", "el guardavidas", "socorrista"] },
-            "Plays": { e1: "Howie se dejó llevar por las luces parpadeantes y los sonidos de victoria. Encontrá el QR para continuar.", e2: "Famoso soy, en lo alto estoy, si queres completar el desafío deci que personaje soy.", r: ["kratos", "cratos"] }
+            "Bicis": { e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas.", e2: "¿Cuántas bicicletas con rueditas de aprendizaje ves acá?", r: ["0", "cero", "ninguna"] },
+            "Lobby": { e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van.", e2: "¿A qué hora es el último adiós a la habitación?", r: ["10", "diez", "las 10"] },
+            "Resto": { e1: "Howie dice que es su lugar favorito para comer en familia.", e2: "En la carta de pizza contá hasta 3.", r: ["especial", "la especial"] },
+            "Arqueria": { e1: "La paciencia es como una flecha.", e2: "¿Círculo de más valor?", r: ["amarillo", "el amarillo"] },
+            "Patio Cervecero": { e1: "Bajo las luces se cuentan mejores historias.", e2: "Formá la inicial del encargado con piedritas.", tipo: "foto", r: ["foto", "piedra"] },
+            "Escaleras": { e1: "Desde acá las cosas se ven distintas…", e2: "Tomá una foto de la ciudad desde donde el esfuerzo afloja.", tipo: "foto", r: ["foto", "vista"] },
+            "Camastros": { e1: "Donde el tiempo se detiene.", e2: "¿Cómo se llama el escenario?", r: ["escenario", "el escenario"] },
+            "Kids": { e1: "Howie se siente chiquito otra vez.", e2: "Tiene cuatro patas y mueve la cola.", r: ["perro", "perros", "perrito"] },
+            "Plaza": { e1: "Howie sigue el rastro de la arena.", e2: "¿Cuántos balcones tiene el edificio frente a ti?", r: ["16", "dieciseis", "dieciséis"] },
+            "Estatuas": { e1: "Figuras que no se mueven.", e2: "¿Siglas en la base del guerrero?", r: ["osn"] },
+            "Pileta": { e1: "¡No se corre en la pile!", e2: "¿Quién vigila el agua?", r: ["bañero", "guardavidas", "el bañero"] },
+            "Plays": { e1: "Sonidos de victoria.", e2: "¿Qué personaje famoso es?", r: ["kratos", "cratos"] }
         };
 
         let db = { nombre: "", hab: "", actual: "", ganadas: [], modo: "e1" };
@@ -164,7 +111,13 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(id === 'home-screen') checkCampeon();
-            if(id === 'mapa-screen') renderMapa();
+            if(id === 'mapa-screen') {
+                // SEGURO ANTI-BLOQUEO: Si no hay estrella, buscar una.
+                if(!db.actual || db.actual === "" || db.actual === "FINAL" || db.ganadas.includes(db.actual)) {
+                    proximaMision();
+                }
+                renderMapa();
+            }
             if(id === 'album-screen') renderAlbum();
             window.scrollTo(0,0);
         }
@@ -172,7 +125,7 @@
         function comenzar() {
             const n = document.getElementById('inputNombre').value.trim();
             const h = document.getElementById('inputHab').value.trim();
-            if(!n || !h) return Swal.fire("¡Epa!", "Howie necesita tus datos", "warning");
+            if(!n || !h) return Swal.fire("¡Epa!", "Completá tus datos", "warning");
             db.nombre = n; db.hab = h; db.ganadas = [];
             proximaMision();
             document.getElementById('saludo').innerText = `¡HOLA ${n.toUpperCase()}!`;
@@ -181,24 +134,27 @@
 
         function proximaMision() {
             const libres = zonas.filter(z => !db.ganadas.includes(z));
-            db.actual = libres.length > 0 ? libres[Math.floor(Math.random() * libres.length)] : "FINAL";
-            db.modo = "e1";
+            if(libres.length > 0) {
+                db.actual = libres[Math.floor(Math.random() * libres.length)];
+                db.modo = "e1";
+            } else {
+                db.actual = "FINAL";
+            }
+            save();
         }
 
         function renderMapa() {
             const list = document.getElementById('listaZonas'); list.innerHTML = "";
             zonas.forEach(z => {
-                const ok = db.ganadas.includes(z);
-                const esHoy = z === db.actual;
+                const ok = db.ganadas.includes(z); const esHoy = z === db.actual;
                 const item = document.createElement('div');
                 item.className = `zona-item ${esHoy ? 'zona-actual' : ''} ${ok ? 'zona-hecha' : (!esHoy ? 'zona-bloqueada' : '')}`;
-                item.innerHTML = `<b>${ok ? '✔️' : (esHoy ? '⭐' : '🔒')} ${z}</b> ${esHoy ? '<small>¡TU MISIÓN!</small>' : ''}`;
+                item.innerHTML = `<b>${ok ? '✔️' : (esHoy ? '⭐' : '🔒')} ${z}</b>`;
                 if(esHoy && !ok) item.onclick = () => {
                     document.getElementById('m-titulo').innerText = db.actual;
                     document.getElementById('m-texto').innerText = misiones[db.actual].e1;
                     document.getElementById('cont-e1').style.display = "block";
                     document.getElementById('cont-e2').style.display = "none";
-                    document.getElementById('btn-ayuda-wa').innerText = "🆘 PEDIR AYUDA A HOWIE";
                     irA('mision-screen');
                 };
                 list.appendChild(item);
@@ -206,25 +162,18 @@
         }
 
         function abrirEscaner() {
-    const rd = document.getElementById('reader'); 
-    rd.style.display = "block";
-    const sc = new Html5Qrcode("reader");
-    
-    sc.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
-        // LIMPIEZA TOTAL: Quitamos guiones, espacios y mayúsculas de AMBOS lados
-        const leido = txt.toLowerCase().replace(/-/g, '').replace(/\s+/g, '');
-        const esperado = db.actual.toLowerCase().replace(/-/g, '').replace(/\s+/g, '');
-
-        if(leido.includes(esperado) || esperado.includes(leido)) {
-            sc.stop().then(() => { 
-                rd.style.display = "none"; 
-                pasarE2(); 
-            });
-        } else { 
-            Swal.fire("¡Epa!", "Este QR no es de " + db.actual, "error"); 
+            const rd = document.getElementById('reader'); rd.style.display = "block";
+            const sc = new Html5Qrcode("reader");
+            sc.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
+                // LIMPIEZA TOTAL: Ignora guiones, espacios y mayúsculas.
+                const leido = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+                const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+                
+                if(leido.includes(esperado) || esperado.includes(leido)) {
+                    sc.stop().then(() => { rd.style.display = "none"; pasarE2(); });
+                } else { Swal.fire("Epa", "Buscá el QR de " + db.actual, "error"); }
+            }).catch(() => Swal.fire("Error", "Cámara no detectada", "error"));
         }
-    }).catch(() => Swal.fire("Error", "No se detecta la cámara", "error"));
-}
 
         function pasarE2() {
             db.modo = "e2";
@@ -237,7 +186,7 @@
         }
 
         function tomarFoto() {
-            Swal.fire({ title: "¡Foto Lista!", text: "Se descargó en tu galería. Adjuntala en el WhatsApp.", icon: "success" }).then(() => {
+            Swal.fire({ title: "¡Foto Lista!", text: "Adjuntala en el WhatsApp.", icon: "success" }).then(() => {
                 document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
                 document.getElementById('modo-normal').style.display = "block";
             });
@@ -245,23 +194,16 @@
 
         function validarRespuesta() {
             const val = document.getElementById('res-input').value.trim().toLowerCase();
-            if(misiones[db.actual].r.includes(val)) {
+            if(misiones[db.actual].r.some(r => val.includes(r))) {
                 db.ganadas.push(db.actual);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                
-                if(db.ganadas.length === 12) {
-                    document.getElementById('e3-tit').innerText = "¡LO LOGRASTE! 🏆";
-                    document.getElementById('e3-txt').innerText = "¡Increíble! Completaste todo el álbum. Howie te espera para darte tu premio.";
-                } else {
-                    document.getElementById('e3-txt').innerText = `¡Bien hecho! Ganaste la figurita de ${db.actual}.`;
-                }
-                
+                document.getElementById('e3-tit').innerText = db.ganadas.length === 12 ? "¡LO LOGRASTE! 🏆" : "¡EXCELENTE! 🎉";
+                document.getElementById('e3-txt').innerText = db.ganadas.length === 12 ? "Álbum completo." : `¡Ganaste la figu de ${db.actual}!`;
                 const img = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
                 document.getElementById('figu-slot').innerHTML = `<img src="img/${img}.jpg">`;
-                
                 proximaMision(); save(); irA('e3-screen');
                 document.getElementById('res-input').value = "";
-            } else { Swal.fire("¡Casi!", "Intentalo de nuevo, Howie sabe que podés.", "error"); }
+            } else { Swal.fire("Casi", "Intentalo de nuevo", "error"); }
         }
 
         function renderAlbum() {
@@ -276,28 +218,20 @@
         }
 
         function ayudaWA() {
-            const esFoto = document.getElementById('btn-ayuda-wa').innerText.includes("ENVIAR FOTO");
-            const msj = esFoto 
-                ? `Howie, aquí te comparto la foto de mi desafío en ${db.actual} para que me envies el código.`
-                : `Hola Howie, soy ${db.nombre}, estoy en ${db.actual} y necesito ayuda con el ${db.modo === 'e1' ? 'QR' : 'desafío'}.`;
+            const msj = `Hola Howie, soy ${db.nombre}, necesito ayuda en ${db.actual}.`;
             window.open(`https://wa.me/5493541215391?text=${encodeURIComponent(msj)}`);
         }
 
-        function checkCampeon() {
-            if(db.ganadas.length === 12) {
-                document.getElementById('cont-campeon').style.display = "block";
-                document.getElementById('btn-mapa').style.display = "none";
-            }
-        }
+        function checkCampeon() { if(db.ganadas.length === 12) { document.getElementById('cont-campeon').style.display = "block"; document.getElementById('btn-mapa').style.display = "none"; } }
 
         function reclamarPremio() {
-            const msj = `¡Howie lo logré! ¡Completé el álbum de HowieGO! Soy ${db.nombre} de la habitación ${db.hab}. ¿Me preparan mi premio? 🦉🎁`;
+            const msj = `¡Howie lo logré! Soy ${db.nombre} de la hab ${db.hab}. ¡Álbum completo! 🦉🎁`;
             window.open(`https://wa.me/5493541215391?text=${encodeURIComponent(msj)}`);
         }
 
         function save() { localStorage.setItem('howiego_final', JSON.stringify(db)); }
         function cerrarSesion() {
-            Swal.fire({ title: '¿Cerrar sesión?', text: "Si sales, perderás todas tus figuritas.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Sí, salir' }).then(r => { if(r.isConfirmed){ localStorage.clear(); location.reload(); } });
+            Swal.fire({ title: '¿Salir?', text: "Perderás tus figus.", icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí' }).then(r => { if(r.isConfirmed){ localStorage.clear(); location.reload(); } });
         }
 
         window.onload = () => {
