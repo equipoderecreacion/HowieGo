@@ -161,19 +161,57 @@
             });
         }
 
-        function abrirEscaner() {
-            const rd = document.getElementById('reader'); rd.style.display = "block";
-            const sc = new Html5Qrcode("reader");
-            sc.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
-                // LIMPIEZA TOTAL: Ignora guiones, espacios y mayúsculas.
-                const leido = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-                const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-                
-                if(leido.includes(esperado) || esperado.includes(leido)) {
-                    sc.stop().then(() => { rd.style.display = "none"; pasarE2(); });
-                } else { Swal.fire("Epa", "Buscá el QR de " + db.actual, "error"); }
-            }).catch(() => Swal.fire("Error", "Cámara no detectada", "error"));
+        let html5QrCode; // Variable global para controlar la cámara
+
+function abrirEscaner() {
+    const rd = document.getElementById('reader');
+    rd.style.display = "block";
+    
+    // Si ya había una instancia, intentamos cerrarla antes de empezar
+    if (html5QrCode) {
+        html5QrCode.stop().catch(() => {});
+    }
+
+    html5QrCode = new Html5Qrcode("reader");
+    
+    const config = { fps: 10, qrbox: 250 };
+
+    html5QrCode.start({ facingMode: "environment" }, config, (txt) => {
+        // LIMPIEZA DE TEXTO (Blindada)
+        const leido = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+        const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+
+        if (leido.includes(esperado) || esperado.includes(leido)) {
+            // DETENCIÓN CRÍTICA: Apagamos la cámara ANTES de cambiar de pantalla
+            html5QrCode.stop().then(() => {
+                rd.style.display = "none";
+                pasarE2();
+            }).catch(err => {
+                console.error("Error al apagar cámara", err);
+                rd.style.display = "none";
+                pasarE2(); // Pasamos igual aunque falle el stop visual
+            });
+        } else {
+            Swal.fire("¡Epa!", "Ese QR no es de " + db.actual, "error");
         }
+    }).catch(err => {
+        Swal.fire("Error de Cámara", "Asegurate de dar permisos o refrescá la página.", "error");
+    });
+}
+
+function pasarE2() {
+    db.modo = "e2";
+    // Limpiamos el lector por las dudas si quedó algo en el DOM
+    document.getElementById('reader').innerHTML = ""; 
+    document.getElementById('m-texto').innerText = misiones[db.actual].e2;
+    document.getElementById('cont-e1').style.display = "none";
+    document.getElementById('cont-e2').style.display = "block";
+    
+    const esFoto = misiones[db.actual].tipo === "foto";
+    document.getElementById('modo-normal').style.display = esFoto ? "none" : "block";
+    document.getElementById('modo-foto').style.display = esFoto ? "block" : "none";
+    save();
+}
 
         function pasarE2() {
             db.modo = "e2";
