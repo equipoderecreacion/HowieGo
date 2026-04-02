@@ -14,28 +14,33 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: var(--fondo); color: #333; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .screen { display: none; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; flex-direction: column; align-items: center; position: relative; }
         .screen.active { display: flex; }
+        
         #login-screen { background: linear-gradient(135deg, var(--azul) 0%, #002d5c 100%); justify-content: center; }
         .card-login { background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 340px; text-align: center; border: 4px solid var(--naranja); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .howie-container { position: relative; width: 120px; height: 130px; margin: 0 auto 15px; }
         .howie-cuerpo { width: 100%; position: absolute; bottom: 0; left: 0; z-index: 1; }
         .ala-animada { width: 100px; position: absolute; top: 20px; left: 12px; z-index: 2; transform-origin: 30% 70%; animation: saludo 2s ease-in-out infinite; }
         @keyframes saludo { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-25deg); } }
+        
         .logo-txt { font-size: 32px; font-weight: 900; color: var(--azul); margin: 5px 0; text-transform: uppercase; }
         .logo-go { color: var(--naranja); }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
+
         #saludo { color: var(--azul); font-weight: 900; margin-top: 40px; font-size: 30px; text-transform: uppercase; text-align: center; }
-        .btn-home { width: 92%; max-width: 320px; height: 110px; border-radius: 25px; margin: 15px 0; border: none; cursor: pointer; position: relative; color: white; display: flex; align-items: center; padding: 0 25px; transition: transform 0.1s; z-index: 5; }
+        .btn-home { width: 92%; max-width: 320px; height: 110px; border-radius: 25px; margin: 15px 0; border: none; cursor: pointer; position: relative; color: white; display: flex; align-items: center; padding: 0 25px; z-index: 5; }
         #btn-mapa { background: var(--naranja); text-align: left; }
         #btn-album { background: var(--azul); text-align: right; justify-content: flex-end; }
         .sticker-img { position: absolute; width: 155px; bottom: -15px; z-index: 10; pointer-events: none; }
         .pos-der { right: -25px; }
         .pos-izq { left: -25px; transform: scaleX(-1); }
-        .zona-item { width: 100%; background: white; margin: 10px 0; padding: 15px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; border: 2px solid transparent; box-sizing: border-box; }
-        .zona-actual { border-color: var(--naranja); background: #fff9e6; }
-        .zona-hecha { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+
         .card-mision { background: white; width: 100%; max-width: 360px; padding: 25px; border-radius: 25px; border: 4px solid var(--naranja); text-align: center; box-sizing: border-box; }
-        .btn-hj { background: var(--naranja); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; margin: 10px 0; font-size: 16px; cursor: pointer; }
+        .btn-hj { background: var(--naranja); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; margin: 10px 0; font-size: 16px; cursor: pointer; text-transform: uppercase; }
         #reader { width: 100%; border-radius: 15px; margin-top: 15px; display: none; overflow: hidden; border: 3px solid var(--naranja); background: #000; min-height: 250px; }
+        
+        /* MINIATURA DE FOTO */
+        #preview-foto { width: 100%; max-width: 200px; border-radius: 15px; margin: 10px auto; display: none; border: 2px solid var(--naranja); }
+        
         .grid-album { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 380px; margin: 20px 0; }
         .slot-figu { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px dashed #999; overflow: hidden; position: relative; }
         .slot-figu img { width: 100%; height: 100%; object-fit: cover; }
@@ -62,35 +67,33 @@
         <button id="btn-mapa" class="btn-home" onclick="irA('mapa-screen')"><div><span>Misiones</span><b>VER MAPA</b></div><img src="img/boton-mapa.png" class="sticker-img pos-der"></button>
         <button id="btn-album" class="btn-home" onclick="irA('album-screen')"><img src="img/boton-album.png" class="sticker-img pos-izq"><div><span>Mis Figus</span><b>MI ÁLBUM</b></div></button>
         <div id="cont-campeon" style="display:none; width:100%; text-align:center;"><button class="btn-hj" style="background:#4CAF50; width:92%;" onclick="reclamarPremio()">🎁 ¡RECLAMAR MI PREMIO!</button></div>
-        <button onclick="cerrarSesion()" style="background:none; border:none; color:#999; text-decoration:underline; margin-top:50px; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
     <div id="mapa-screen" class="screen"><h2 style="color:var(--azul)">MAPA DE MISIONES</h2><div id="listaZonas" style="width:100%"></div><button class="btn-hj" onclick="irA('home-screen')" style="background:var(--azul); width:85%">⬅ VOLVER</button></div>
 
     <div id="mision-screen" class="screen">
         <div class="card-mision">
-            <h2 id="m-titulo" style="color:var(--naranja); margin:0;"></h2>
+            <h2 id="m-titulo" style="color:var(--naranja); margin:0; text-transform:uppercase;"></h2>
             <p id="m-texto" style="font-size:16px; margin:20px 0; color:#444;"></p>
             
             <div id="cont-e1">
                 <button id="btn-scan" class="btn-hj" onclick="abrirEscaner()">🔍 ABRIR ESCÁNER</button>
                 <div id="reader"></div>
-                <button id="btn-reset-cam" style="display:none; background:none; border:none; color:var(--azul); text-decoration:underline; font-size:13px; margin-top:10px;" onclick="location.reload()">¿Pantalla negra? Toca aquí para reiniciar</button>
             </div>
 
             <div id="cont-e2" style="display:none;">
+                <img id="preview-foto" src="">
                 <div id="modo-normal">
                     <input type="text" id="res-input" placeholder="Tu respuesta...">
                     <button class="btn-hj" onclick="validarRespuesta()">ENVIAR RESPUESTA</button>
                 </div>
                 <div id="modo-foto" style="display:none;">
-                    <input type="file" id="input-foto" accept="image/*" capture="camera" style="display:none;" onchange="fotoCapturada()">
-                    <button class="btn-hj" onclick="document.getElementById('input-foto').click()">📸 TOMAR FOTO</button>
+                    <input type="file" id="input-foto" accept="image/*" capture="camera" style="display:none;" onchange="fotoCapturada(event)">
+                    <button class="btn-hj" onclick="document.getElementById('input-foto').click()">📸 TOMAR FOTO DEL DESAFÍO</button>
                 </div>
             </div>
             <button id="btn-ayuda-wa" class="btn-hj" style="background:var(--azul); width:85%; font-size:14px;" onclick="ayudaWA()">🆘 PEDIR AYUDA</button>
         </div>
-        <button class="btn-hj" onclick="irA('mapa-screen')" style="background:var(--azul); width:85%; margin-top:20px;">⬅ VOLVER AL MAPA</button>
     </div>
 
     <div id="e3-screen" class="screen">
@@ -102,25 +105,25 @@
     <script>
         const zonas = ["Bicis", "Lobby", "Resto", "Arqueria", "Patio Cervecero", "Escaleras", "Camastros", "Kids", "Plaza", "Estatuas", "Pileta", "Plays"];
         const misiones = {
-            "Bicis": { e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas. Encontrá el QR para continuar.", e2: "¿Cuántas bicicletas con rueditas de aprendizaje ves acá?", r: ["0", "cero", "ninguna"] },
-            "Lobby": { e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.", e2: "¿A qué hora es el último adiós a la habitación?", r: ["10", "diez", "las 10"] },
-            "Resto": { e1: "Howie dice que es su lugar favorito para compartir en familia. Encontrá el QR para continuar.", e2: "En la carta de pizza contá hasta 3.", r: ["especial", "la especial"] },
-            "Arqueria": { e1: "Howie dice que la paciencia es como una flecha. Encontrá el QR para continuar.", e2: "¿Cuál es el círculo de más valor?", r: ["amarillo", "el amarillo"] },
-            "Patio Cervecero": { e1: "Bajo las luces, las historias se cuentan mejor. Encontrá el QR para continuar.", e2: "Formá la inicial del encargado con piedritas.", tipo: "foto", r: ["foto"] },
-            "Escaleras": { e1: "Desde acá las cosas se ven distintas… Encontrá el QR para continuar.", e2: "Tomale una foto a la ciudad desde donde el esfuerzo afloja.", tipo: "foto", r: ["foto"] },
-            "Camastros": { e1: "El lugar donde el tiempo se detiene. Encontrá el QR para continuar.", e2: "¿Cómo se llama el escenario?", r: ["escenario", "el escenario"] },
-            "Kids": { e1: "Howie se siente chiquito otra vez. Encontrá el QR para continuar.", e2: "Tiene cuatro patas y mueve la cola.", r: ["perro", "perros", "perrito"] },
-            "Plaza": { e1: "Howie sigue el rastro de la arena. Encontrá el QR para continuar.", e2: "¿Cuántos balcones tiene el edificio frente a ti?", r: ["16", "dieciseis"] },
-            "Estatuas": { e1: "Figuras que no se mueven. Encontrá el QR para continuar.", e2: "¿Qué siglas ves en la base del guerrero?", r: ["osn"] },
-            "Pileta": { e1: "¡Acá se juega pero no se corre! Encontrá el QR para continuar.", e2: "¿Quién vigila el agua?", r: ["bañero", "guardavidas", "el bañero"] },
-            "Plays": { e1: "Sonidos de victoria. Encontrá el QR para continuar.", e2: "¿Qué personaje famoso es?", r: ["kratos", "cratos"] }
+            "Bicis": { e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas. Encontrá el QR para continuar.", e2: "Howie estuvo contando rayos y pedales. Dice que para los más aventureros, el equilibrio es un arte. ¿Cuántas bicicletas con rueditas de aprendizaje ves acá?", r: ["0", "cero", "ninguna"] },
+            "Lobby": { e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.", e2: "A Howie le preocupa el tiempo. Se quedó mirando el reloj y se pregunta: ¿A qué hora es el último adiós a la habitación?", r: ["10", "diez", "las 10"] },
+            "Resto": { e1: "Howie dice que es su lugar favorito, lo que más le gusta es compartir en familia, repasar las anécdotas y que no falten las risas. Encontrá el QR para continuar.", e2: "Howie es un gran comensal. Para saber cuál es su plato favorito, en la carta de pizza contá hasta 3.", r: ["especial", "la especial"] },
+            "Arqueria": { e1: "Howie dice que la paciencia es como una flecha: cuanto más la tensás, más lejos llegás. Encontrá el QR para continuar.", e2: "Howie estuvo mirando los círculos que nunca terminan: ¿Cuál es el de más valor?", r: ["amarillo", "el amarillo"] },
+            "Patio Cervecero": { e1: "Howie busca la brisa de la tarde y el tintineo de los vasos fríos. Bajo las luces, las historias se cuentan mejor. Encontrá el QR para continuar.", e2: "Howie dice que el suelo está lleno de tesoros pequeños. Usá las piedritas para formar la inicial de la persona que atiende el foodtruck.", tipo: "foto", r: ["foto"] },
+            "Escaleras": { e1: "Howie siempre se detiene un momento antes de subir. Dice que desde acá las cosas se ven distintas… Encontrá el QR para continuar.", e2: "Howie se queda justo donde el esfuerzo afloja. Desde ahí, los colores cuentan historias de la ciudad. Tomale una foto y envíasela a Howie.", tipo: "foto", r: ["foto"] },
+            "Camastros": { e1: "Howie encontró el lugar donde el tiempo se detiene y el sol te abraza en silencio. Encontrá el QR para continuar.", e2: "No siempre es el lugar más ruidoso, pero cuando algo importante pasa, todas las miradas terminan ahí. ¿Sabés qué es?", r: ["escenario", "el escenario"] },
+            "Kids": { e1: "Howie se siente chiquito otra vez, así que acá se pone a jugar. Encontrá el QR para continuar.", e2: "Tiene cuatro patas, cuida este lugar sin hablar, y cuando está contento mueve la cola sin parar.", r: ["perro", "perros", "perrito"] },
+            "Plaza": { e1: "Howie sigue el rastro de la arena y el sonido de los saltos. Encontrá el QR para continuar.", e2: "Sube a lo mas alto y desde ahí cuenta cuantos balcones tiene el edificio frente a ti.", r: ["16", "dieciseis"] },
+            "Estatuas": { e1: "Figuras que no se mueven, pero son centro de atracción. Encontrá el QR para continuar.", e2: "El guerrero protege un mensaje. La aprobación está escrita más de una vez. Decinos qué siglas ves.", r: ["osn"] },
+            "Pileta": { e1: "Acá todo es diversión. Recordá: ¡acá se juega… pero no se corre! Encontrá el QR para continuar.", e2: "No se mete a jugar, pero cuida el juego. Está siempre atento mientras otros chapotean. ¿Quién es?", r: ["bañero", "guardavidas", "el bañero"] },
+            "Plays": { e1: "Sonidos de victoria. Encontrá el QR para continuar.", e2: "Famoso soy, en lo alto estoy, si queres completar el desafío deci que personaje soy.", r: ["kratos", "cratos"] }
         };
 
         let db = { nombre: "", hab: "", actual: "", ganadas: [], modo: "e1" };
         let html5QrCode = null;
 
         function irA(id) {
-            if(html5QrCode) { html5QrCode.stop().catch(()=>{}); html5QrCode = null; }
+            detenerScanner();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(id === 'mapa-screen') { if(!db.actual || db.ganadas.includes(db.actual)) proximaMision(); renderMapa(); }
@@ -141,8 +144,7 @@
         function proximaMision() {
             const libres = zonas.filter(z => !db.ganadas.includes(z));
             db.actual = libres.length > 0 ? libres[Math.floor(Math.random() * libres.length)] : "FINAL";
-            db.modo = "e1";
-            save();
+            db.modo = "e1"; save();
         }
 
         function renderMapa() {
@@ -158,27 +160,34 @@
                     document.getElementById('m-texto').innerText = misiones[db.actual].e1;
                     document.getElementById('cont-e1').style.display = "block";
                     document.getElementById('cont-e2').style.display = "none";
-                    document.getElementById('btn-scan').style.display = "block";
+                    document.getElementById('preview-foto').style.display = "none";
                     irA('mision-screen');
                 };
                 list.appendChild(item);
             });
         }
 
+        async function detenerScanner() {
+            if (html5QrCode) {
+                try { await html5QrCode.stop(); } catch(e) {}
+                html5QrCode = null;
+            }
+            document.getElementById('reader').style.display = "none";
+            document.getElementById('btn-scan').style.display = "block";
+        }
+
         function abrirEscaner() {
             const rd = document.getElementById('reader'); rd.style.display = "block";
             document.getElementById('btn-scan').style.display = "none";
-            document.getElementById('btn-reset-cam').style.display = "block";
-            
             html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
                 const leido = txt.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
                 const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
                 if(leido.includes(esperado) || esperado.includes(leido)) {
-                    html5QrCode.stop().then(() => { html5QrCode = null; rd.style.display="none"; pasarE2(); });
+                    detenerScanner().then(() => pasarE2());
                 } else { Swal.fire("Epa", "Buscá el QR de " + db.actual, "error"); }
             }).catch(() => { 
-                Swal.fire("Error", "Permisos de cámara denegados o bloqueados.", "error"); 
+                Swal.fire("Error", "Permití la cámara para jugar.", "error"); 
                 document.getElementById('btn-scan').style.display = "block";
             });
         }
@@ -194,10 +203,20 @@
             save();
         }
 
-        function fotoCapturada() {
-            Swal.fire("📸 ¡Foto enviada!", "Howie la está revisando. Dale a enviar para seguir.", "success");
-            document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
-            document.getElementById('modo-normal').style.display = "block";
+        function fotoCapturada(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('preview-foto');
+                    img.src = e.target.result;
+                    img.style.display = "block";
+                    Swal.fire("📸 ¡HERMOSA FOTO!", "Ya está guardada... adjuntala desde tu galería al enviarle el mensaje a Howie.", "success");
+                    document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
+                    document.getElementById('modo-normal').style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         function validarRespuesta() {
@@ -224,17 +243,18 @@
         }
 
         function ayudaWA() {
-            const msj = `Hola Howie, soy ${db.nombre}, necesito ayuda en ${db.actual}.`;
+            const esFoto = document.getElementById('btn-ayuda-wa').innerText.includes("ENVIAR FOTO");
+            const msj = esFoto ? `¡Howie! Aquí te comparto la foto de mi desafío en ${db.actual}.` : `Hola Howie, soy ${db.nombre}, necesito ayuda en ${db.actual}.`;
             window.open(`https://wa.me/5493541215391?text=${encodeURIComponent(msj)}`);
         }
 
         function checkCampeon() { if(db.ganadas.length === 12) document.getElementById('cont-campeon').style.display = "block"; }
         function reclamarPremio() { window.open(`https://wa.me/5493541215391?text=¡Completé el álbum! Soy ${db.nombre} de la hab ${db.hab}`); }
-        function save() { localStorage.setItem('howiego_v3', JSON.stringify(db)); }
+        function save() { localStorage.setItem('howiego_vfinal', JSON.stringify(db)); }
         function cerrarSesion() { localStorage.clear(); location.reload(); }
 
         window.onload = () => {
-            const s = localStorage.getItem('howiego_v3');
+            const s = localStorage.getItem('howiego_vfinal');
             if(s) { db = JSON.parse(s); document.getElementById('saludo').innerText = `¡HOLA ${db.nombre.toUpperCase()}!`; irA('home-screen'); }
         };
     </script>
