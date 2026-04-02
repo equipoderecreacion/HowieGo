@@ -15,6 +15,7 @@
         .screen { display: none; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; flex-direction: column; align-items: center; position: relative; }
         .screen.active { display: flex; }
         
+        /* LOGIN ANIMADO */
         #login-screen { background: linear-gradient(135deg, var(--azul) 0%, #002d5c 100%); justify-content: center; }
         .card-login { background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 340px; text-align: center; border: 4px solid var(--naranja); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .howie-container { position: relative; width: 120px; height: 130px; margin: 0 auto 15px; }
@@ -26,24 +27,26 @@
         .logo-go { color: var(--naranja); }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
 
+        /* HOME CON STICKERS */
         #saludo { color: var(--azul); font-weight: 900; margin-top: 40px; font-size: 30px; text-transform: uppercase; text-align: center; }
         .btn-home { width: 92%; max-width: 320px; height: 110px; border-radius: 25px; margin: 15px 0; border: none; cursor: pointer; position: relative; color: white; display: flex; align-items: center; padding: 0 25px; z-index: 5; }
-        #btn-mapa { background: var(--naranja); text-align: left; }
-        #btn-album { background: var(--azul); text-align: right; justify-content: flex-end; }
+        #btn-mapa { background: var(--naranja); text-align: left; box-shadow: 0 6px 15px rgba(245,124,0,0.3); }
+        #btn-album { background: var(--azul); text-align: right; justify-content: flex-end; box-shadow: 0 6px 15px rgba(0,74,151,0.3); }
         .sticker-img { position: absolute; width: 155px; bottom: -15px; z-index: 10; pointer-events: none; }
         .pos-der { right: -25px; }
         .pos-izq { left: -25px; transform: scaleX(-1); }
 
+        /* MAPA ORIGINAL */
+        .zona-item { width: 100%; background: white; margin: 10px 0; padding: 15px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .zona-actual { border-color: var(--naranja); background: #fff9e6; }
+        .zona-hecha { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+        .zona-bloqueada { opacity: 0.5; filter: grayscale(1); }
+
+        /* MISIONES */
         .card-mision { background: white; width: 100%; max-width: 360px; padding: 25px; border-radius: 25px; border: 4px solid var(--naranja); text-align: center; box-sizing: border-box; }
         .btn-hj { background: var(--naranja); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; margin: 10px 0; font-size: 16px; cursor: pointer; text-transform: uppercase; }
         #reader { width: 100%; border-radius: 15px; margin-top: 15px; display: none; overflow: hidden; border: 3px solid var(--naranja); background: #000; min-height: 250px; }
-        
-        /* MINIATURA DE FOTO */
         #preview-foto { width: 100%; max-width: 200px; border-radius: 15px; margin: 10px auto; display: none; border: 2px solid var(--naranja); }
-        
-        .grid-album { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 380px; margin: 20px 0; }
-        .slot-figu { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px dashed #999; overflow: hidden; position: relative; }
-        .slot-figu img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -75,12 +78,10 @@
         <div class="card-mision">
             <h2 id="m-titulo" style="color:var(--naranja); margin:0; text-transform:uppercase;"></h2>
             <p id="m-texto" style="font-size:16px; margin:20px 0; color:#444;"></p>
-            
             <div id="cont-e1">
                 <button id="btn-scan" class="btn-hj" onclick="abrirEscaner()">🔍 ABRIR ESCÁNER</button>
                 <div id="reader"></div>
             </div>
-
             <div id="cont-e2" style="display:none;">
                 <img id="preview-foto" src="">
                 <div id="modo-normal">
@@ -120,7 +121,7 @@
         };
 
         let db = { nombre: "", hab: "", actual: "", ganadas: [], modo: "e1" };
-        let html5QrCode = null;
+        let scannerInst = null;
 
         function irA(id) {
             detenerScanner();
@@ -168,10 +169,7 @@
         }
 
         async function detenerScanner() {
-            if (html5QrCode) {
-                try { await html5QrCode.stop(); } catch(e) {}
-                html5QrCode = null;
-            }
+            if (scannerInst) { try { await scannerInst.stop(); } catch(e) {} scannerInst = null; }
             document.getElementById('reader').style.display = "none";
             document.getElementById('btn-scan').style.display = "block";
         }
@@ -179,17 +177,14 @@
         function abrirEscaner() {
             const rd = document.getElementById('reader'); rd.style.display = "block";
             document.getElementById('btn-scan').style.display = "none";
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
+            scannerInst = new Html5Qrcode("reader");
+            scannerInst.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
                 const leido = txt.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
                 const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
                 if(leido.includes(esperado) || esperado.includes(leido)) {
                     detenerScanner().then(() => pasarE2());
                 } else { Swal.fire("Epa", "Buscá el QR de " + db.actual, "error"); }
-            }).catch(() => { 
-                Swal.fire("Error", "Permití la cámara para jugar.", "error"); 
-                document.getElementById('btn-scan').style.display = "block";
-            });
+            }).catch(() => { Swal.fire("Error", "Cámara bloqueada", "error"); detenerScanner(); });
         }
 
         function pasarE2() {
@@ -208,12 +203,10 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const img = document.getElementById('preview-foto');
-                    img.src = e.target.result;
-                    img.style.display = "block";
+                    document.getElementById('preview-foto').src = e.target.result;
+                    document.getElementById('preview-foto').style.display = "block";
                     Swal.fire("📸 ¡HERMOSA FOTO!", "Ya está guardada... adjuntala desde tu galería al enviarle el mensaje a Howie.", "success");
                     document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
-                    document.getElementById('modo-normal').style.display = "block";
                 };
                 reader.readAsDataURL(file);
             }
@@ -243,18 +236,17 @@
         }
 
         function ayudaWA() {
-            const esFoto = document.getElementById('btn-ayuda-wa').innerText.includes("ENVIAR FOTO");
-            const msj = esFoto ? `¡Howie! Aquí te comparto la foto de mi desafío en ${db.actual}.` : `Hola Howie, soy ${db.nombre}, necesito ayuda en ${db.actual}.`;
+            const msj = document.getElementById('btn-ayuda-wa').innerText.includes("ENVIAR FOTO") ? `¡Howie! Aquí te comparto la foto de mi desafío en ${db.actual}.` : `Hola Howie, soy ${db.nombre}, necesito ayuda en ${db.actual}.`;
             window.open(`https://wa.me/5493541215391?text=${encodeURIComponent(msj)}`);
         }
 
         function checkCampeon() { if(db.ganadas.length === 12) document.getElementById('cont-campeon').style.display = "block"; }
-        function reclamarPremio() { window.open(`https://wa.me/5493541215391?text=¡Completé el álbum! Soy ${db.nombre} de la hab ${db.hab}`); }
-        function save() { localStorage.setItem('howiego_vfinal', JSON.stringify(db)); }
+        function reclamarPremio() { window.open(`https://wa.me/5493541215391?text=¡Completé el álbum! Soy ${db.nombre} hab ${db.hab}`); }
+        function save() { localStorage.setItem('howiego_final_v1', JSON.stringify(db)); }
         function cerrarSesion() { localStorage.clear(); location.reload(); }
 
         window.onload = () => {
-            const s = localStorage.getItem('howiego_vfinal');
+            const s = localStorage.getItem('howiego_final_v1');
             if(s) { db = JSON.parse(s); document.getElementById('saludo').innerText = `¡HOLA ${db.nombre.toUpperCase()}!`; irA('home-screen'); }
         };
     </script>
