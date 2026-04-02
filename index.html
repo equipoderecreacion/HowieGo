@@ -142,13 +142,13 @@
     </div>
 
     <script>
-        const zonas = ["Bicis", "Lobby", "Resto", "Arqueria", "Patio-Cervecero", "Escaleras", "Camastros", "Kids", "Plaza", "Estatuas", "Pileta", "Plays"];
+        const zonas = ["Bicis", "Lobby", "Resto", "Arqueria", "Patio cervecero", "Escaleras", "Camastros", "Kids", "Plaza", "Estatuas", "Pileta", "Plays"];
         const misiones = {
             "Bicis": { e1: "Howie dice que el viento solo se siente real cuando lo perseguís a dos ruedas. Encontrá el QR para continuar.", e2: "Howie estuvo contando rayos y pedales. Dice que para los más aventureros, el equilibrio es un arte. ¿Cuántas bicicletas con rueditas de aprendizaje ves acá?", r: ["0", "cero", "ninguna"] },
             "Lobby": { e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.", e2: "A Howie le preocupa el tiempo. Se quedó mirando el reloj y se pregunta: ¿A qué hora es el último adiós a la habitación?", r: ["10", "diez", "las 10", "10 am"] },
             "Resto": { e1: "Howie dice que es su lugar favorito, lo que más le gusta es compartir en familia, repasar las anécdotas y que no falten las risas.", e2: "Howie es un gran comensal. Para saber cuál es su plato favorito, en la carta de pizza contá hasta 3.", r: ["especial", "la especial"] },
             "Arqueria": { e1: "Howie dice que la paciencia es como una flecha: cuanto más la tensás, más lejos llegás. Encontrá el QR para continuar.", e2: "Howie estuvo mirando los círculos que nunca terminan: ¿Cuál es el de más valor?", r: ["amarillo", "el amarillo", "centro"] },
-            "Patio Cervecero": { e1: "Howie busca la brisa de la tarde y el tintineo de los vasos fríos. Bajo las luces, las historias se cuentan mejor. Encontrá el QR para continuar.", e2: "Howie dice que el suelo está lleno de tesoros pequeños. Usá las piedritas para formar la inicial de la persona que atiende el foodtruck.", tipo: "foto", r: ["foto", "piedra"] },
+            "Patio cervecero": { e1: "Howie busca la brisa de la tarde y el tintineo de los vasos fríos. Bajo las luces, las historias se cuentan mejor. Encontrá el QR para continuar.", e2: "Howie dice que el suelo está lleno de tesoros pequeños. Usá las piedritas para formar la inicial de la persona que atiende el foodtruck.", tipo: "foto", r: ["foto", "piedra"] },
             "Escaleras": { e1: "Howie siempre se detiene un momento antes de subir. Dice que desde acá las cosas se ven distintas… Encontrá el QR para continuar.", e2: "Howie se queda justo donde el esfuerzo afloja. Desde ahí, los colores cuentan historias de la ciudad. Tomale una foto y envíasela a Howie.", tipo: "foto", r: ["foto", "vista"] },
             "Camastros": { e1: "Howie encontró el lugar donde el tiempo se detiene y el sol te abraza en silencio. Encontrá el QR para continuar.", e2: "No siempre es el lugar más ruidoso, pero cuando algo importante pasa, todas las miradas terminan ahí. ¿Sabés qué es?", r: ["escenario", "el escenario"] },
             "Kids": { e1: "Howie se siente chiquito otra vez, así que acá se pone a jugar. Encontrá el QR para continuar.", e2: "Tiene cuatro patas, cuida este lugar sin hablar, y cuando está contento mueve la cola sin parar.", r: ["perro", "perros", "perrito", "perritos"] },
@@ -211,20 +211,19 @@
     const sc = new Html5Qrcode("reader");
     
     sc.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
-        // ESTA ES LA MAGIA: Limpiamos lo que lee el QR y lo que espera el código
-        const leido = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
-        const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+        // LIMPIEZA TOTAL: Quitamos guiones, espacios y mayúsculas de AMBOS lados
+        const leido = txt.toLowerCase().replace(/-/g, '').replace(/\s+/g, '');
+        const esperado = db.actual.toLowerCase().replace(/-/g, '').replace(/\s+/g, '');
 
-        // Si el QR contiene la palabra clave (ej: "patio"), habilita
         if(leido.includes(esperado) || esperado.includes(leido)) {
             sc.stop().then(() => { 
                 rd.style.display = "none"; 
                 pasarE2(); 
             });
         } else { 
-            Swal.fire("¡Epa!", "Este QR no es de " + db.actual + ". ¡Seguí buscando!", "error"); 
+            Swal.fire("¡Epa!", "Este QR no es de " + db.actual, "error"); 
         }
-    }).catch(() => Swal.fire("Error", "No puedo abrir la cámara", "error"));
+    }).catch(() => Swal.fire("Error", "No se detecta la cámara", "error"));
 }
 
         function pasarE2() {
