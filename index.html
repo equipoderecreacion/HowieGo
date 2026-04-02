@@ -14,6 +14,8 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: var(--fondo); color: #333; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .screen { display: none; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; flex-direction: column; align-items: center; position: relative; }
         .screen.active { display: flex; }
+
+        /* LOGIN */
         #login-screen { background: linear-gradient(135deg, var(--azul) 0%, #002d5c 100%); justify-content: center; }
         .card-login { background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 340px; text-align: center; border: 4px solid var(--naranja); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .howie-container { position: relative; width: 120px; height: 130px; margin: 0 auto 15px; }
@@ -23,6 +25,8 @@
         .logo-txt { font-size: 32px; font-weight: 900; color: var(--azul); margin: 5px 0; text-transform: uppercase; letter-spacing: -1px; }
         .logo-go { color: var(--naranja); }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
+
+        /* HOME */
         #saludo { color: var(--azul); font-weight: 900; margin-top: 40px; font-size: 30px; text-transform: uppercase; text-align: center; }
         .btn-home { width: 92%; max-width: 320px; height: 110px; border-radius: 25px; margin: 15px 0; border: none; cursor: pointer; position: relative; overflow: visible; color: white; display: flex; align-items: center; padding: 0 25px; transition: transform 0.1s; z-index: 5; }
         #btn-mapa { background: var(--naranja); box-shadow: 0 6px 15px rgba(245,124,0,0.3); text-align: left; }
@@ -32,14 +36,20 @@
         .sticker-img { position: absolute; width: 155px; bottom: -15px; z-index: 10; pointer-events: none; filter: drop-shadow(2px 5px 8px rgba(0,0,0,0.2)); }
         .pos-der { right: -25px; }
         .pos-izq { left: -25px; transform: scaleX(-1); }
+
+        /* MAPA */
         .zona-item { width: 100%; background: white; margin: 10px 0; padding: 15px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 2px solid transparent; box-sizing: border-box; }
         .zona-actual { border-color: var(--naranja); background: #fff9e6; }
-        .zona-bloqueada { opacity: 0.5; filter: grayscale(1); }
         .zona-hecha { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+        .zona-bloqueada { opacity: 0.5; filter: grayscale(1); }
+
+        /* MISIONES */
         .card-mision { background: white; width: 100%; max-width: 360px; padding: 25px; border-radius: 25px; border: 4px solid var(--naranja); text-align: center; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .btn-hj { background: var(--naranja); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; width: 100%; margin: 10px 0; font-size: 16px; cursor: pointer; text-transform: uppercase; }
         .btn-ayuda { background: var(--azul); width: 85%; font-size: 14px; margin-top: 5px; }
         #reader { width: 100%; border-radius: 15px; margin-top: 15px; display: none; overflow: hidden; border: 3px solid var(--naranja); }
+
+        /* ALBUM */
         .grid-album { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 380px; margin: 20px 0; }
         .slot-figu { aspect-ratio: 2/3; background: #e0e0e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px dashed #999; overflow: hidden; position: relative; }
         .slot-figu img { width: 100%; height: 100%; object-fit: cover; }
@@ -106,16 +116,18 @@
         };
 
         let db = { nombre: "", hab: "", actual: "", ganadas: [], modo: "e1" };
+        let html5QrCode = null;
 
         function irA(id) {
+            if (html5QrCode) {
+                html5QrCode.stop().catch(() => {});
+                document.getElementById('reader').style.display = "none";
+            }
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(id === 'home-screen') checkCampeon();
             if(id === 'mapa-screen') {
-                // SEGURO ANTI-BLOQUEO: Si no hay estrella, buscar una.
-                if(!db.actual || db.actual === "" || db.actual === "FINAL" || db.ganadas.includes(db.actual)) {
-                    proximaMision();
-                }
+                if(!db.actual || db.ganadas.includes(db.actual)) proximaMision();
                 renderMapa();
             }
             if(id === 'album-screen') renderAlbum();
@@ -134,12 +146,8 @@
 
         function proximaMision() {
             const libres = zonas.filter(z => !db.ganadas.includes(z));
-            if(libres.length > 0) {
-                db.actual = libres[Math.floor(Math.random() * libres.length)];
-                db.modo = "e1";
-            } else {
-                db.actual = "FINAL";
-            }
+            db.actual = libres.length > 0 ? libres[Math.floor(Math.random() * libres.length)] : "FINAL";
+            db.modo = "e1";
             save();
         }
 
@@ -161,57 +169,26 @@
             });
         }
 
-        let html5QrCode; // Variable global para controlar la cámara
+        async function abrirEscaner() {
+            const rd = document.getElementById('reader');
+            rd.style.display = "block";
+            rd.innerHTML = "";
+            if (html5QrCode) { try { await html5QrCode.stop(); } catch(e) {} }
 
-function abrirEscaner() {
-    const rd = document.getElementById('reader');
-    rd.style.display = "block";
-    
-    // Si ya había una instancia, intentamos cerrarla antes de empezar
-    if (html5QrCode) {
-        html5QrCode.stop().catch(() => {});
-    }
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, async (txt) => {
+                // Limpieza de texto blindada para guiones y espacios
+                const leido = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+                const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
 
-    html5QrCode = new Html5Qrcode("reader");
-    
-    const config = { fps: 10, qrbox: 250 };
-
-    html5QrCode.start({ facingMode: "environment" }, config, (txt) => {
-        // LIMPIEZA DE TEXTO (Blindada)
-        const leido = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-        const esperado = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-
-        if (leido.includes(esperado) || esperado.includes(leido)) {
-            // DETENCIÓN CRÍTICA: Apagamos la cámara ANTES de cambiar de pantalla
-            html5QrCode.stop().then(() => {
-                rd.style.display = "none";
-                pasarE2();
-            }).catch(err => {
-                console.error("Error al apagar cámara", err);
-                rd.style.display = "none";
-                pasarE2(); // Pasamos igual aunque falle el stop visual
-            });
-        } else {
-            Swal.fire("¡Epa!", "Ese QR no es de " + db.actual, "error");
+                if (leido.includes(esperado) || esperado.includes(leido)) {
+                    await html5QrCode.stop();
+                    html5QrCode = null;
+                    rd.style.display = "none";
+                    pasarE2();
+                } else { Swal.fire("Epa", "Buscá el QR de " + db.actual, "error"); }
+            }).catch(() => Swal.fire("Error", "Permití la cámara para jugar", "error"));
         }
-    }).catch(err => {
-        Swal.fire("Error de Cámara", "Asegurate de dar permisos o refrescá la página.", "error");
-    });
-}
-
-function pasarE2() {
-    db.modo = "e2";
-    // Limpiamos el lector por las dudas si quedó algo en el DOM
-    document.getElementById('reader').innerHTML = ""; 
-    document.getElementById('m-texto').innerText = misiones[db.actual].e2;
-    document.getElementById('cont-e1').style.display = "none";
-    document.getElementById('cont-e2').style.display = "block";
-    
-    const esFoto = misiones[db.actual].tipo === "foto";
-    document.getElementById('modo-normal').style.display = esFoto ? "none" : "block";
-    document.getElementById('modo-foto').style.display = esFoto ? "block" : "none";
-    save();
-}
 
         function pasarE2() {
             db.modo = "e2";
@@ -256,7 +233,7 @@ function pasarE2() {
         }
 
         function ayudaWA() {
-            const msj = `Hola Howie, soy ${db.nombre}, necesito ayuda en ${db.actual}.`;
+            const msj = `Hola Howie, soy ${db.nombre}, hab ${db.hab}, necesito ayuda en ${db.actual}.`;
             window.open(`https://wa.me/5493541215391?text=${encodeURIComponent(msj)}`);
         }
 
