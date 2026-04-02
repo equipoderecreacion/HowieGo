@@ -10,171 +10,119 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
+        /* 1. BASES */
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: #f4f4f4; color: #333; overflow-x: hidden; }
         .screen { display: none !important; min-height: 100vh; width: 100%; box-sizing: border-box; padding: 20px; }
         .screen.active { display: block !important; }
+        #login-screen.active, #home-screen.active { display: flex !important; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 
-        #login-screen.active, #home-screen.active {
-            display: flex !important; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-        }
-
+        /* 2. LOGIN */
         #login-screen { background: linear-gradient(135deg, #004A97 0%, #003366 100%); }
-        .card-sticker { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); width: 85%; max-width: 320px; border: 3px solid #F57C00; }
+        .card-login { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); width: 85%; max-width: 320px; border: 3px solid #F57C00; }
 
-        /* HOWIE ANIMADO LOGIN */
-        .howie-container { position: relative; width: 100px; height: 110px; margin: 0 auto 15px; }
-        .howie-cuerpo { width: 100%; position: absolute; bottom: 0; left: 0; z-index: 1; }
-        .ala-animada { width: 85px; position: absolute; top: 18px; left: 10px; z-index: 2; transform-origin: 30% 70%; animation: saludoHowie 2s ease-in-out infinite; }
-        @keyframes saludoHowie { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-25deg); } }
+        /* 3. BOTONES HOME */
+        .btn-home {
+            width: 90%; max-width: 320px; height: 100px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; cursor: pointer; position: relative;
+            overflow: visible; margin-bottom: 25px; border: none; transition: transform 0.1s;
+        }
+        #btn-mapa { background-color: #F57C00 !important; box-shadow: 0 6px 15px rgba(245, 124, 0, 0.4); }
+        #btn-album { background-color: #004A97 !important; box-shadow: 0 6px 15px rgba(0, 74, 151, 0.4); }
+        
+        .btn-texto { color: white; text-align: left; z-index: 5; flex: 1; pointer-events: none; }
+        .btn-texto b { font-size: 22px; display: block; }
+        .btn-texto span { font-size: 13px; opacity: 0.9; text-transform: uppercase; }
 
-        /* COMPONENTES */
-        h1 { color: #004A97; margin: 0; font-size: 28px; text-transform: uppercase; }
-        .btn-hj { background: #F57C00; color: white; border: none; padding: 15px; min-width: 260px; border-radius: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .btn-blue { background: #004A97; }
+        /* 4. STICKERS HOWIE */
+        .sticker-container { width: 100px; height: 100px; position: relative; pointer-events: none; }
+        .howie-sticker {
+            width: 160px !important; height: auto !important;
+            position: absolute !important; bottom: -22px !important;
+            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+            z-index: 10;
+        }
+        .howie-der { right: -25px !important; }
+        .howie-izq { left: -25px !important; }
 
-        /* --- ESTILO INDESTRUCTIBLE PARA BOTONES HOME --- */
-
-.btn-contenedor-sticker {
-    width: 90% !important;
-    max-width: 320px !important;
-    height: 100px !important;
-    border-radius: 20px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0 20px !important;
-    cursor: pointer !important;
-    position: relative !important;
-    overflow: visible !important;
-    margin-bottom: 25px !important;
-    border: none !important;
-    transition: transform 0.1s;
-}
-
-/* Color NARANJA para el Mapa */
-#btn-mapa-principal {
-    background-color: #F57C00 !important;
-    box-shadow: 0 6px 15px rgba(245, 124, 0, 0.4) !important;
-}
-
-/* Color AZUL para el Álbum */
-#btn-album-principal {
-    background-color: #004A97 !important;
-    box-shadow: 0 6px 15px rgba(0, 74, 151, 0.4) !important;
-}
-
-.btn-contenedor-sticker:active {
-    transform: scale(0.96);
-}
-
-.btn-sticker-lado {
-    width: 100px;
-    height: 100px;
-    position: relative;
-}
-
-/* LOS HOWIES: Bajamos el bottom para que "pisen" el botón */
-.btn-sticker-lado img {
-    width: 155px !important; 
-    height: auto !important;
-    position: absolute !important;
-    bottom: -25px !important; /* <--- MÁS ABAJO QUE NUNCA */
-    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)) !important;
-    z-index: 20 !important;
-}
-
-/* El del Mapa a la derecha */
-.img-derecha {
-    right: -25px !important;
-}
-
-/* El del Álbum a la izquierda */
-.img-izquierda {
-    right: auto !important;
-    left: -25px !important;
-}
+        /* 5. OTROS ESTILOS */
+        .zona-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 15px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        #contenedorFiguritas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .sticker-slot { aspect-ratio: 2/3; background: #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px dashed #999; }
+        .img-sticker { width: 100%; height: 100%; object-fit: cover; }
+        .btn-volver { background: #004A97; color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: bold; margin-top: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="screen active">
-        <div class="card-sticker">
-            <div class="howie-container">
-                <img src="img/howie-cuerpo.png" class="howie-cuerpo">
-                <img src="img/howie-ala.png" class="ala-animada">
-            </div>
-            <h1>Howie<span style="color:#F57C00">GO</span></h1>
-            <input type="text" id="inputNombre" style="width:100%; padding:10px; margin:10px 0;" placeholder="Nombre">
-            <input type="text" id="inputHabitacion" style="width:100%; padding:10px; margin:10px 0;" placeholder="Habitación">
-            <button class="btn-hj" onclick="comenzarJuego()">¡Empezar!</button>
+        <div class="card-login">
+            <h1 style="color:#004A97; margin:0;">HOWIE<span style="color:#F57C00">GO</span></h1>
+            <input type="text" id="inputNombre" style="width:100%; padding:12px; margin:20px 0 10px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box;" placeholder="Tu Nombre">
+            <input type="text" id="inputHabitacion" style="width:100%; padding:12px; margin:0 0 20px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box;" placeholder="Habitación">
+            <button onclick="comenzarJuego()" style="background:#F57C00; color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold; cursor:pointer;">¡EMPEZAR!</button>
         </div>
     </div>
 
     <div id="home-screen" class="screen">
-        <h1 id="saludo" style="color: #004A97;">¡HOLA!</h1>
-        <p style="color: #666; margin-bottom: 30px;">¡Vamos a la aventura! 🦉✨</p>
-        
-        <div class="btn-contenedor-sticker" onclick="irA('mapa-screen')">
-            <div class="btn-texto-lado">
-                <span style="font-size: 13px; opacity: 0.8; display: block;">MISIONES</span>
-                <span style="font-size: 21px; font-weight: bold;">VER MAPA</span>
-            </div>
-            <div class="btn-sticker-lado"><img src="img/boton-mapa.png"></div>
-        </div>
-        
-        <div class="btn-contenedor-sticker btn-blue" onclick="irA('album-screen')">
-            <div class="btn-sticker-lado"><img src="img/boton-album.png" class="espejado"></div>
-            <div class="btn-texto-lado" style="text-align: right;">
-                <span style="font-size: 13px; opacity: 0.8; display: block;">MIS FIGUS</span>
-                <span style="font-size: 21px; font-weight: bold;">MI ÁLBUM</span>
-            </div>
+        <h1 id="saludo" style="color:#004A97; text-transform: uppercase;">¡HOLA!</h1>
+        <p style="color:#666; margin-bottom:40px;">¡Vamos a la aventura! 🦉✨</p>
+
+        <div id="btn-mapa" class="btn-home" onclick="irA('mapa-screen')">
+            <div class="btn-texto"><span>Misiones</span><b>VER MAPA</b></div>
+            <div class="sticker-container"><img src="img/boton-mapa.png" class="howie-sticker howie-der"></div>
         </div>
 
-        <button onclick="cerrarSesion()" style="margin-top: 30px; background: none; border: none; color: #999; text-decoration: underline;">Cerrar Sesión</button>
+        <div id="btn-album" class="btn-home" onclick="irA('album-screen')">
+            <div class="sticker-container"><img src="img/boton-album.png" class="howie-sticker howie-izq"></div>
+            <div class="btn-texto" style="text-align: right;"><span>Mis Figus</span><b>MI ÁLBUM</b></div>
+        </div>
+
+        <button onclick="cerrarSesion()" style="margin-top:40px; background:none; border:none; color:#999; text-decoration:underline; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
     <div id="mapa-screen" class="screen">
-        <h2 style="text-align: center; color: #004A97;">Misiones en el Hotel</h2>
+        <h2 style="color:#004A97;">Misiones en el Hotel</h2>
         <div id="listaZonas"></div>
-        <button class="btn-hj btn-blue" onclick="irA('home-screen')" style="width:100%">⬅ Volver al Inicio</button>
-    </div>
-
-    <div id="zona-screen" class="screen">
-        <div style="background:white; padding:25px; border-radius:25px; text-align:center; border: 3px solid #ddd;">
-            <h2 id="zonaTitulo" style="color:#F57C00;"></h2>
-            <p id="textoEstado1"></p>
-            <div id="estado1"><button class="btn-hj" onclick="iniciarEscaneo()">🔍 ESCANEAR QR</button></div>
-            <div id="estado2" style="display:none;">
-                <p id="textoEstado2" style="font-weight:bold; color:#004A97;"></p>
-                <input type="text" id="respuestaInput" style="width:100%; padding:10px; margin-bottom:10px;" placeholder="Respuesta...">
-                <button class="btn-hj" onclick="validarRespuesta()">Enviar</button>
-            </div>
-            <button onclick="irA('mapa-screen')" style="margin-top:20px; border:none; background:none; color:#999;">⬅ Volver al mapa</button>
-        </div>
-        <div id="reader" style="width:100%; max-width:350px; margin:20px auto; display:none;"></div>
+        <button class="btn-volver" onclick="irA('home-screen')">⬅ VOLVER AL INICIO</button>
     </div>
 
     <div id="album-screen" class="screen">
-        <h2 style="text-align:center; color:#004A97;">Mis Figuritas</h2>
+        <h2 style="color:#004A97;">Mis Figuritas</h2>
         <div id="contenedorFiguritas"></div>
-        <button class="btn-hj btn-blue" style="margin-top:25px; width:100%" onclick="irA('home-screen')">⬅ Volver al Inicio</button>
+        <button class="btn-volver" onclick="irA('home-screen')">⬅ VOLVER AL INICIO</button>
+    </div>
+
+    <div id="zona-screen" class="screen">
+        <div style="background:white; padding:25px; border-radius:25px; text-align:center; border: 3px solid #F57C00;">
+            <h2 id="zonaTitulo" style="color:#F57C00; margin:0;"></h2>
+            <p id="textoEstado1" style="margin:20px 0; color:#666;"></p>
+            <div id="estado1"><button onclick="iniciarEscaneo()" style="background:#F57C00; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; width:100%; cursor:pointer;">🔍 ESCANEAR QR</button></div>
+            <div id="estado2" style="display:none;">
+                <p id="textoEstado2" style="font-weight:bold; color:#004A97;"></p>
+                <input type="text" id="respuestaInput" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box;" placeholder="Tu respuesta...">
+                <button onclick="validarRespuesta()" style="background:#F57C00; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; width:100%; cursor:pointer;">ENVIAR</button>
+            </div>
+            <button onclick="irA('mapa-screen')" style="margin-top:25px; border:none; background:none; color:#999; cursor:pointer;">⬅ VOLVER AL MAPA</button>
+        </div>
+        <div id="reader" style="width:100%; max-width:350px; margin:20px auto; border-radius:20px; overflow:hidden; display:none; border: 4px solid #F57C00;"></div>
     </div>
 
     <script>
         const zonasVisuales = ["Bicis", "Lobby", "Resto","Arqueria", "Patio cervecero", "Escaleras", "Camastros", "Kids", "Plaza", "Estatuas", "Pileta", "Plays"];
         const zonasData = {
-            "Bicis": { e1: "Howie dice...", e2: "¿Bicis?", respuestasValidas: ["0","cero"], tipo: "auto" },
-            "Lobby": { e1: "Howie mira...", e2: "¿Check-out?", respuestasValidas: ["10"], tipo: "auto" },
-            "Resto": { e1: "Familia...", e2: "Pizza 3:", respuestasValidas: ["especial"], tipo: "auto" },
-            "Arqueria": { e1: "Paciencia...", e2: "Valor?", respuestasValidas: ["amarillo"], tipo: "auto" },
-            "Patio cervecero": { e1: "Brisa...", e2: "Inicial?", respuesta: "PIEDRA", tipo: "auto" },
-            "Escaleras": { e1: "Vista...", e2: "Foto?", respuesta: "VISTA", tipo: "auto" },
-            "Camastros": { e1: "Sol...", e2: "Escenario?", respuestasValidas: ["escenario"], tipo: "auto" },
-            "Kids": { e1: "Jugar...", e2: "Mueve la cola?", respuestasValidas: ["perro"], tipo: "auto" },
-            "Plaza": { e1: "Arena...", e2: "Balcones?", respuestasValidas: ["16"], tipo: "auto" },
-            "Estatuas": { e1: "Figuras...", e2: "Siglas?", respuestasValidas: ["osn"], tipo: "auto" },
-            "Pileta": { e1: "No correr...", e2: "Vigila?", respuestasValidas: ["bañero"], tipo: "auto" },
-            "Plays": { e1: "Victoria...", e2: "Personaje?", respuestasValidas: ["kratos"], tipo: "auto" }
+            "Bicis": { e1: "Viento a dos ruedas...", e2: "¿Cuántas bicis con rueditas?", respuestasValidas: ["0","cero"], tipo: "auto" },
+            "Lobby": { e1: "Howie mira...", e2: "¿Hora de check-out?", respuestasValidas: ["10"], tipo: "auto" },
+            "Resto": { e1: "Plato favorito...", e2: "Pizza nro 3:", respuestasValidas: ["especial"], tipo: "auto" },
+            "Arqueria": { e1: "Paciencia...", e2: "¿Color de más valor?", respuestasValidas: ["amarillo"], tipo: "auto" },
+            "Patio cervecero": { e1: "Brisa...", e2: "Misión de foto", respuestasValidas: ["piedra"], tipo: "auto" },
+            "Escaleras": { e1: "Vista...", e2: "Misión de foto", respuestasValidas: ["vista"], tipo: "auto" },
+            "Camastros": { e1: "Sol...", e2: "¿Nombre del escenario?", respuestasValidas: ["escenario"], tipo: "auto" },
+            "Kids": { e1: "Cuatro patas...", e2: "¿Quién mueve la cola?", respuestasValidas: ["perro"], tipo: "auto" },
+            "Plaza": { e1: "Arena...", e2: "¿Cuántos balcones ves?", respuestasValidas: ["16"], tipo: "auto" },
+            "Estatuas": { e1: "Guerrero...", e2: "Siglas en la base:", respuestasValidas: ["osn"], tipo: "auto" },
+            "Pileta": { e1: "Agua...", e2: "¿Quién vigila?", respuestasValidas: ["bañero"], tipo: "auto" },
+            "Plays": { e1: "Victoria...", e2: "¿Personaje famoso?", respuestasValidas: ["kratos"], tipo: "auto" }
         };
 
         let player = { nombre: "", habitacion: "", actualNombre: "", completadas: [] };
@@ -182,10 +130,12 @@
         function irA(id) {
             document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
             const target = document.getElementById(id);
-            if(target) target.classList.add("active");
-            if (id === "mapa-screen") renderMapa();
-            if (id === "album-screen") renderAlbum();
-            window.scrollTo(0, 0);
+            if(target) {
+                target.classList.add("active");
+                if (id === "mapa-screen") renderMapa();
+                if (id === "album-screen") renderAlbum();
+                window.scrollTo(0,0);
+            }
         }
 
         function seleccionarNuevaMision() {
@@ -197,10 +147,10 @@
         function comenzarJuego() {
             const n = document.getElementById("inputNombre").value.trim();
             const h = document.getElementById("inputHabitacion").value.trim();
-            if(!n || !h) return;
+            if(!n || !h) { Swal.fire("¡Opa!", "Completá tus datos", "warning"); return; }
             player.nombre = n; player.habitacion = h; player.completadas = [];
             seleccionarNuevaMision();
-            document.getElementById("saludo").innerText = `¡Hola ${player.nombre}!`;
+            document.getElementById("saludo").innerText = `¡HOLA ${player.nombre.toUpperCase()}!`;
             irA("home-screen");
         }
 
@@ -211,8 +161,8 @@
                 const div = document.createElement("div");
                 div.className = "zona-item";
                 if(z === player.actualNombre) {
-                    div.innerHTML = `<span>⭐ <b>${z}</b></span>`;
-                    div.style.border = "3px solid #F57C00"; div.style.background = "#fff9c4";
+                    div.innerHTML = `<span>⭐ <b>${z}</b></span> <small style="color:#F57C00">¡IR AQUÍ!</small>`;
+                    div.style.border = "2px solid #F57C00"; div.style.background = "#fff9c4";
                     div.onclick = () => entrarZona(z);
                 } else {
                     const ok = player.completadas.includes(z);
@@ -243,9 +193,9 @@
                     if(text.toLowerCase().includes(player.actualNombre.toLowerCase())) {
                         document.getElementById("estado1").style.display = "none";
                         document.getElementById("estado2").style.display = "block";
-                    }
+                    } else { Swal.fire("QR Incorrecto", "No es de esta zona", "warning"); }
                 });
-            });
+            }).catch(() => { Swal.fire("Error", "Cámara no disponible", "error"); });
         }
 
         function validarRespuesta() {
@@ -254,9 +204,12 @@
             if(data.respuestasValidas && data.respuestasValidas.includes(val)) {
                 player.completadas.push(player.actualNombre);
                 confetti();
-                seleccionarNuevaMision();
-                irA("album-screen");
-            }
+                Swal.fire("¡Bien!", "Figurita ganada", "success").then(() => {
+                    seleccionarNuevaMision();
+                    document.getElementById("respuestaInput").value = "";
+                    irA("album-screen");
+                });
+            } else { Swal.fire("Casi...", "Revisá el dato", "error"); }
         }
 
         function renderAlbum() {
@@ -279,7 +232,7 @@
             const saved = localStorage.getItem("howie");
             if(saved) { 
                 player = JSON.parse(saved); 
-                document.getElementById("saludo").innerText = `¡Hola ${player.nombre}!`;
+                document.getElementById("saludo").innerText = `¡HOLA ${player.nombre.toUpperCase()}!`;
                 irA("home-screen"); 
             }
         };
