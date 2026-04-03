@@ -81,7 +81,7 @@
             </div>
             <div id="cont-e2" style="display:none;">
                 <img id="preview-foto" src="">
-                <div id="modo-normal">
+                <div id="cont-respuesta">
                     <input type="text" id="res-input" placeholder="Tu respuesta...">
                     <button class="btn-hj" onclick="validarRespuesta()">ENVIAR RESPUESTA</button>
                 </div>
@@ -166,23 +166,15 @@
             });
         }
 
-        // --- ARREGLO CRÍTICO: LIMPIEZA ABSOLUTA ---
         async function detenerScanner() {
-            if (scannerInst) { 
-                try { await scannerInst.stop(); } catch(e) {} 
-                scannerInst = null; 
-            }
-            document.getElementById('reader').innerHTML = ""; // Borramos el visor
+            if (scannerInst) { try { await scannerInst.stop(); } catch(e) {} scannerInst = null; }
             document.getElementById('reader').style.display = "none";
             document.getElementById('btn-scan').style.display = "block";
         }
 
         function abrirEscaner() {
-            const rd = document.getElementById('reader'); 
-            rd.style.display = "block";
-            rd.innerHTML = ""; // Limpiamos antes de empezar
+            const rd = document.getElementById('reader'); rd.style.display = "block";
             document.getElementById('btn-scan').style.display = "none";
-            
             scannerInst = new Html5Qrcode("reader");
             scannerInst.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
                 const leido = txt.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
@@ -191,8 +183,8 @@
                     detenerScanner().then(() => pasarE2());
                 } else { Swal.fire("Epa", "Buscá el QR de " + db.actual, "error"); }
             }).catch(() => { 
-                Swal.fire("Error", "Cámara bloqueada o saturada. Refrescá la página.", "error"); 
-                detenerScanner();
+                Swal.fire("Error", "Permití la cámara para jugar.", "error"); 
+                document.getElementById('btn-scan').style.display = "block";
             });
         }
 
@@ -202,7 +194,9 @@
             document.getElementById('cont-e1').style.display = "none";
             document.getElementById('cont-e2').style.display = "block";
             const esFoto = misiones[db.actual].tipo === "foto";
-            document.getElementById('modo-normal').style.display = esFoto ? "none" : "block";
+            
+            // Ajuste aquí: ocultamos el campo de respuesta hasta que saque la foto si es de tipo foto
+            document.getElementById('cont-respuesta').style.display = esFoto ? "none" : "block";
             document.getElementById('modo-foto').style.display = esFoto ? "block" : "none";
             save();
         }
@@ -224,7 +218,10 @@
                     document.body.removeChild(link);
 
                     Swal.fire("📸 ¡HERMOSA FOTO!", "Ya está guardada... adjuntala desde tu galería al enviarle el mensaje a Howie.", "success");
+                    
+                    // Mostramos el botón de WhatsApp y el campo para el código final
                     document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
+                    document.getElementById('cont-respuesta').style.display = "block"; 
                 };
                 reader.readAsDataURL(file);
             }
@@ -232,6 +229,7 @@
 
         function validarRespuesta() {
             const val = document.getElementById('res-input').value.trim().toLowerCase();
+            // Si es foto, aceptamos cualquier código (o el que Howie les dé), aquí lo dejamos flexible
             if(misiones[db.actual].tipo === "foto" || misiones[db.actual].r.some(r => val.includes(r))) {
                 db.ganadas.push(db.actual);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -240,6 +238,7 @@
                 document.getElementById('e3-txt').innerText = `¡Ganaste la figu de ${db.actual}!`;
                 proximaMision(); save(); irA('e3-screen');
                 document.getElementById('res-input').value = "";
+                document.getElementById('btn-ayuda-wa').innerText = "🆘 PEDIR AYUDA";
             } else { Swal.fire("Casi", "Intentalo de nuevo", "error"); }
         }
 
@@ -259,10 +258,18 @@
             window.open(`https://wa.me/5493541215391?text=${encodeURIComponent(msj)}`);
         }
 
-        function checkCampeon() { if(db.ganadas.length === 12) document.getElementById('cont-campeon').style.display = "block"; }
-        function reclamarPremio() { window.open(`https://wa.me/5493541215391?text=¡Completé el álbum! Soy ${db.nombre} hab ${db.hab}`); }
+        function checkCampeon() { 
+            if(db.ganadas.length === 12) {
+                document.getElementById('cont-campeon').style.display = "block"; 
+                document.getElementById('btn-mapa').style.display = "none";
+            } 
+        }
+
+        function reclamarPremio() { 
+            const msj = `¡Howie lo logré! Soy ${db.nombre} de la hab ${db.hab}. ¡Álbum completo! 🦉🎁`;
+            window.open(`https://wa.me/5493541215391?text=${encodeURIComponent(msj)}`); 
+        }
         
-        // --- GUARDADO PERSISTENTE ---
         function save() { localStorage.setItem('howiego_final_milenavp', JSON.stringify(db)); }
         
         function cerrarSesion() {
