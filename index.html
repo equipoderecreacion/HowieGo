@@ -81,13 +81,13 @@
             </div>
             <div id="cont-e2" style="display:none;">
                 <img id="preview-foto" src="">
-                <div id="cont-respuesta">
-                    <input type="text" id="res-input" placeholder="Tu respuesta...">
-                    <button class="btn-hj" onclick="validarRespuesta()">ENVIAR RESPUESTA</button>
-                </div>
                 <div id="modo-foto" style="display:none;">
                     <input type="file" id="input-foto" accept="image/*" capture="camera" style="display:none;" onchange="fotoCapturada(event)">
                     <button class="btn-hj" onclick="document.getElementById('input-foto').click()">📸 TOMAR FOTO DEL DESAFÍO</button>
+                </div>
+                <div id="cont-respuesta">
+                    <input type="text" id="res-input" placeholder="Tu respuesta...">
+                    <button class="btn-hj" onclick="validarRespuesta()">ENVIAR RESPUESTA</button>
                 </div>
             </div>
             <button id="btn-ayuda-wa" class="btn-hj" style="background:var(--azul); width:85%; font-size:14px;" onclick="ayudaWA()">🆘 PEDIR AYUDA</button>
@@ -108,8 +108,8 @@
             "Lobby": { e1: "Aquí Howie se relaja y se queda mirando a los que llegan y a los que se van. Encontrá el QR para continuar.", e2: "A Howie le preocupa el tiempo. Se quedó mirando el reloj y se pregunta: ¿A qué hora es el último adiós a la habitación?", r: ["10", "8", "ocho", "diez", "las 10", "las 8"] },
             "Resto": { e1: "Howie dice que es su lugar favorito, lo que más le gusta es compartir en familia, repasar las anécdotas y que no falten las risas. Encontrá el QR para continuar.", e2: "Howie es un gran comensal. Para saber cuál es su plato favorito, en la carta de pizza contá hasta 3.", r: ["especial", "la especial"] },
             "Arqueria": { e1: "Howie dice que la paciencia es como una flecha: cuanto más la tensás, más lejos llegás. Encontrá el QR para continuar.", e2: "Howie estuvo mirando los círculos que nunca terminan: ¿Cuál es el de más valor?", r: ["amarillo", "el amarillo"] },
-            "Quinchos": { e1: "Howie busca la brisa de la tarde y un refujio del sol. Encontrá el QR para continuar.", e2: "Howie dice que hay un asiento que es super especial, Sacate una foto siendo Rey/Reina.", tipo: "foto", r: ["piedra"] },
-            "Escaleras": { e1: "Howie siempre se detiene un momento antes de subir. Dice que desde acá las cosas se ven distintas… Encontrá el QR para continuar.", e2: "Howie se queda justo donde el esfuerzo afloja. Desde ahí, los colores cuentan historias de la ciudad. Tomale una foto y envíasela a Howie.", tipo: "foto", r: ["vista"] },
+            "Quinchos": { e1: "Howie busca la brisa de la tarde y un refujio del sol. Encontrá el QR para continuar.", e2: "Howie dice que hay un asiento que es super especial, Sacate una foto siendo Rey/Reina.", tipo: "foto", r: ["foto"] },
+            "Escaleras": { e1: "Howie siempre se detiene un momento antes de subir. Dice que desde acá las cosas se ven distintas… Encontrá el QR para continuar.", e2: "Howie se queda justo donde el esfuerzo afloja. Desde ahí, los colores cuentan historias de la ciudad. Tomale una foto y envíasela a Howie.", tipo: "foto", r: ["foto"] },
             "Camastros": { e1: "Howie encontró el lugar donde el tiempo se detiene y el sol te abraza en silencio. Encontrá el QR para continuar.", e2: "No siempre es el lugar más ruidoso, pero cuando algo importante pasa, todas las miradas terminan ahí. ¿Sabés qué es?", r: ["escenario", "el escenario"] },
             "Kids": { e1: "Howie se siente chiquito otra vez, así que acá se pone a jugar. Encontrá el QR para continuar.", e2: "Tiene cuatro patas, cuida este lugar sin hablar, y cuando está contento mueve la cola sin parar.", r: ["perro", "perros", "perrito"] },
             "Plaza": { e1: "Howie sigue el rastro de la arena y el sonido de los saltos. Encontrá el QR para continuar.", e2: "Sube a lo mas alto y desde ahí cuenta cuantos balcones tiene el edificio frente a ti.", r: ["16", "dieciseis"] },
@@ -195,7 +195,7 @@
             document.getElementById('cont-e2').style.display = "block";
             const esFoto = misiones[db.actual].tipo === "foto";
             
-            // Ajuste aquí: ocultamos el campo de respuesta hasta que saque la foto si es de tipo foto
+            // Ocultamos la caja de respuesta al principio de las de foto
             document.getElementById('cont-respuesta').style.display = esFoto ? "none" : "block";
             document.getElementById('modo-foto').style.display = esFoto ? "block" : "none";
             save();
@@ -219,8 +219,8 @@
 
                     Swal.fire("📸 ¡HERMOSA FOTO!", "Ya está guardada... adjuntala desde tu galería al enviarle el mensaje a Howie.", "success");
                     
-                    // Mostramos el botón de WhatsApp y el campo para el código final
                     document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
+                    // HACE APARECER EL ESPACIO PARA RESPONDER DESPUÉS DE SACAR LA FOTO
                     document.getElementById('cont-respuesta').style.display = "block"; 
                 };
                 reader.readAsDataURL(file);
@@ -229,7 +229,7 @@
 
         function validarRespuesta() {
             const val = document.getElementById('res-input').value.trim().toLowerCase();
-            // Si es foto, aceptamos cualquier código (o el que Howie les dé), aquí lo dejamos flexible
+            // Si es foto, se valida con la palabra clave que configuraste en "r" (ej: "foto" o lo que Howie le de al chico)
             if(misiones[db.actual].tipo === "foto" || misiones[db.actual].r.some(r => val.includes(r))) {
                 db.ganadas.push(db.actual);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
