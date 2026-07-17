@@ -227,24 +227,16 @@
             }
         }
 
-        // --- ARREGLO ABSOLUTO DE VALIDACIÓN ---
+        // --- VALIDACIÓN REPARADA: LEE TUS VALORES ORIGINALES ---
         function validarRespuesta() {
             const val = document.getElementById('res-input').value.trim().toLowerCase();
             
-            // Si está vacío, frena de inmediato
             if (val === "") {
                 return Swal.fire("Casi", "¡No podés dejar la respuesta vacía!", "error");
             }
 
-            let esCorrecto = false;
-
-            if (misiones[db.actual].tipo === "foto") {
-                // Para foto, forzamos comparación exacta con "foto" para evitar fallas del includes
-                esCorrecto = (val === "foto");
-            } else {
-                // Para las normales, recorremos el array
-                esCorrecto = misiones[db.actual].r.some(r => val.includes(r));
-            }
+            // Compara contra los elementos del array 'r' de cada misión de manera exacta
+            const esCorrecto = misiones[db.actual].r.some(r => val.includes(r.toLowerCase().trim()));
 
             if (esCorrecto) {
                 db.ganadas.push(db.actual);
@@ -273,7 +265,7 @@
 
         function ayudaWA() {
             const msj = document.getElementById('btn-ayuda-wa').innerText.includes("ENVIAR FOTO") ? `¡Howie! Aquí te comparto la foto de mi desafío en ${db.actual}.` : `Hola Howie, soy ${db.nombre}, necesito ayuda en ${db.actual}.`;
-            window.open(`https://wa.me/549317669480?text=${encodeURIComponent(msj)}`);
+            window.open(`https://wa.me/5493517669480?text=${encodeURIComponent(msj)}`);
         }
 
         function checkCampeon() { 
