@@ -83,7 +83,7 @@
                 <img id="preview-foto" src="">
                 <div id="modo-foto" style="display:none;">
                     <input type="file" id="input-foto" accept="image/*" capture="camera" style="display:none;" onchange="fotoCapturada(event)">
-                    <button class="btn-hj" onclick="document.getElementById('input-foto').click()">📸 TOMAR FOTO DEL DESAFÍO</button>
+                    <button id="btn-disparar-foto" class="btn-hj" onclick="document.getElementById('input-foto').click()">📸 TOMAR FOTO DEL DESAFÍO</button>
                 </div>
                 <div id="cont-respuesta">
                     <input type="text" id="res-input" placeholder="Tu respuesta...">
@@ -195,9 +195,9 @@
             document.getElementById('cont-e2').style.display = "block";
             const esFoto = misiones[db.actual].tipo === "foto";
             
-            // Ocultamos la caja de respuesta al principio de las de foto
             document.getElementById('cont-respuesta').style.display = esFoto ? "none" : "block";
             document.getElementById('modo-foto').style.display = esFoto ? "block" : "none";
+            document.getElementById('btn-disparar-foto').style.display = esFoto ? "block" : "none";
             save();
         }
 
@@ -220,7 +220,7 @@
                     Swal.fire("📸 ¡HERMOSA FOTO!", "Ya está guardada... adjuntala desde tu galería al enviarle el mensaje a Howie.", "success");
                     
                     document.getElementById('btn-ayuda-wa').innerText = "📤 ENVIAR FOTO A HOWIE";
-                    // HACE APARECER EL ESPACIO PARA RESPONDER DESPUÉS DE SACAR LA FOTO
+                    document.getElementById('btn-disparar-foto').style.display = "none"; // Oculta el de sacar foto para no confundir
                     document.getElementById('cont-respuesta').style.display = "block"; 
                 };
                 reader.readAsDataURL(file);
@@ -229,8 +229,9 @@
 
         function validarRespuesta() {
             const val = document.getElementById('res-input').value.trim().toLowerCase();
-            // Si es foto, se valida con la palabra clave que configuraste en "r" (ej: "foto" o lo que Howie le de al chico)
-            if(misiones[db.actual].tipo === "foto" || misiones[db.actual].r.some(r => val.includes(r))) {
+            
+            // FIX CRÍTICO: Ahora sí o sí la respuesta debe coincidir con la lista "r" ("foto" o la palabra clave), no pasa vacío
+            if(val !== "" && misiones[db.actual].r.some(r => val.includes(r))) {
                 db.ganadas.push(db.actual);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 const imgName = db.actual.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
